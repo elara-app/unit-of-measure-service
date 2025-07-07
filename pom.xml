@@ -51,11 +51,13 @@
     <!-- - - - - - - - - - - - - -->
     <properties>
         <java.version>21</java.version>
+        <maven.compiler.version>3.14.0</maven.compiler.version>
         <lombok.version>1.18.38</lombok.version>
         <h2.version>2.3.232</h2.version>
         <postgresql.version>42.7.7</postgresql.version>
         <jacoco.version>0.8.12</jacoco.version>
         <sonar.scanner.version>5.1.0.4751</sonar.scanner.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
     </properties>
 
     <!-- - - - - - - - - - - - - -->
@@ -95,6 +97,11 @@
             <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
     </dependencies>
 
     <!-- - - - - - - - - - - - - -->
@@ -104,12 +111,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -123,12 +136,6 @@
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </exclude>
-                        <exclude>
-                            <groupId>org.jacoco</groupId>
-                            <artifactId>jacoco-maven-plugin</artifactId>
-                            <version>${jacoco.version}</version>
                         </exclude>
                     </excludes>
                 </configuration>
