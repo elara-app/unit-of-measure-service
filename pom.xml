@@ -2,34 +2,68 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- - - - - - - - - - - - - -->
+    <!--The parent POM already defines the versions of all official Spring Boot starters.-->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.3</version>
         <relativePath/> <!-- lookup parent from a repository -->
     </parent>
+
+    <!-- - - - - - - - - - - - - -->
     <groupId>com.elara.app</groupId>
     <artifactId>unit-of-measure-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>unit-of-measure-service</name>
     <description>Manage the unit of measure for the inventory and product services</description>
     <url/>
+
+    <!-- - - - - - - - - - - - - -->
     <licenses>
-        <license/>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/license/mit</url>
+            <distribution>repo</distribution>
+            <comments>MIT License</comments>
+        </license>
     </licenses>
+
+    <!-- - - - - - - - - - - - - -->
     <developers>
-        <developer/>
+        <developer>
+            <id>julianbetov</id>
+            <name>Julian Bermudez</name>
+            <email>julianbetov@gmail.com</email>
+            <url>https://github.com/julianbetov</url>
+        </developer>
     </developers>
+
+    <!-- - - - - - - - - - - - - -->
     <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
+        <connection>scm:git:https://github.com/elara-app/unit-of-measure-service</connection>
+        <developerConnection>scm:git:git@github.com:elara-app/unit-of-measure-service.git</developerConnection>
+        <url>https://github.com/elara-app/unit-of-measure-service</url>
+        <tag>main</tag>
     </scm>
+
+    <!-- - - - - - - - - - - - - -->
     <properties>
         <java.version>21</java.version>
+        <lombok.version>1.18.38</lombok.version>
+        <h2.version>2.3.232</h2.version>
+        <postgresql.version>42.7.7</postgresql.version>
+        <jacoco.version>0.8.12</jacoco.version>
+        <sonar.scanner.version>5.1.0.4751</sonar.scanner.version>
     </properties>
+
+    <!-- - - - - - - - - - - - - -->
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -40,38 +74,33 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.12</version>
         </dependency>
     </dependencies>
 
+    <!-- - - - - - - - - - - - - -->
     <build>
         <plugins>
+            <!-- + + + + -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -80,11 +109,12 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.38</version>
+                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <!-- + + + + -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -93,15 +123,21 @@
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.jacoco</groupId>
+                            <artifactId>jacoco-maven-plugin</artifactId>
+                            <version>${jacoco.version}</version>
                         </exclude>
                     </excludes>
                 </configuration>
             </plugin>
-
+            <!-- + + + + -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>${jacoco.version}</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -116,7 +152,6 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
-
                     <execution>
                         <id>check</id>
                         <goals>
@@ -166,7 +201,6 @@
                         </configuration>
                     </execution>
                 </executions>
-
                 <configuration>
                     <dataFile>${project.build.directory}/jacoco.exec</dataFile>
                     <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
@@ -176,11 +210,11 @@
                     </excludes>
                 </configuration>
             </plugin>
-
+            <!-- + + + + -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
-                <version>5.1.0.4751</version>
+                <version>${sonar.scanner.version}</version>
             </plugin>
         </plugins>
     </build>
