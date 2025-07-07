@@ -160,6 +160,7 @@
                             <excludes>
                                 <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
                                 <exclude>**/config/**</exclude>
+                                <exclude>**/dto/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -170,7 +171,7 @@
                     <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
                     <excludes>
                         <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
-                        <exclude>**/model/**</exclude>
+                        <exclude>**/dto/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
