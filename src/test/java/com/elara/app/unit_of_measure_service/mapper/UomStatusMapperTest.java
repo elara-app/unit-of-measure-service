@@ -5,14 +5,18 @@ import com.elara.app.unit_of_measure_service.dto.response.UomStatusResponse;
 import com.elara.app.unit_of_measure_service.model.UomStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 @ActiveProfiles("test")
 class UomStatusMapperTest {
 
-    private final UomStatusMapper mapper = UomStatusMapper.INSTANCE;
+    @Autowired
+    private UomStatusMapper mapper;
 
     @Test
     @DisplayName("toEntity() should map UomStatusRequest to UomStatus")
