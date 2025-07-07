@@ -153,12 +153,12 @@
                                         </limit>
                                     </limits>
                                     <excludes>
-                                        <exclude>com.elara.app.validation_utils.configuration.*</exclude>
+                                        <exclude>com.elara.app.UnitOfMeasureServiceApplication.configuration.*</exclude>
                                     </excludes>
                                 </rule>
                             </rules>
                             <excludes>
-                                <exclude>**/ValidationUtilsApplication.class</exclude>
+                                <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
                                 <exclude>**/config/**</exclude>
                             </excludes>
                         </configuration>
@@ -169,7 +169,7 @@
                     <dataFile>${project.build.directory}/jacoco.exec</dataFile>
                     <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
                     <excludes>
-                        <exclude>**/ValidationUtilsApplication.class</exclude>
+                        <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
                         <exclude>**/model/**</exclude>
                     </excludes>
                 </configuration>
