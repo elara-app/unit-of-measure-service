@@ -202,7 +202,6 @@
                             </rules>
                             <excludes>
                                 <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
-                                <exclude>**/config/**</exclude>
                                 <exclude>**/dto/**</exclude>
                             </excludes>
                         </configuration>
