@@ -58,6 +58,14 @@
         <jacoco.version>0.8.12</jacoco.version>
         <sonar.scanner.version>5.1.0.4751</sonar.scanner.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <!-- + + + + -->
+        <sonar.language>java</sonar.language>
+        <sonar.projectKey>com.elara.app:unit-of-measure-service</sonar.projectKey>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.exclusions>
+            **/UnitOfMeasureServiceApplication.java
+        </sonar.exclusions>
     </properties>
 
     <!-- - - - - - - - - - - - - -->
