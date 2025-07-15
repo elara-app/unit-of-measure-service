@@ -17,9 +17,9 @@ public class BaseException extends RuntimeException {
     }
 
     public BaseException(ErrorCode errorCode, String customMessage) {
-        super(customMessage != null ? errorCode.getMessage() + " - " + customMessage : errorCode.getMessage());
+        super(customMessage != null ? errorCode.getMessage() + ": " + customMessage : errorCode.getMessage());
         this.code = errorCode.getCode();
         this.value = errorCode.getValue();
-        this.message = customMessage != null ? errorCode.getMessage() + " - " + customMessage : errorCode.getMessage();
+        this.message = customMessage != null ? errorCode.getMessage() + ": " + customMessage : errorCode.getMessage();
     }
 }
