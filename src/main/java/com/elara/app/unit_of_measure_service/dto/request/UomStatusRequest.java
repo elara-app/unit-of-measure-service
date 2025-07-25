@@ -6,14 +6,14 @@ import jakarta.validation.constraints.Size;
 
 public record UomStatusRequest(
 
-        @NotBlank(message = "Name cannot be blank")
-        @Size(max = 50, message = "Name cannot exceed 50 characters")
+        @NotBlank(message = "validation.blank")
+        @Size(max = 50, message = "validation.size.max")
         String name,
 
-        @Size(max = 200, message = "Description cannot exceed 200 characters")
+        @Size(max = 200, message = "validation.size.max")
         String description,
 
-        @NotNull(message = "Is usable cannot be null")
+        @NotNull(message = "validation.not.null")
         Boolean isUsable
 
 ) {
