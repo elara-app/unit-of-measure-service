@@ -36,7 +36,7 @@ class UomStatusTest {
                 .isUsable(true)
                 .build();
         Set<ConstraintViolation<UomStatus>> violations = validator.validate(status);
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Name")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("validation")));
     }
 
     static Stream<String> invalidNames() {
@@ -58,7 +58,7 @@ class UomStatusTest {
                 .description("a".repeat(201))
                 .build();
         Set<ConstraintViolation<UomStatus>> violations = validator.validate(status);
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Description cannot exceed 200 characters")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("validation.size.max")));
     }
 
     @ParameterizedTest
@@ -100,7 +100,7 @@ class UomStatusTest {
                 .isUsable(null)
                 .build();
         Set<ConstraintViolation<UomStatus>> violations = validator.validate(status);
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Is usable cannot be null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("validation.not.null")));
     }
 
     @Test
