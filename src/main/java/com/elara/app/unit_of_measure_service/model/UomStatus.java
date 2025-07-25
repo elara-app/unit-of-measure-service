@@ -20,17 +20,17 @@ public class UomStatus {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @NotBlank(message = "Name cannot be blank")
-    @Size(max = 50, message = "Name cannot exceed 50 characters")
+    @NotBlank(message = "validation.blank")
+    @Size(max = 50, message = "validation.size.max")
     @Column(name = "name", unique = true, nullable = false, length = 50)
     private String name;
 
-    @Size(max = 200, message = "Description cannot exceed 200 characters")
+    @Size(max = 200, message = "validation.size.max")
     @Column(name = "description", length = 200)
     private String description;
 
     @Builder.Default
-    @NotNull(message = "Is usable cannot be null")
+    @NotNull(message = "validation.not.null")
     @Column(name = "is_usable", nullable = false)
     private Boolean isUsable = true;
 
