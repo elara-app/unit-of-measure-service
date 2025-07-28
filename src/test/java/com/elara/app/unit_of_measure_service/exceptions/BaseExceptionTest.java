@@ -15,6 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
 @ExtendWith(MockitoExtension.class)
 class BaseExceptionTest {
 
@@ -71,6 +77,40 @@ class BaseExceptionTest {
             }
         }
 
+        @Nested
+        @DisplayName("Subclass constructors")
+        class SubclassConstructors {
+
+            static Stream<Supplier<BaseException>> exceptionSuppliers() {
+                return Stream.of(
+                        DatabaseException::new,
+                        () -> new DatabaseException("custom"),
+                        InvalidDataException::new,
+                        () -> new InvalidDataException("custom"),
+                        ResourceConflictException::new,
+                        () -> new ResourceConflictException("custom"),
+                        ResourceNotFoundException::new,
+                        () -> new ResourceNotFoundException("custom"),
+                        ServiceUnavailableException::new,
+                        () -> new ServiceUnavailableException("custom"),
+                        UnexpectedErrorException::new,
+                        () -> new UnexpectedErrorException("custom")
+                );
+            }
+
+            @ParameterizedTest(name = "#{index} -> constructor {0}")
+            @MethodSource("exceptionSuppliers")
+            void shouldInstantiateAll(Supplier<BaseException> supplier) {
+                when(messageService.getMessage(any(ErrorCode.class), any())).thenReturn("msg");
+
+                try (MockedStatic<ApplicationContextHolder> mockedHolder = mockStatic(ApplicationContextHolder.class)) {
+                    mockedHolder.when(() -> ApplicationContextHolder.getBean(MessageService.class)).thenReturn(messageService);
+
+                    BaseException ex = supplier.get();
+                    assertNotNull(ex);
+                }
+            }
+        }
     }
 
     @Nested
