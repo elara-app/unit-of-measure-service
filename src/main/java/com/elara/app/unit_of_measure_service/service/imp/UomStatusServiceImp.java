@@ -86,7 +86,20 @@ public class UomStatusServiceImp implements UomStatusService {
 
     @Override
     public void deleteById(Long id) {
-
+        log.debug("Deleting UomStatus with id: {}", id);
+        if (!repository.existsById(id)) {
+            String errorMessage = String.format("UomStatus with id %d not found", id);
+            log.error(errorMessage);
+            throw new ResourceNotFoundException(id);
+        }
+        try {
+            repository.deleteById(id);
+            log.info("Successfully deleted UomStatus with id: {}", id);
+        } catch (DataIntegrityViolationException e) {
+            String errorMessage = String.format("Database error while deleting UomStatus with id %d", id);
+            log.error(errorMessage, e);
+            throw new UnexpectedErrorException(errorMessage);
+        }
     }
 
     @Override
