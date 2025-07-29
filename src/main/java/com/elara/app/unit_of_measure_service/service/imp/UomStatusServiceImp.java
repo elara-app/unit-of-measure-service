@@ -158,7 +158,15 @@ public class UomStatusServiceImp implements UomStatusService {
     }
 
     @Override
+    @Transactional
     public void changeStatus(Long id, Boolean isUsable) {
-
+        UomStatus existing = repository.findById(id)
+                .orElseThrow(() -> {
+                    String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
+                    log.error(errorMessage);
+                    return new ResourceNotFoundException(id);
+                });
+        existing.setIsUsable(isUsable);
+        log.info("Changed status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
     }
 }

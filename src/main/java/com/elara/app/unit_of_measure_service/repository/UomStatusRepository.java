@@ -22,8 +22,4 @@ public interface UomStatusRepository extends JpaRepository<UomStatus, Long> {
 
     Boolean existsByName(String name);
 
-    @Modifying
-    @Query("UPDATE uom_status u SET u.isUsable = :isUsable WHERE u.id = :id")
-    void changeStatus(@Param("id") Long id, @Param("isUsable") Boolean isUsable);
-
 }
