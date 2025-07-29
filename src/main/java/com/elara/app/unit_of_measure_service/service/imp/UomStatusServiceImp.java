@@ -142,7 +142,14 @@ public class UomStatusServiceImp implements UomStatusService {
 
     @Override
     public Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable) {
-        return null;
+        if (pageable == null) {
+            String errorCode = messageService.getMessage("validation.not.null", "Pageable");
+            log.error(errorCode);
+            throw new IllegalArgumentException(errorCode);
+        }
+        log.debug("Fetching all {entities} with isUsable: {} and pagination", ENTITY_NAME, isUsable);
+        return repository.findAllByIsUsable(isUsable, pageable)
+                .map(mapper::toResponse);
     }
 
     @Override
