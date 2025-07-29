@@ -4,6 +4,7 @@ import com.elara.app.unit_of_measure_service.dto.request.UomStatusRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomStatusResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomStatusUpdate;
 import com.elara.app.unit_of_measure_service.exceptions.ResourceConflictException;
+import com.elara.app.unit_of_measure_service.exceptions.ResourceNotFoundException;
 import com.elara.app.unit_of_measure_service.exceptions.UnexpectedErrorException;
 import com.elara.app.unit_of_measure_service.mapper.UomStatusMapper;
 import com.elara.app.unit_of_measure_service.model.UomStatus;
@@ -37,7 +38,7 @@ public class UomStatusServiceImp implements UomStatusService {
             throw new ResourceConflictException(errorMessage);
         }
         try {
-            UomStatus entity = mapper.toEntity(request);
+            UomStatus entity = mapper.updateEntityFromDto(request);
             UomStatus saved = repository.save(entity);
             log.info("Successfully created UomStatus with id: {}", saved.getId());
             return mapper.toResponse(saved);
@@ -49,8 +50,38 @@ public class UomStatusServiceImp implements UomStatusService {
     }
 
     @Override
+    @Transactional // Important to use without explicit save () | automatic flush() and commit
     public UomStatusResponse update(Long id, UomStatusUpdate request) {
-        return null;
+        if (request == null) {
+            String errorMessage = "UomStatusUpdate request cannot be null";
+            log.error(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
+        }
+
+        log.debug("Updating UomStatus with id: {}", id);
+        UomStatus existing = repository.findById(id)
+                .orElseThrow(() -> {
+                    String errorMessage = String.format("UomStatus with id %d not found", id);
+                    log.error(errorMessage);
+                    return new ResourceNotFoundException(id);
+                });
+
+        if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(existsByName(request.name()))) {
+            String errorMessage = String.format("UomStatus with name '%s' already exists", request.name());
+            log.error(errorMessage);
+            throw new ResourceConflictException(id);
+        }
+
+        try {
+            mapper.updateEntityFromDto(existing, request);
+//            repository.save() is not necessary as hibernate detects changes automatically
+            log.info("Successfully updated UomStatus with id: {}", id);
+            return mapper.toResponse(existing);
+        } catch (DataIntegrityViolationException e) {
+            String errorMessage = String.format("Database error while updating UomStatus with name '%s'", request.name());
+            log.error(errorMessage, e);
+            throw new UnexpectedErrorException(errorMessage);
+        }
     }
 
     @Override
