@@ -24,7 +24,7 @@ public interface UomStatusService {
 
     Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable);
 
-    Boolean existsByName(String name);
+    Boolean isNameTaken(String name);
 
     void changeStatus(Long id, Boolean isUsable);
 
