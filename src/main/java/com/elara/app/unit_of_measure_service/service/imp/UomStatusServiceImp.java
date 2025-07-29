@@ -50,7 +50,7 @@ public class UomStatusServiceImp implements UomStatusService {
     @Transactional
     public UomStatusResponse save(UomStatusRequest request) {
         log.debug("[save] Attempting to create {} with name: {}", ENTITY_NAME, request != null ? request.name() : null);
-        if (Boolean.TRUE.equals(existsByName(request.name()))) {
+        if (Boolean.TRUE.equals(isNameTaken(request.name()))) {
             String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
             log.warn("[save] {}", errorMessage);
             throw new ResourceConflictException(errorMessage);
@@ -69,14 +69,17 @@ public class UomStatusServiceImp implements UomStatusService {
 
     /**
      * Updates an existing UomStatus entity.
-     * Logs the attempt, checks for existence, and logs success or error.
+     * <p>
+     * <b>Transactional:</b> This method is transactional. All changes are committed atomically.
+     * <b>Edge Cases:</b> If the entity does not exist, a ResourceNotFoundException is thrown. If the new name is already taken, a ResourceConflictException is thrown.
+     * <b>Hibernate Behavior:</b> The entity is managed by the persistence context. Changes are flushed automatically at transaction commit. Explicit save is not required unless using a detached entity.
      *
-     * @param id      the id of the UomStatus to update
-     * @param request the UomStatusUpdate DTO
+     * @param id      the id of the UomStatus to update (must not be null)
+     * @param request the UomStatusUpdate DTO (must not be null)
      * @return the updated UomStatusResponse
      * @throws ResourceNotFoundException if no UomStatus found with the given id
      * @throws ResourceConflictException if a conflict exists with the new data
-     * @throws UnexpectedErrorException if a database error occurs
+     * @throws UnexpectedErrorException  if a database error occurs
      */
     @Override
     @Transactional
@@ -89,7 +92,7 @@ public class UomStatusServiceImp implements UomStatusService {
                     return new ResourceNotFoundException(id);
                 });
 
-        if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(existsByName(request.name()))) {
+        if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
             String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
             log.warn("[update] {}", errorMessage);
             throw new ResourceConflictException(id);
@@ -97,7 +100,7 @@ public class UomStatusServiceImp implements UomStatusService {
 
         try {
             mapper.updateEntityFromDto(existing, request);
-//            repository.save() is not necessary as hibernate detects changes automatically
+            // Hibernate will flush changes automatically at transaction commit.
             log.info("[update] Successfully updated {} with id: {}", ENTITY_NAME, id);
             return mapper.toResponse(existing);
         } catch (DataIntegrityViolationException e) {
@@ -203,9 +206,8 @@ public class UomStatusServiceImp implements UomStatusService {
      * @param name the name of the UomStatus to check
      * @return true if exists, false otherwise
      */
-    @Override
-    public Boolean existsByName(String name) {
-        log.debug("[existsByName] Checking existence of {} with name: {}", ENTITY_NAME, name);
+    public Boolean isNameTaken(String name) {
+        log.debug("[isNameTaken] Checking if {} name is taken: {}", ENTITY_NAME, name);
         return repository.existsByName(name);
     }
 
