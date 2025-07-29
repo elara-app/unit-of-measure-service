@@ -21,16 +21,31 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Service implementation for managing UomStatus entities.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UomStatusServiceImp implements UomStatusService {
 
+    /**
+     * Name of the entity managed by this service.
+     */
     private static final String ENTITY_NAME = "UomStatus";
     private final UomStatusRepository repository;
     private final UomStatusMapper mapper;
     private final MessageService messageService;
 
+    /**
+     * Saves a new UomStatus entity.
+     * Logs the attempt, warns if a conflict exists, and logs success or error.
+     *
+     * @param request the UomStatusRequest DTO
+     * @return the saved UomStatusResponse
+     * @throws ResourceConflictException if a UomStatus with the same name exists
+     * @throws UnexpectedErrorException if a database error occurs
+     */
     @Override
     @Transactional
     public UomStatusResponse save(UomStatusRequest request) {
@@ -52,6 +67,17 @@ public class UomStatusServiceImp implements UomStatusService {
         }
     }
 
+    /**
+     * Updates an existing UomStatus entity.
+     * Logs the attempt, checks for existence, and logs success or error.
+     *
+     * @param id      the id of the UomStatus to update
+     * @param request the UomStatusUpdate DTO
+     * @return the updated UomStatusResponse
+     * @throws ResourceNotFoundException if no UomStatus found with the given id
+     * @throws ResourceConflictException if a conflict exists with the new data
+     * @throws UnexpectedErrorException if a database error occurs
+     */
     @Override
     @Transactional
     public UomStatusResponse update(Long id, UomStatusUpdate request) {
@@ -81,6 +107,14 @@ public class UomStatusServiceImp implements UomStatusService {
         }
     }
 
+    /**
+     * Deletes a UomStatus entity by its id.
+     * Logs the attempt and success or error.
+     *
+     * @param id the id of the UomStatus to delete
+     * @throws ResourceNotFoundException if no UomStatus found with the given id
+     * @throws UnexpectedErrorException if a database error occurs
+     */
     @Override
     @Transactional
     public void deleteById(Long id) {
@@ -100,6 +134,14 @@ public class UomStatusServiceImp implements UomStatusService {
         }
     }
 
+    /**
+     * Finds a UomStatus entity by its id.
+     * Logs the search and result or error.
+     *
+     * @param id the id of the UomStatus to find
+     * @return an Optional containing the found UomStatusResponse, or empty if not found
+     * @throws ResourceNotFoundException if no UomStatus found with the given id
+     */
     @Override
     public Optional<UomStatusResponse> findById(Long id) {
         log.debug("[findById] Searching {} with id: {}", ENTITY_NAME, id);
@@ -114,6 +156,12 @@ public class UomStatusServiceImp implements UomStatusService {
         return response;
     }
 
+    /**
+     * Finds all UomStatus entities with pagination.
+     *
+     * @param pageable the pagination information
+     * @return a page of UomStatusResponse
+     */
     @Override
     public Page<UomStatusResponse> findAll(Pageable pageable) {
         log.debug("[findAll] Fetching all {} entities with pagination: {}", ENTITY_NAME, pageable);
@@ -121,6 +169,13 @@ public class UomStatusServiceImp implements UomStatusService {
                 .map(mapper::toResponse);
     }
 
+    /**
+     * Finds all UomStatus entities by name with pagination.
+     *
+     * @param name     the name to search for
+     * @param pageable the pagination information
+     * @return a page of UomStatusResponse
+     */
     @Override
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
         log.debug("[findAllByName] Fetching all {} entities with name containing: '{}' and pagination: {}", ENTITY_NAME, name, pageable);
@@ -128,6 +183,13 @@ public class UomStatusServiceImp implements UomStatusService {
                 .map(mapper::toResponse);
     }
 
+    /**
+     * Finds all UomStatus entities by usability status with pagination.
+     *
+     * @param isUsable the usability status to filter by
+     * @param pageable the pagination information
+     * @return a page of UomStatusResponse
+     */
     @Override
     public Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable) {
         log.debug("[findAllByIsUsable] Fetching all {} with isUsable: {} and pagination: {}", ENTITY_NAME, isUsable, pageable);
@@ -135,12 +197,26 @@ public class UomStatusServiceImp implements UomStatusService {
                 .map(mapper::toResponse);
     }
 
+    /**
+     * Checks if a UomStatus entity exists by its name.
+     *
+     * @param name the name of the UomStatus to check
+     * @return true if exists, false otherwise
+     */
     @Override
     public Boolean existsByName(String name) {
         log.debug("[existsByName] Checking existence of {} with name: {}", ENTITY_NAME, name);
         return repository.existsByName(name);
     }
 
+    /**
+     * Changes the usability status of a UomStatus entity.
+     * Logs the attempt and result.
+     *
+     * @param id      the id of the UomStatus to update
+     * @param isUsable the new usability status
+     * @throws ResourceNotFoundException if no UomStatus found with the given id
+     */
     @Override
     @Transactional
     public void changeStatus(Long id, Boolean isUsable) {
