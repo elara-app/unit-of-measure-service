@@ -16,7 +16,7 @@ public class MessageService {
         try {
             return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
         } catch (NoSuchMessageException e) {
-            return messageSource.getMessage("app.error.message.not.found", null, LocaleContextHolder.getLocale());
+            return messageSource.getMessage("default.error.message", null, LocaleContextHolder.getLocale());
         }
     }
 
@@ -24,7 +24,7 @@ public class MessageService {
         try {
             return messageSource.getMessage(errorCode.getKey(), args, LocaleContextHolder.getLocale());
         } catch (NoSuchMessageException e) {
-            return messageSource.getMessage("app.error.message.not.found", null, LocaleContextHolder.getLocale());
+            return messageSource.getMessage("default.error.message", null, LocaleContextHolder.getLocale());
         }
     }
 
