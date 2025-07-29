@@ -114,7 +114,12 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     public Optional<UomStatusResponse> findById(Long id) {
         return repository.findById(id)
-                .map(mapper::toResponse);
+                .map(mapper::toResponse)
+                .orElseThrow(() -> {);
+                    String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
+                    log.error(errorMessage);
+                    return new ResourceNotFoundException(id);
+                });
     }
 
     @Override
