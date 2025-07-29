@@ -34,6 +34,11 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public UomStatusResponse save(UomStatusRequest request) {
+        if (request == null) {
+            String errorMessage = messageService.getMessage("validation.not.null", ENTITY_NAME + "Request");
+            log.error(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
+        }
         log.debug("Creating {} with name: {}", ENTITY_NAME, request.name());
         if (Boolean.TRUE.equals(existsByName(request.name()))) {
             String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
