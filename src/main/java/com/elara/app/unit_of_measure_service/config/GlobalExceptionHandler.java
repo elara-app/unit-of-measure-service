@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = createErrorResponse(
                 ErrorCode.INVALID_DATA.getCode(),
                 ErrorCode.INVALID_DATA.getValue(),
-                messageService.getMessage("app.error.parameter.missing", exception.getParameterName()),
+                messageService.getMessage("parameter.missing", exception.getParameterName()),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = createErrorResponse(
                 ErrorCode.INVALID_DATA.getCode(),
                 ErrorCode.INVALID_DATA.getValue(),
-                messageService.getMessage("app.error.method.not.supported", request.getMethod()),
+                messageService.getMessage("method.not.supported", request.getMethod()),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.METHOD_NOT_ALLOWED);
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = createErrorResponse(
                 ErrorCode.UNEXPECTED_ERROR.getCode(),
                 ErrorCode.UNEXPECTED_ERROR.getValue(),
-                messageService.getMessage("error.unexpectedError", exception.getMessage()),
+                messageService.getMessage("global.error.unexpected", exception.getMessage()),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
