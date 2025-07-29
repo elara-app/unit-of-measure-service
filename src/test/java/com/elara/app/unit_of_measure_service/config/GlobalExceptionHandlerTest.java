@@ -159,7 +159,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void shouldHandleMissingParameterException() throws Exception {
         String expectedMessage = "The required parameter requiredParam is missing";
-        when(messageService.getMessage("app.error.parameter.missing", "requiredParam")).thenReturn(expectedMessage);
+        when(messageService.getMessage("parameter.missing", "requiredParam")).thenReturn(expectedMessage);
         mockMvc.perform(get("/test/missing-param").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(ErrorCode.INVALID_DATA.getCode()))
@@ -172,7 +172,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void shouldHandleMethodNotSupportedException() throws Exception {
         String expectedMessage = "The HTTP method GET is not supported";
-        when(messageService.getMessage("app.error.method.not.supported", "GET")).thenReturn(expectedMessage);
+        when(messageService.getMessage("method.not.supported", "GET")).thenReturn(expectedMessage);
         mockMvc.perform(get("/test/method-not-supported").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.code").value(ErrorCode.INVALID_DATA.getCode()))
@@ -185,7 +185,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void shouldHandleGenericException() throws Exception {
         String expectedMessage = "An unexpected error occurred";
-        when(messageService.getMessage("error.unexpectedError", "error thrown from a test")).thenReturn(expectedMessage);
+        when(messageService.getMessage("global.error.unexpected", "error thrown from a test")).thenReturn(expectedMessage);
         mockMvc.perform(get("/test/generic-exception").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.code").value(ErrorCode.UNEXPECTED_ERROR.getCode()))
