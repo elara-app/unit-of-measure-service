@@ -10,6 +10,7 @@ import com.elara.app.unit_of_measure_service.mapper.UomStatusMapper;
 import com.elara.app.unit_of_measure_service.model.UomStatus;
 import com.elara.app.unit_of_measure_service.repository.UomStatusRepository;
 import com.elara.app.unit_of_measure_service.service.interfaces.UomStatusService;
+import com.elara.app.unit_of_measure_service.utils.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,25 +26,27 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UomStatusServiceImp implements UomStatusService {
 
+    private static final String ENTITY_NAME = "UomStatus";
     private final UomStatusRepository repository;
     private final UomStatusMapper mapper;
+    private final MessageService messageService;
 
     @Override
     @Transactional
     public UomStatusResponse save(UomStatusRequest request) {
-        log.debug("Creating UomStatus with name: {}", request.name());
+        log.debug("Creating {} with name: {}", ENTITY_NAME, request.name());
         if (Boolean.TRUE.equals(existsByName(request.name()))) {
-            String errorMessage = String.format("UomStatus with name '%s' already exists", request.name());
+            String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
             log.error(errorMessage);
             throw new ResourceConflictException(errorMessage);
         }
         try {
             UomStatus entity = mapper.updateEntityFromDto(request);
             UomStatus saved = repository.save(entity);
-            log.info("Successfully created UomStatus with id: {}", saved.getId());
+            log.info("Successfully created {} with id: {}", ENTITY_NAME, saved.getId());
             return mapper.toResponse(saved);
         } catch (DataIntegrityViolationException e) {
-            String errorMessage = String.format("Database error while saving UomStatus with name '%s'", request.name());
+            String errorMessage = messageService.getMessage("repository.save.error", ENTITY_NAME, e.getMessage());
             log.error(errorMessage, e);
             throw new UnexpectedErrorException(errorMessage);
         }
@@ -53,21 +56,21 @@ public class UomStatusServiceImp implements UomStatusService {
     @Transactional // Important to use without explicit save () | automatic flush() and commit
     public UomStatusResponse update(Long id, UomStatusUpdate request) {
         if (request == null) {
-            String errorMessage = "UomStatusUpdate request cannot be null";
+            String errorMessage = messageService.getMessage("validation.not.null", ENTITY_NAME + "Update request");
             log.error(errorMessage);
             throw new IllegalArgumentException(errorMessage);
         }
 
-        log.debug("Updating UomStatus with id: {}", id);
+        log.debug("Updating {} with id: {}", ENTITY_NAME, id);
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
-                    String errorMessage = String.format("UomStatus with id %d not found", id);
+                    String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
                     log.error(errorMessage);
                     return new ResourceNotFoundException(id);
                 });
 
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(existsByName(request.name()))) {
-            String errorMessage = String.format("UomStatus with name '%s' already exists", request.name());
+            String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
             log.error(errorMessage);
             throw new ResourceConflictException(id);
         }
@@ -75,10 +78,10 @@ public class UomStatusServiceImp implements UomStatusService {
         try {
             mapper.updateEntityFromDto(existing, request);
 //            repository.save() is not necessary as hibernate detects changes automatically
-            log.info("Successfully updated UomStatus with id: {}", id);
+            log.info("Successfully updated {} with id: {}", ENTITY_NAME, id);
             return mapper.toResponse(existing);
         } catch (DataIntegrityViolationException e) {
-            String errorMessage = String.format("Database error while updating UomStatus with name '%s'", request.name());
+            String errorMessage = messageService.getMessage("repository.update.error", ENTITY_NAME, e.getMessage());
             log.error(errorMessage, e);
             throw new UnexpectedErrorException(errorMessage);
         }
@@ -86,17 +89,17 @@ public class UomStatusServiceImp implements UomStatusService {
 
     @Override
     public void deleteById(Long id) {
-        log.debug("Deleting UomStatus with id: {}", id);
+        log.debug("Deleting {} with id: {}", ENTITY_NAME, id);
         if (!repository.existsById(id)) {
-            String errorMessage = String.format("UomStatus with id %d not found", id);
+            String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
             log.error(errorMessage);
             throw new ResourceNotFoundException(id);
         }
         try {
             repository.deleteById(id);
-            log.info("Successfully deleted UomStatus with id: {}", id);
+            log.info("Successfully deleted {} with id: {}", ENTITY_NAME, id);
         } catch (DataIntegrityViolationException e) {
-            String errorMessage = String.format("Database error while deleting UomStatus with id %d", id);
+            String errorMessage = messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage());
             log.error(errorMessage, e);
             throw new UnexpectedErrorException(errorMessage);
         }
