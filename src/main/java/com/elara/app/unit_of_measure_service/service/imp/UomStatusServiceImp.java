@@ -113,7 +113,8 @@ public class UomStatusServiceImp implements UomStatusService {
 
     @Override
     public Optional<UomStatusResponse> findById(Long id) {
-        return Optional.empty();
+        return repository.findById(id)
+                .map(mapper::toResponse);
     }
 
     @Override
