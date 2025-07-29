@@ -10,5 +10,7 @@ public record UomStatusUpdate(
         @Size(max = 200, message = "validation.size.max")
         String description
 
+        // Deliberately exclude isUsable to force use of changeStatus()
+
 ) {
 }
