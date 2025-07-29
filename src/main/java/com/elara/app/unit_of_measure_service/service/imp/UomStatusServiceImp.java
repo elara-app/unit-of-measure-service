@@ -117,7 +117,14 @@ public class UomStatusServiceImp implements UomStatusService {
 
     @Override
     public Page<UomStatusResponse> findAll(Pageable pageable) {
-        return null;
+        if (pageable == null) {
+            String errorCode = messageService.getMessage("validation.not.null", "Pageable");
+            log.error(errorCode);
+            throw new IllegalArgumentException(errorCode);
+        }
+        log.debug("Fetching all {} entities with pagination", ENTITY_NAME);
+        return repository.findAll(pageable)
+                .map(mapper::toResponse);
     }
 
     @Override
