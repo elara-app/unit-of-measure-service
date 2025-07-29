@@ -135,7 +135,7 @@ public class UomStatusServiceImp implements UomStatusService {
             log.error(errorCode);
             throw new IllegalArgumentException(errorCode);
         }
-        log.debug("Fetching all {} entities with name containing: '{}' and pagination", ENTITY_NAME, name, pageable);
+        log.debug("Fetching all {} entities with name containing: '{}' and pagination", ENTITY_NAME, name);
         return repository.findAllByNameContainingIgnoreCase(name, pageable)
                 .map(mapper::toResponse);
     }
@@ -147,7 +147,7 @@ public class UomStatusServiceImp implements UomStatusService {
             log.error(errorCode);
             throw new IllegalArgumentException(errorCode);
         }
-        log.debug("Fetching all {entities} with isUsable: {} and pagination", ENTITY_NAME, isUsable);
+        log.debug("Fetching all {} with isUsable: {} and pagination", ENTITY_NAME, isUsable);
         return repository.findAllByIsUsable(isUsable, pageable)
                 .map(mapper::toResponse);
     }
