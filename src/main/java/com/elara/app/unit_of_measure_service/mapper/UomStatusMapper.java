@@ -17,6 +17,6 @@ public interface UomStatusMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "isUsable", ignore = true)
-    UomStatus updateEntityFromDto(@MappingTarget UomStatus existing, UomStatusUpdate update);
+    void updateEntityFromDto(@MappingTarget UomStatus existing, UomStatusUpdate update);
 
 }
