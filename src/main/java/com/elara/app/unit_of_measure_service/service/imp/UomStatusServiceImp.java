@@ -93,6 +93,7 @@ public class UomStatusServiceImp implements UomStatusService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         log.debug("Deleting {} with id: {}", ENTITY_NAME, id);
         if (!repository.existsById(id)) {
