@@ -26,7 +26,7 @@ class UomStatusMapperTest {
                 "Status is active",
                 true
         );
-        UomStatus entity = mapper.toEntity(request);
+        UomStatus entity = mapper.updateEntityFromDto(request);
         assertNotNull(entity);
         assertEquals("Active", entity.getName());
         assertEquals("Status is active", entity.getDescription());
@@ -52,7 +52,7 @@ class UomStatusMapperTest {
     @Test
     @DisplayName("toResponse() should handle null entity gracefully")
     void shouldHandleNullEntityGracefully() {
-        assertNull(mapper.toEntity(null));
+        assertNull(mapper.updateEntityFromDto(null));
         assertNull(mapper.toResponse(null));
     }
 
