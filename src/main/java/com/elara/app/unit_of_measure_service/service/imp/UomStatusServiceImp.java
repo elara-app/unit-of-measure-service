@@ -42,7 +42,7 @@ public class UomStatusServiceImp implements UomStatusService {
             log.info("Successfully created UomStatus with id: {}", saved.getId());
             return mapper.toResponse(saved);
         } catch (DataIntegrityViolationException e) {
-            String errorMessage = String.format("Database error while UomStatus with name '%s'", request.name());
+            String errorMessage = String.format("Database error while saving UomStatus with name '%s'", request.name());
             log.error(errorMessage, e);
             throw new UnexpectedErrorException(errorMessage);
         }
