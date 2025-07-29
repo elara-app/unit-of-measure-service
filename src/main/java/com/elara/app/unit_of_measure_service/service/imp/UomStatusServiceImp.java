@@ -34,60 +34,49 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public UomStatusResponse save(UomStatusRequest request) {
-        if (request == null) {
-            String errorMessage = messageService.getMessage("validation.not.null", ENTITY_NAME + "Request");
-            log.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
-        }
-        log.debug("Creating {} with name: {}", ENTITY_NAME, request.name());
+        log.debug("[save] Attempting to create {} with name: {}", ENTITY_NAME, request != null ? request.name() : null);
         if (Boolean.TRUE.equals(existsByName(request.name()))) {
             String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
-            log.error(errorMessage);
+            log.warn("[save] {}", errorMessage);
             throw new ResourceConflictException(errorMessage);
         }
         try {
             UomStatus entity = mapper.updateEntityFromDto(request);
             UomStatus saved = repository.save(entity);
-            log.info("Successfully created {} with id: {}", ENTITY_NAME, saved.getId());
+            log.info("[save] Successfully created {} with id: {}", ENTITY_NAME, saved.getId());
             return mapper.toResponse(saved);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = messageService.getMessage("repository.save.error", ENTITY_NAME, e.getMessage());
-            log.error(errorMessage, e);
+            log.error("[save] {} Exception: {}", errorMessage, e.getClass().getSimpleName(), e);
             throw new UnexpectedErrorException(errorMessage);
         }
     }
 
     @Override
-    @Transactional // Important to use without explicit save () | automatic flush() and commit
+    @Transactional
     public UomStatusResponse update(Long id, UomStatusUpdate request) {
-        if (request == null) {
-            String errorMessage = messageService.getMessage("validation.not.null", ENTITY_NAME + "Update request");
-            log.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
-        }
-
-        log.debug("Updating {} with id: {}", ENTITY_NAME, id);
+        log.debug("[update] Attempting to update {} with id: {}", ENTITY_NAME, id);
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
-                    log.error(errorMessage);
+                    log.warn("[update] {}", errorMessage);
                     return new ResourceNotFoundException(id);
                 });
 
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(existsByName(request.name()))) {
             String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
-            log.error(errorMessage);
+            log.warn("[update] {}", errorMessage);
             throw new ResourceConflictException(id);
         }
 
         try {
             mapper.updateEntityFromDto(existing, request);
 //            repository.save() is not necessary as hibernate detects changes automatically
-            log.info("Successfully updated {} with id: {}", ENTITY_NAME, id);
+            log.info("[update] Successfully updated {} with id: {}", ENTITY_NAME, id);
             return mapper.toResponse(existing);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = messageService.getMessage("repository.update.error", ENTITY_NAME, e.getMessage());
-            log.error(errorMessage, e);
+            log.error("[update] {} Exception: {}", errorMessage, e.getClass().getSimpleName(), e);
             throw new UnexpectedErrorException(errorMessage);
         }
     }
@@ -95,84 +84,74 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        log.debug("Deleting {} with id: {}", ENTITY_NAME, id);
+        log.debug("[deleteById] Attempting to delete {} with id: {}", ENTITY_NAME, id);
         if (!repository.existsById(id)) {
             String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
-            log.error(errorMessage);
+            log.warn("[deleteById] {}", errorMessage);
             throw new ResourceNotFoundException(id);
         }
         try {
             repository.deleteById(id);
-            log.info("Successfully deleted {} with id: {}", ENTITY_NAME, id);
+            log.info("[deleteById] Successfully deleted {} with id: {}", ENTITY_NAME, id);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage());
-            log.error(errorMessage, e);
+            log.error("[deleteById] {} Exception: {}", errorMessage, e.getClass().getSimpleName(), e);
             throw new UnexpectedErrorException(errorMessage);
         }
     }
 
     @Override
     public Optional<UomStatusResponse> findById(Long id) {
-        return repository.findById(id)
-                .map(mapper::toResponse)
-                .orElseThrow(() -> {);
-                    String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
-                    log.error(errorMessage);
-                    return new ResourceNotFoundException(id);
-                });
+        log.debug("[findById] Searching {} with id: {}", ENTITY_NAME, id);
+        Optional<UomStatusResponse> response = repository.findById(id)
+                .map(mapper::toResponse);
+        if (response.isEmpty()) {
+            String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
+            log.warn("[findById] {} not found with id: {}. {}", ENTITY_NAME, id, errorMessage);
+            throw new ResourceNotFoundException(id);
+        }
+        log.info("[findById] Found {} with id: {}", ENTITY_NAME, id);
+        return response;
     }
 
     @Override
     public Page<UomStatusResponse> findAll(Pageable pageable) {
-        if (pageable == null) {
-            String errorCode = messageService.getMessage("validation.not.null", "Pageable");
-            log.error(errorCode);
-            throw new IllegalArgumentException(errorCode);
-        }
-        log.debug("Fetching all {} entities with pagination", ENTITY_NAME);
+        log.debug("[findAll] Fetching all {} entities with pagination: {}", ENTITY_NAME, pageable);
         return repository.findAll(pageable)
                 .map(mapper::toResponse);
     }
 
     @Override
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
-        if (pageable == null) {
-            String errorCode = messageService.getMessage("validation.not.null", "Pageable");
-            log.error(errorCode);
-            throw new IllegalArgumentException(errorCode);
-        }
-        log.debug("Fetching all {} entities with name containing: '{}' and pagination", ENTITY_NAME, name);
+        log.debug("[findAllByName] Fetching all {} entities with name containing: '{}' and pagination: {}", ENTITY_NAME, name, pageable);
         return repository.findAllByNameContainingIgnoreCase(name, pageable)
                 .map(mapper::toResponse);
     }
 
     @Override
     public Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable) {
-        if (pageable == null) {
-            String errorCode = messageService.getMessage("validation.not.null", "Pageable");
-            log.error(errorCode);
-            throw new IllegalArgumentException(errorCode);
-        }
-        log.debug("Fetching all {} with isUsable: {} and pagination", ENTITY_NAME, isUsable);
+        log.debug("[findAllByIsUsable] Fetching all {} with isUsable: {} and pagination: {}", ENTITY_NAME, isUsable, pageable);
         return repository.findAllByIsUsable(isUsable, pageable)
                 .map(mapper::toResponse);
     }
 
     @Override
     public Boolean existsByName(String name) {
+        log.debug("[existsByName] Checking existence of {} with name: {}", ENTITY_NAME, name);
         return repository.existsByName(name);
     }
 
     @Override
     @Transactional
     public void changeStatus(Long id, Boolean isUsable) {
+        log.debug("[changeStatus] Attempting to change status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
-                    log.error(errorMessage);
+                    log.warn("[changeStatus] {}", errorMessage);
                     return new ResourceNotFoundException(id);
                 });
         existing.setIsUsable(isUsable);
-        log.info("Changed status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
+        log.info("[changeStatus] Changed status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
     }
 }
