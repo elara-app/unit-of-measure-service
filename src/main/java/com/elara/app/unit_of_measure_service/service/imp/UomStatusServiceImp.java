@@ -129,7 +129,14 @@ public class UomStatusServiceImp implements UomStatusService {
 
     @Override
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
-        return null;
+        if (pageable == null) {
+            String errorCode = messageService.getMessage("validation.not.null", "Pageable");
+            log.error(errorCode);
+            throw new IllegalArgumentException(errorCode);
+        }
+        log.debug("Fetching all {} entities with name containing: '{}' and pagination", ENTITY_NAME, name, pageable);
+        return repository.findAllByNameContainingIgnoreCase(name, pageable)
+                .map(mapper::toResponse);
     }
 
     @Override
