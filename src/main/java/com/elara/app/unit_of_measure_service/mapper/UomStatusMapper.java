@@ -11,7 +11,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface UomStatusMapper {
 
-    UomStatus updateEntityFromDto(UomStatusRequest request);
+    UomStatus toEntity(UomStatusRequest request);
 
     UomStatusResponse toResponse(UomStatus entity);
 
