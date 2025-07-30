@@ -89,13 +89,13 @@ public class UomStatusServiceImp implements UomStatusService {
                 .orElseThrow(() -> {
                     String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
                     log.warn("[update] {}", errorMessage);
-                    return new ResourceNotFoundException(id);
+                    return new ResourceNotFoundException(errorMessage);
                 });
 
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
             String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
             log.warn("[update] {}", errorMessage);
-            throw new ResourceConflictException(id);
+            throw new ResourceConflictException(errorMessage);
         }
 
         try {
