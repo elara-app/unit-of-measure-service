@@ -44,7 +44,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @param request the UomStatusRequest DTO
      * @return the saved UomStatusResponse
      * @throws ResourceConflictException if a UomStatus with the same name exists
-     * @throws UnexpectedErrorException if a database error occurs
+     * @throws UnexpectedErrorException  if a database error occurs
      */
     @Override
     @Transactional
@@ -56,7 +56,7 @@ public class UomStatusServiceImp implements UomStatusService {
             throw new ResourceConflictException(errorMessage);
         }
         try {
-            UomStatus entity = mapper.updateEntityFromDto(request);
+            UomStatus entity = mapper.toEntity(request);
             UomStatus saved = repository.save(entity);
             log.info("[save] Successfully created {} with id: {}", ENTITY_NAME, saved.getId());
             return mapper.toResponse(saved);
@@ -116,7 +116,7 @@ public class UomStatusServiceImp implements UomStatusService {
      *
      * @param id the id of the UomStatus to delete
      * @throws ResourceNotFoundException if no UomStatus found with the given id
-     * @throws UnexpectedErrorException if a database error occurs
+     * @throws UnexpectedErrorException  if a database error occurs
      */
     @Override
     @Transactional
@@ -215,7 +215,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * Changes the usability status of a UomStatus entity.
      * Logs the attempt and result.
      *
-     * @param id      the id of the UomStatus to update
+     * @param id       the id of the UomStatus to update
      * @param isUsable the new usability status
      * @throws ResourceNotFoundException if no UomStatus found with the given id
      */
