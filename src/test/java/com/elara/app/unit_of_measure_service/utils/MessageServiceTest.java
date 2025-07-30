@@ -26,8 +26,8 @@ class MessageServiceTest {
     @InjectMocks
     private MessageService messageService;
 
-    private static final String TEST_KEY = "uom.error.invalid.data";
-    private static final String ERROR_KEY = "app.error.message.not.found";
+    private static final String TEST_KEY = "uom.invalid.data";
+    private static final String ERROR_KEY = "default.error.message";
     private static final String TEST_MESSAGE = "Provided data is invalid";
     private static final String ERROR_MESSAGE = "An error occurred. Please try again.";
     private static final Locale DEFAULT_LOCALE = Locale.US;

@@ -20,7 +20,7 @@ public class UomStatus {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @NotBlank(message = "validation.blank")
+    @NotBlank(message = "validation.not.blank")
     @Size(max = 50, message = "validation.size.max")
     @Column(name = "name", unique = true, nullable = false, length = 50)
     private String name;
