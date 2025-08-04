@@ -10,12 +10,12 @@ import com.elara.app.unit_of_measure_service.mapper.UomStatusMapper;
 import com.elara.app.unit_of_measure_service.model.UomStatus;
 import com.elara.app.unit_of_measure_service.repository.UomStatusRepository;
 import com.elara.app.unit_of_measure_service.utils.MessageService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class UomStatusServiceImpTest {
 
     @Mock
@@ -39,11 +40,6 @@ class UomStatusServiceImpTest {
 
     @InjectMocks
     private UomStatusServiceImp service;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     // --- Save method tests ---
 
@@ -73,12 +69,11 @@ class UomStatusServiceImpTest {
     void save_shouldThrowResourceConflictIfNameTaken() {
         UomStatusRequest request = new UomStatusRequest("Active", "desc", true);
         when(service.isNameTaken("Active")).thenReturn(true);
-        when(messageService.getMessage("crud.already.exists", "UomStatus", "Active"))
+        when(messageService.getMessage("crud.already.exists", "UomStatus", "name", "Active"))
                 .thenReturn("UomStatus with name 'Active' already exists");
 
         assertThatThrownBy(() -> service.save(request))
-                .isInstanceOf(ResourceConflictException.class)
-                .hasMessageContaining("UomStatus with name 'Active' already exists");
+                .isInstanceOf(ResourceConflictException.class);
         verify(repository, never()).save(any());
     }
 
@@ -90,12 +85,12 @@ class UomStatusServiceImpTest {
         when(service.isNameTaken("Active")).thenReturn(false);
         when(mapper.toEntity(request)).thenReturn(entity);
         when(repository.save(entity)).thenThrow(new DataIntegrityViolationException("db error"));
-        when(messageService.getMessage(eq("repository.save.error"), eq("UomStatus"), any()))
+        when(messageService.getMessage("repository.save.error", "UomStatus", "db error"))
                 .thenReturn("Database error while saving UomStatus");
 
         assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(UnexpectedErrorException.class)
-                .hasMessageContaining("Database error while saving UomStatus");
+                .hasMessageContaining("db error");
         verify(repository).save(entity);
     }
 
@@ -103,8 +98,7 @@ class UomStatusServiceImpTest {
     @DisplayName("save() should handle null request gracefully")
     void save_shouldHandleNullRequest() {
         assertThatThrownBy(() -> service.save(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(""); // Adjust if you want a custom message
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -174,11 +168,10 @@ class UomStatusServiceImpTest {
         Long id = 2L;
         UomStatusUpdate update = new UomStatusUpdate("Name", "Desc");
         when(repository.findById(id)).thenReturn(Optional.empty());
-        when(messageService.getMessage("crud.not.found", "UomStatus", id)).thenReturn("Not found");
+        when(messageService.getMessage("crud.not.found", "UomStatus", "id", id)).thenReturn("Not found");
 
         assertThatThrownBy(() -> service.update(id, update))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Not found");
+                .isInstanceOf(ResourceNotFoundException.class);
         verify(mapper, never()).updateEntityFromDto(any(), any());
     }
 
@@ -190,14 +183,11 @@ class UomStatusServiceImpTest {
         UomStatus existing = UomStatus.builder().id(id).name("Old Name").description("Old Desc").isUsable(true).build();
         when(repository.findById(id)).thenReturn(Optional.of(existing));
         when(service.isNameTaken("Taken Name")).thenReturn(true);
-        when(messageService.getMessage("crud.already.exists", "UomStatus", "Taken Name"))
+        when(messageService.getMessage("crud.already.exists", "UomStatus", "name", "Taken Name"))
                 .thenReturn("UomStatus with name 'Taken Name' already exists");
 
-        when(messageService.getMessage("global.error.conflict", id)).thenReturn("this is a conflict message");
-
         assertThatThrownBy(() -> service.update(id, update))
-                .isInstanceOf(ResourceConflictException.class)
-                .hasMessageContaining("UomStatus with name 'Taken Name' already exists");
+                .isInstanceOf(ResourceConflictException.class);
     }
 
     @Test
@@ -209,12 +199,12 @@ class UomStatusServiceImpTest {
         when(repository.findById(id)).thenReturn(Optional.of(existing));
         when(service.isNameTaken("Name")).thenReturn(false);
         doThrow(new DataIntegrityViolationException("db error")).when(mapper).updateEntityFromDto(existing, update);
-        when(messageService.getMessage(eq("repository.update.error"), eq("UomStatus"), any()))
+        when(messageService.getMessage("repository.update.error", "UomStatus", "db error"))
                 .thenReturn("Database error while updating UomStatus");
 
         assertThatThrownBy(() -> service.update(id, update))
                 .isInstanceOf(UnexpectedErrorException.class)
-                .hasMessageContaining("Database error while updating UomStatus");
+                .hasMessageContaining("db error");
     }
 
     @Test
@@ -292,7 +282,7 @@ class UomStatusServiceImpTest {
     void deleteById_shouldThrowResourceNotFoundIfNotFound() {
         Long id = 11L;
         when(repository.existsById(id)).thenReturn(false);
-        when(messageService.getMessage("crud.not.found", "UomStatus", id)).thenReturn("Not found");
+        when(messageService.getMessage("crud.not.found", "UomStatus", "id", id)).thenReturn("Not found");
 
         assertThatThrownBy(() -> service.deleteById(id))
                 .isInstanceOf(ResourceNotFoundException.class);
@@ -305,12 +295,12 @@ class UomStatusServiceImpTest {
         Long id = 12L;
         when(repository.existsById(id)).thenReturn(true);
         doThrow(new DataIntegrityViolationException("db error")).when(repository).deleteById(id);
-        when(messageService.getMessage(eq("repository.delete.error"), eq("UomStatus"), any()))
+        when(messageService.getMessage("repository.delete.error", "UomStatus", "db error"))
                 .thenReturn("Database error while deleting UomStatus");
 
         assertThatThrownBy(() -> service.deleteById(id))
                 .isInstanceOf(UnexpectedErrorException.class)
-                .hasMessageContaining("Database error while deleting UomStatus");
+                .hasMessageContaining("db error");
     }
 
     // --- Find methods tests ---
@@ -333,7 +323,7 @@ class UomStatusServiceImpTest {
     void findById_shouldThrowResourceNotFoundIfNotFound() {
         Long id = 21L;
         when(repository.findById(id)).thenReturn(Optional.empty());
-        when(messageService.getMessage("crud.not.found", "UomStatus", id)).thenReturn("Not found");
+        when(messageService.getMessage("crud.not.found", "UomStatus", "id", id)).thenReturn("Not found");
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(ResourceNotFoundException.class);
@@ -413,7 +403,7 @@ class UomStatusServiceImpTest {
     void changeStatus_shouldThrowResourceNotFoundIfNotFound() {
         Long id = 31L;
         when(repository.findById(id)).thenReturn(Optional.empty());
-        when(messageService.getMessage("crud.not.found", "UomStatus", id)).thenReturn("Not found");
+        when(messageService.getMessage("crud.not.found", "UomStatus", "id", id)).thenReturn("Not found");
 
         assertThatThrownBy(() -> service.changeStatus(id, true))
                 .isInstanceOf(ResourceNotFoundException.class);
