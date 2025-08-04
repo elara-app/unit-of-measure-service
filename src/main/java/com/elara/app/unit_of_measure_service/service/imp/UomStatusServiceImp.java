@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -50,20 +51,18 @@ public class UomStatusServiceImp implements UomStatusService {
     @Transactional
     public UomStatusResponse save(UomStatusRequest request) {
         log.debug("[save] Attempting to create {} with name: {}", ENTITY_NAME, request != null ? request.name() : null);
-        if (Boolean.TRUE.equals(isNameTaken(request.name()))) {
-            String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
-            log.warn("[save] {}", errorMessage);
-            throw new ResourceConflictException(errorMessage);
+        if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
+            log.warn("[save] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
+            throw new ResourceConflictException((Object) new String[]{"name", request.name()});
         }
         try {
             UomStatus entity = mapper.toEntity(request);
             UomStatus saved = repository.save(entity);
-            log.info("[save] Successfully created {} with id: {}", ENTITY_NAME, saved.getId());
+            log.info("[save] {}", messageService.getMessage("crud.create.success", ENTITY_NAME));
             return mapper.toResponse(saved);
         } catch (DataIntegrityViolationException e) {
-            String errorMessage = messageService.getMessage("repository.save.error", ENTITY_NAME, e.getMessage());
-            log.error("[save] {} Exception: {}", errorMessage, e.getClass().getSimpleName(), e);
-            throw new UnexpectedErrorException(errorMessage);
+            log.error("[save] {}", messageService.getMessage("repository.save.error", ENTITY_NAME, e.getMessage()));
+            throw new UnexpectedErrorException(e.getMessage());
         }
     }
 
@@ -87,26 +86,23 @@ public class UomStatusServiceImp implements UomStatusService {
         log.debug("[update] Attempting to update {} with id: {}", ENTITY_NAME, id);
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
-                    String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
-                    log.warn("[update] {}", errorMessage);
-                    return new ResourceNotFoundException(errorMessage);
+                    log.warn("[update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+                    return new ResourceNotFoundException((Object) new String[]{"id", id.toString()});
                 });
 
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
-            String errorMessage = messageService.getMessage("crud.already.exists", ENTITY_NAME, request.name());
-            log.warn("[update] {}", errorMessage);
-            throw new ResourceConflictException(errorMessage);
+            log.warn("[update] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
+            throw new ResourceConflictException("name", request.name());
         }
 
         try {
             mapper.updateEntityFromDto(existing, request);
             // Hibernate will flush changes automatically at transaction commit.
-            log.info("[update] Successfully updated {} with id: {}", ENTITY_NAME, id);
+            log.info("[update] {}", messageService.getMessage("crud.update.success", ENTITY_NAME));
             return mapper.toResponse(existing);
         } catch (DataIntegrityViolationException e) {
-            String errorMessage = messageService.getMessage("repository.update.error", ENTITY_NAME, e.getMessage());
-            log.error("[update] {} Exception: {}", errorMessage, e.getClass().getSimpleName(), e);
-            throw new UnexpectedErrorException(errorMessage);
+            log.error("[update] {}", messageService.getMessage("repository.update.error", ENTITY_NAME, e.getMessage()));
+            throw new UnexpectedErrorException(e.getMessage());
         }
     }
 
@@ -123,17 +119,15 @@ public class UomStatusServiceImp implements UomStatusService {
     public void deleteById(Long id) {
         log.debug("[deleteById] Attempting to delete {} with id: {}", ENTITY_NAME, id);
         if (!repository.existsById(id)) {
-            String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
-            log.warn("[deleteById] {}", errorMessage);
-            throw new ResourceNotFoundException(id);
+            log.warn("[deleteById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+            throw new ResourceNotFoundException((Object) new String[]{"id", id.toString()});
         }
         try {
             repository.deleteById(id);
-            log.info("[deleteById] Successfully deleted {} with id: {}", ENTITY_NAME, id);
+            log.info("[deleteById] {}", messageService.getMessage("crud.delete.success", ENTITY_NAME));
         } catch (DataIntegrityViolationException e) {
-            String errorMessage = messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage());
-            log.error("[deleteById] {} Exception: {}", errorMessage, e.getClass().getSimpleName(), e);
-            throw new UnexpectedErrorException(errorMessage);
+            log.error("[deleteById] {}", messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage()));
+            throw new UnexpectedErrorException(e.getMessage());
         }
     }
 
@@ -151,11 +145,10 @@ public class UomStatusServiceImp implements UomStatusService {
         Optional<UomStatusResponse> response = repository.findById(id)
                 .map(mapper::toResponse);
         if (response.isEmpty()) {
-            String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
-            log.warn("[findById] {} not found with id: {}. {}", ENTITY_NAME, id, errorMessage);
-            throw new ResourceNotFoundException(id);
+            log.warn("[findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+            throw new ResourceNotFoundException((Object) new String[]{"id", id.toString()});
         }
-        log.info("[findById] Found {} with id: {}", ENTITY_NAME, id);
+        log.info("[findById] {}", messageService.getMessage("crud.read.success", ENTITY_NAME));
         return response;
     }
 
@@ -225,9 +218,8 @@ public class UomStatusServiceImp implements UomStatusService {
         log.debug("[changeStatus] Attempting to change status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
-                    String errorMessage = messageService.getMessage("crud.not.found", ENTITY_NAME, id);
-                    log.warn("[changeStatus] {}", errorMessage);
-                    return new ResourceNotFoundException(id);
+                    log.warn("[changeStatus] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+                    return new ResourceNotFoundException((Object) new String[]{"id", id.toString()});
                 });
         existing.setIsUsable(isUsable);
         log.info("[changeStatus] Changed status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
