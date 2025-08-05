@@ -16,7 +16,7 @@ public interface UomStatusService {
 
     void deleteById(Long id);
 
-    Optional<UomStatusResponse> findById(Long id);
+    UomStatusResponse findById(Long id);
 
     Page<UomStatusResponse> findAll(Pageable pageable);
 
