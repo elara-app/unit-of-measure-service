@@ -143,7 +143,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @throws ResourceNotFoundException if no UomStatus found with the given id
      */
     @Override
-    public Optional<UomStatusResponse> findById(Long id) {
+    public UomStatusResponse findById(Long id) {
         log.debug("[findById] Searching {} with id: {}", ENTITY_NAME, id);
         Optional<UomStatusResponse> response = repository.findById(id)
                 .map(mapper::toResponse);
@@ -153,7 +153,7 @@ public class UomStatusServiceImp implements UomStatusService {
 //            throw new ResourceNotFoundException((Object[]) new Object[]{"id", id.toString()});
         }
         log.info("[findById] {}", messageService.getMessage("crud.read.success", ENTITY_NAME));
-        return response;
+        return response.get();
     }
 
     /**
