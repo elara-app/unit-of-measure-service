@@ -53,7 +53,8 @@ public class UomStatusServiceImp implements UomStatusService {
         log.debug("[save] Attempting to create {} with name: {}", ENTITY_NAME, request != null ? request.name() : null);
         if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
             log.warn("[save] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
-            throw new ResourceConflictException((Object[]) new Object[]{"name", request.name()});
+            throw new ResourceConflictException(new Object[]{"name", request.name()});
+//            throw new ResourceConflictException((Object[]) new Object[]{"name", request.name()});
         }
         try {
             UomStatus entity = mapper.toEntity(request);
@@ -87,7 +88,8 @@ public class UomStatusServiceImp implements UomStatusService {
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("[update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
-                    return new ResourceNotFoundException((Object[]) new Object[]{"id", id.toString()});
+                    return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+//                    return new ResourceNotFoundException((Object[]) new Object[]{"id", id.toString()});
                 });
 
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
@@ -120,7 +122,8 @@ public class UomStatusServiceImp implements UomStatusService {
         log.debug("[deleteById] Attempting to delete {} with id: {}", ENTITY_NAME, id);
         if (!repository.existsById(id)) {
             log.warn("[deleteById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
-            throw new ResourceNotFoundException((Object[]) new Object[]{"id", id.toString()});
+            throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
+//            throw new ResourceNotFoundException((Object[]) new Object[]{"id", id.toString()});
         }
         try {
             repository.deleteById(id);
@@ -146,7 +149,8 @@ public class UomStatusServiceImp implements UomStatusService {
                 .map(mapper::toResponse);
         if (response.isEmpty()) {
             log.warn("[findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
-            throw new ResourceNotFoundException((Object[]) new Object[]{"id", id.toString()});
+            throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
+//            throw new ResourceNotFoundException((Object[]) new Object[]{"id", id.toString()});
         }
         log.info("[findById] {}", messageService.getMessage("crud.read.success", ENTITY_NAME));
         return response;
@@ -219,7 +223,8 @@ public class UomStatusServiceImp implements UomStatusService {
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("[changeStatus] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
-                    return new ResourceNotFoundException((Object[]) new Object[]{"id", id.toString()});
+                    return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+//                    return new ResourceNotFoundException((Object[]) new Object[]{"id", id.toString()});
                 });
         existing.setIsUsable(isUsable);
         log.info("[changeStatus] Changed status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
