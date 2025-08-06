@@ -36,7 +36,9 @@ public class UomStatusController {
     public ResponseEntity<UomStatusResponse> createUomStatus(
             @Valid @RequestBody UomStatusRequest request
     ) {
+        log.info("[createUomStatus] Request to create UomStatus: {}", request);
         UomStatusResponse response = service.save(request);
+        log.info("[createUomStatus] UomStatus created with id: {}", response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -48,7 +50,9 @@ public class UomStatusController {
     public ResponseEntity<UomStatusResponse> getUomStatusById(
             @PathVariable @NotNull(message = "validation.not.null") @Positive(message = "validation.positive") Long id
     ) {
+        log.info("[getUomStatusById] Request to get UomStatus by id: {}", id);
         UomStatusResponse response = service.findById(id);
+        log.info("[getUomStatusById] UomStatus found: {}", response);
         return ResponseEntity.ok(response);
     }
 
@@ -57,7 +61,9 @@ public class UomStatusController {
     public ResponseEntity<Page<UomStatusResponse>> getAllUomStatuses(
             @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
+        log.info("[getAllUomStatuses] Request to get all UomStatuses. Pageable: {}", pageable);
         Page<UomStatusResponse> response = service.findAll(pageable);
+        log.info("[getAllUomStatuses] Fetched {} UomStatuses", response.getNumberOfElements());
         return ResponseEntity.ok(response);
     }
 
@@ -70,7 +76,9 @@ public class UomStatusController {
             @RequestParam @NotBlank(message = "validation.not.blank") String name,
             @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
+        log.info("[searchUomStatusesByName] Request to search UomStatuses by name: '{}'", name);
         Page<UomStatusResponse> response = service.findAllByName(name, pageable);
+        log.info("[searchUomStatusesByName] Fetched {} UomStatuses for name: '{}'", response.getNumberOfElements(), name);
         return ResponseEntity.ok(response);
     }
 
@@ -83,7 +91,9 @@ public class UomStatusController {
             @RequestParam @NotNull(message = "validation.not.null") Boolean isUsable,
             @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
+        log.info("[filterUomStatusesByUsability] Request to filter UomStatuses by isUsable: {}", isUsable);
         Page<UomStatusResponse> response = service.findAllByIsUsable(isUsable, pageable);
+        log.info("[filterUomStatusesByUsability] Fetched {} UomStatuses for isUsable: {}", response.getNumberOfElements(), isUsable);
         return ResponseEntity.ok(response);
     }
 
@@ -97,7 +107,9 @@ public class UomStatusController {
             @PathVariable @NotNull(message = "validation.not.null") @Positive(message = "validation.positive") Long id,
             @Valid @RequestBody UomStatusUpdate request
     ) {
+        log.info("[updateUomStatus] Request to update UomStatus id: {} with data: {}", id, request);
         UomStatusResponse response = service.update(id, request);
+        log.info("[updateUomStatus] UomStatus updated: {}", response);
         return ResponseEntity.ok(response);
     }
 
@@ -110,7 +122,9 @@ public class UomStatusController {
             @PathVariable @NotNull(message = "validation.not.null") @Positive(message = "validation.positive") Long id,
             @RequestParam @NotNull(message = "validation.not.null") Boolean isUsable
     ) {
+        log.info("[changeUomStatusUsability] Request to change usability for UomStatus id: {} to: {}", id, isUsable);
         service.changeStatus(id, isUsable);
+        log.info("[changeUomStatusUsability] Usability changed for UomStatus id: {}", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -122,7 +136,9 @@ public class UomStatusController {
     public ResponseEntity<Boolean> isNameTaken(
             @RequestParam @NotBlank(message = "validation.not.blank") String name
     ) {
+        log.info("[isNameTaken] Request to check if name is taken: '{}'", name);
         Boolean isTaken = service.isNameTaken(name);
+        log.info("[isNameTaken] Name '{}' taken: {}", name, isTaken);
         return ResponseEntity.ok(isTaken);
     }
 
@@ -131,7 +147,9 @@ public class UomStatusController {
     public ResponseEntity<Void> deleteUomStatus(
             @PathVariable @NotNull @Positive Long id
     ) {
+        log.info("[deleteUomStatus] Request to delete UomStatus id: {}", id);
         service.deleteById(id);
+        log.info("[deleteUomStatus] UomStatus deleted: {}", id);
         return ResponseEntity.noContent().build();
     }
 
