@@ -156,7 +156,7 @@ public class UomStatusServiceImp implements UomStatusService {
         Optional<UomStatusResponse> response = repository.findById(id)
                 .map(mapper::toResponse);
         if (response.isEmpty()) {
-            log.warn("[findById] {} - Entity not found for id: {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id), id);
+            log.warn("[findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
             throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
         }
         log.info("[findById] Successfully found {} with id: {}", ENTITY_NAME, id);
@@ -239,6 +239,6 @@ public class UomStatusServiceImp implements UomStatusService {
                 });
         Boolean oldStatus = existing.getIsUsable();
         existing.setIsUsable(isUsable);
-        log.info("[changeStatus] Changed status of {} with id: {} from isUsable: {} to isUsable: {}", ENTITY_NAME, id, oldStatus, isUsable);
+        log.info("[changeStatus] Changed status of {} with id: {} from isUsable with id: {} to: {}", ENTITY_NAME, id, oldStatus, isUsable);
     }
 }
