@@ -4,13 +4,13 @@ import jakarta.validation.constraints.Size;
 
 public record UomStatusUpdate(
 
-        @Size(max = 50, message = "validation.size.max")
-        String name,
+    @Size(max = 50, message = "validation.size.max")
+    String name,
 
-        @Size(max = 200, message = "validation.size.max")
-        String description
+    @Size(max = 200, message = "validation.size.max")
+    String description
 
-        // Deliberately exclude isUsable to force use of changeStatus()
+    // Deliberately exclude isUsable to force use of changeStatus()
 
 ) {
 }
