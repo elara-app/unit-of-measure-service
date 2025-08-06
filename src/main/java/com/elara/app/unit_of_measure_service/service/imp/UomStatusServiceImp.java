@@ -215,7 +215,7 @@ public class UomStatusServiceImp implements UomStatusService {
      */
     public Boolean isNameTaken(String name) {
         log.debug("[isNameTaken] Checking if name '{}' is taken for {}", name, ENTITY_NAME);
-        boolean exists = repository.existsByName(name);
+        Boolean exists = repository.existsByName(name);
         log.info("[isNameTaken] Name '{}' taken: {}", name, exists);
         return exists;
     }
