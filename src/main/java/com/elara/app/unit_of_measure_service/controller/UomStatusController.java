@@ -387,7 +387,11 @@ public class UomStatusController {
     public ResponseEntity<Page<UomStatusResponse>> getAllUomStatuses(
         @Parameter(
             description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
-            example = "page=0&size=20&sort=name,asc"
+            schema = @Schema(
+                type = "object",
+                description = "Pageable object with page, size, and sort parameters"
+            ),
+            example = "{ \"page\": 0, \"size\": 20, \"sort\": [\"name,asc\"] }"
         )
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
@@ -486,8 +490,12 @@ public class UomStatusController {
         )
         @RequestParam @NotBlank(message = "validation.not.blank") String name,
         @Parameter(
-            description = "Pagination and sorting parameters",
-            example = "page=0&size=10&sort=name,asc"
+            description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
+            schema = @Schema(
+                type = "object",
+                description = "Pageable object with page, size, and sort parameters"
+            ),
+            example = "{ \"page\": 0, \"size\": 20, \"sort\": [\"name,asc\"] }"
         )
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
@@ -586,8 +594,12 @@ public class UomStatusController {
         )
         @RequestParam @NotNull(message = "validation.not.null") Boolean isUsable,
         @Parameter(
-            description = "Pagination and sorting parameters",
-            example = "page=0&size=10&sort=name,desc"
+            description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
+            schema = @Schema(
+                type = "object",
+                description = "Pageable object with page, size, and sort parameters"
+            ),
+            example = "{ \"page\": 0, \"size\": 20, \"sort\": [\"name,asc\"] }"
         )
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
