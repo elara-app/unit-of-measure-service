@@ -197,8 +197,6 @@ class UomStatusServiceImpTest {
         when(repository.findById(id)).thenReturn(Optional.of(existing));
         when(service.isNameTaken("Name")).thenReturn(false);
         doThrow(new DataIntegrityViolationException("db error")).when(mapper).updateEntityFromDto(existing, update);
-        /*when(messageService.getMessage("repository.update.error", "UomStatus", "db error"))
-                .thenReturn("Database error while updating UomStatus");*/
 
         assertThatThrownBy(() -> service.update(id, update))
                 .isInstanceOf(UnexpectedErrorException.class)
@@ -313,7 +311,7 @@ class UomStatusServiceImpTest {
         when(mapper.toResponse(entity)).thenReturn(response);
 
         UomStatusResponse result = service.findById(id);
-//        assertThat(result).contains(response);
+        assertThat(result.description()).isEqualTo(entity.getDescription());
     }
 
     @Test
