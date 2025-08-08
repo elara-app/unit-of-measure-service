@@ -331,6 +331,7 @@ class UomStatusServiceImpTest {
     @DisplayName("findAll() should return page of responses")
     void findAll_shouldReturnPage() {
         Pageable pageable = mock(Pageable.class);
+        @SuppressWarnings("unchecked")
         Page<UomStatus> page = mock(Page.class);
         when(repository.findAll(pageable)).thenReturn(page);
         when(page.map(any())).thenReturn(Page.empty());
@@ -344,6 +345,7 @@ class UomStatusServiceImpTest {
     void findAllByName_shouldReturnPage() {
         Pageable pageable = mock(Pageable.class);
         String name = "Test";
+        @SuppressWarnings("unchecked")
         Page<UomStatus> page = mock(Page.class);
         when(repository.findAllByNameContainingIgnoreCase(name, pageable)).thenReturn(page);
         when(page.map(any())).thenReturn(Page.empty());
@@ -357,6 +359,7 @@ class UomStatusServiceImpTest {
     void findAllByIsUsable_shouldReturnPage() {
         Pageable pageable = mock(Pageable.class);
         Boolean isUsable = true;
+        @SuppressWarnings("unchecked")
         Page<UomStatus> page = mock(Page.class);
         when(repository.findAllByIsUsable(isUsable, pageable)).thenReturn(page);
         when(page.map(any())).thenReturn(Page.empty());
