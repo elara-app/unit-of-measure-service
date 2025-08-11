@@ -203,9 +203,9 @@ public class UomStatusController {
         )
         @Valid @RequestBody UomStatusRequest request
     ) {
-        log.info("[createUomStatus] Request to create UomStatus: {}", request);
+        log.info("[UomStatus-controller-create] Request to create UomStatus: {}.", request);
         UomStatusResponse response = service.save(request);
-        log.info("[createUomStatus] UomStatus created with id: {}", response.id());
+        log.info("[UomStatus-controller-create] UomStatus created with id: {}.", response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
