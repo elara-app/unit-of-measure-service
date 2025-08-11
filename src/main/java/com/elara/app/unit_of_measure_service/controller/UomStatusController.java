@@ -395,9 +395,9 @@ public class UomStatusController {
         )
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        log.info("[getAllUomStatuses] Request to get all UomStatuses. Pageable: {}", pageable);
+        log.info("[UomStatus-controller-getAll] Request to get all UomStatuses.");
         Page<UomStatusResponse> response = service.findAll(pageable);
-        log.info("[getAllUomStatuses] Fetched {} UomStatuses", response.getNumberOfElements());
+        log.info("[UomStatus-controller-getAll] Fetched {} UomStatuses.", response.getNumberOfElements());
         return ResponseEntity.ok(response);
     }
 
