@@ -171,9 +171,9 @@ public class UomStatusServiceImp implements UomStatusService {
      */
     @Override
     public Page<UomStatusResponse> findAll(Pageable pageable) {
-        log.debug("[findAll] Fetching all {} entities with pagination: {}", ENTITY_NAME, pageable);
+        log.debug("[UomStatus-service-findAll] Fetching all {} entities with pagination: {}.", ENTITY_NAME, pageable);
         Page<UomStatusResponse> page = repository.findAll(pageable).map(mapper::toResponse);
-        log.info("[findAll] Fetched {} entities, page size: {}", ENTITY_NAME, page.getNumberOfElements());
+        log.debug("[UomStatus-service-findAll] Fetched {} entities, page size: {}.", ENTITY_NAME, page.getNumberOfElements());
         return page;
     }
 
