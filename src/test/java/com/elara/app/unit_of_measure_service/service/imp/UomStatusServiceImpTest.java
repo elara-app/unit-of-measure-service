@@ -85,8 +85,6 @@ class UomStatusServiceImpTest {
         when(service.isNameTaken("Active")).thenReturn(false);
         when(mapper.toEntity(request)).thenReturn(entity);
         when(repository.save(entity)).thenThrow(new DataIntegrityViolationException("db error"));
-        when(messageService.getMessage("repository.save.error", "UomStatus", "db error"))
-                .thenReturn("Database error while saving UomStatus");
 
         assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(UnexpectedErrorException.class)
@@ -199,8 +197,6 @@ class UomStatusServiceImpTest {
         when(repository.findById(id)).thenReturn(Optional.of(existing));
         when(service.isNameTaken("Name")).thenReturn(false);
         doThrow(new DataIntegrityViolationException("db error")).when(mapper).updateEntityFromDto(existing, update);
-        when(messageService.getMessage("repository.update.error", "UomStatus", "db error"))
-                .thenReturn("Database error while updating UomStatus");
 
         assertThatThrownBy(() -> service.update(id, update))
                 .isInstanceOf(UnexpectedErrorException.class)
@@ -314,8 +310,8 @@ class UomStatusServiceImpTest {
         when(repository.findById(id)).thenReturn(Optional.of(entity));
         when(mapper.toResponse(entity)).thenReturn(response);
 
-        Optional<UomStatusResponse> result = service.findById(id);
-        assertThat(result).isPresent().contains(response);
+        UomStatusResponse result = service.findById(id);
+        assertThat(result.description()).isEqualTo(entity.getDescription());
     }
 
     @Test
@@ -333,6 +329,7 @@ class UomStatusServiceImpTest {
     @DisplayName("findAll() should return page of responses")
     void findAll_shouldReturnPage() {
         Pageable pageable = mock(Pageable.class);
+        @SuppressWarnings("unchecked")
         Page<UomStatus> page = mock(Page.class);
         when(repository.findAll(pageable)).thenReturn(page);
         when(page.map(any())).thenReturn(Page.empty());
@@ -346,6 +343,7 @@ class UomStatusServiceImpTest {
     void findAllByName_shouldReturnPage() {
         Pageable pageable = mock(Pageable.class);
         String name = "Test";
+        @SuppressWarnings("unchecked")
         Page<UomStatus> page = mock(Page.class);
         when(repository.findAllByNameContainingIgnoreCase(name, pageable)).thenReturn(page);
         when(page.map(any())).thenReturn(Page.empty());
@@ -359,6 +357,7 @@ class UomStatusServiceImpTest {
     void findAllByIsUsable_shouldReturnPage() {
         Pageable pageable = mock(Pageable.class);
         Boolean isUsable = true;
+        @SuppressWarnings("unchecked")
         Page<UomStatus> page = mock(Page.class);
         when(repository.findAllByIsUsable(isUsable, pageable)).thenReturn(page);
         when(page.map(any())).thenReturn(Page.empty());
