@@ -203,9 +203,9 @@ public class UomStatusController {
         )
         @Valid @RequestBody UomStatusRequest request
     ) {
-        log.info("[createUomStatus] Request to create UomStatus: {}", request);
+        log.info("[UomStatus-controller-create] Request to create UomStatus: {}.", request);
         UomStatusResponse response = service.save(request);
-        log.info("[createUomStatus] UomStatus created with id: {}", response.id());
+        log.info("[UomStatus-controller-create] UomStatus created with id: {}.", response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -308,7 +308,7 @@ public class UomStatusController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64", minimum = "1")
         )
-        @PathVariable @NotNull(message = "validation.not.null") @Positive(message = "validation.positive") Long id
+        @PathVariable @NotNull @Positive Long id
     ) {
         log.info("[getUomStatusById] Request to get UomStatus by id: {}", id);
         UomStatusResponse response = service.findById(id);
@@ -395,9 +395,9 @@ public class UomStatusController {
         )
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        log.info("[getAllUomStatuses] Request to get all UomStatuses. Pageable: {}", pageable);
+        log.info("[UomStatus-controller-getAll] Request to get all UomStatuses.");
         Page<UomStatusResponse> response = service.findAll(pageable);
-        log.info("[getAllUomStatuses] Fetched {} UomStatuses", response.getNumberOfElements());
+        log.info("[UomStatus-controller-getAll] Fetched {} UomStatuses.", response.getNumberOfElements());
         return ResponseEntity.ok(response);
     }
 
@@ -488,7 +488,7 @@ public class UomStatusController {
             example = "active",
             schema = @Schema(type = "string", minLength = 1)
         )
-        @RequestParam @NotBlank(message = "validation.not.blank") String name,
+        @RequestParam @NotBlank String name,
         @Parameter(
             description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
             schema = @Schema(
@@ -592,7 +592,7 @@ public class UomStatusController {
             example = "true",
             schema = @Schema(type = "boolean")
         )
-        @RequestParam @NotNull(message = "validation.not.null") Boolean isUsable,
+        @RequestParam @NotNull Boolean isUsable,
         @Parameter(
             description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
             schema = @Schema(
@@ -684,7 +684,7 @@ public class UomStatusController {
             example = "Active",
             schema = @Schema(type = "string", minLength = 1, maxLength = 50)
         )
-        @RequestParam @NotBlank(message = "validation.not.blank") String name
+        @RequestParam @NotBlank() String name
     ) {
         log.info("[isNameTaken] Request to check if name is taken: '{}'", name);
         Boolean isTaken = service.isNameTaken(name);
@@ -817,7 +817,7 @@ public class UomStatusController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64", minimum = "1")
         )
-        @PathVariable @NotNull(message = "validation.not.null") @Positive(message = "validation.positive") Long id,
+        @PathVariable @NotNull @Positive Long id,
         @Parameter(
             description = "Update request containing the fields to modify (excludes isUsable)",
             required = true,
@@ -912,14 +912,14 @@ public class UomStatusController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64", minimum = "1")
         )
-        @PathVariable @NotNull(message = "validation.not.null") @Positive(message = "validation.positive") Long id,
+        @PathVariable @NotNull @Positive Long id,
         @Parameter(
             description = "The new usability status (true for usable, false for unusable)",
             required = true,
             example = "false",
             schema = @Schema(type = "boolean")
         )
-        @RequestParam @NotNull(message = "validation.not.null") Boolean isUsable
+        @RequestParam @NotNull Boolean isUsable
     ) {
         log.info("[changeUomStatusUsability] Request to change usability for UomStatus id: {} to: {}", id, isUsable);
         service.changeStatus(id, isUsable);

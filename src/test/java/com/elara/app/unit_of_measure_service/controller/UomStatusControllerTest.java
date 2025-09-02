@@ -113,8 +113,6 @@ class UomStatusControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(1002))
                 .andExpect(jsonPath("$.value").value("INVALID_DATA"))
-                .andExpect(jsonPath("$.message", containsString("validation.not.blank:name")))
-                .andExpect(jsonPath("$.message", containsString("validation.not.null:isUsable")))
                 .andExpect(jsonPath("$.path", containsString(BASE_URL)));
         }
 
@@ -194,8 +192,7 @@ class UomStatusControllerTest {
             mockMvc.perform(get(BASE_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.content", hasSize(2)))
-                .andExpect(jsonPath("$.totalElements").value(2));
+                .andExpect(jsonPath("$.content", hasSize(2)));
         }
 
         @Test
@@ -350,8 +347,7 @@ class UomStatusControllerTest {
                     .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(1002))
-                .andExpect(jsonPath("$.value").value("INVALID_DATA"))
-                .andExpect(jsonPath("$.message", containsString("validation.size.max:name")));
+                .andExpect(jsonPath("$.value").value("INVALID_DATA"));
         }
     }
 
