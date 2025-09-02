@@ -7,10 +7,10 @@ import jakarta.validation.constraints.Size;
 public record UomStatusRequest(
 
         @NotBlank
-        @Size(max = 50, message = "validation.size.max")
+        @Size(max = 50)
         String name,
 
-        @Size(max = 200, message = "validation.size.max")
+        @Size(max = 200)
         String description,
 
         @NotNull
