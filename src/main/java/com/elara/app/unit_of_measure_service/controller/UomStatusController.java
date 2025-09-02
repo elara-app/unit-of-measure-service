@@ -488,7 +488,7 @@ public class UomStatusController {
             example = "active",
             schema = @Schema(type = "string", minLength = 1)
         )
-        @RequestParam @NotBlank(message = "validation.not.blank") String name,
+        @RequestParam @NotBlank() String name,
         @Parameter(
             description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
             schema = @Schema(
@@ -684,7 +684,7 @@ public class UomStatusController {
             example = "Active",
             schema = @Schema(type = "string", minLength = 1, maxLength = 50)
         )
-        @RequestParam @NotBlank(message = "validation.not.blank") String name
+        @RequestParam @NotBlank() String name
     ) {
         log.info("[isNameTaken] Request to check if name is taken: '{}'", name);
         Boolean isTaken = service.isNameTaken(name);
