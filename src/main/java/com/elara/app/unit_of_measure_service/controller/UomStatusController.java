@@ -308,7 +308,7 @@ public class UomStatusController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64", minimum = "1")
         )
-        @PathVariable @NotNull @Positive(message = "validation.positive") Long id
+        @PathVariable @NotNull @Positive Long id
     ) {
         log.info("[getUomStatusById] Request to get UomStatus by id: {}", id);
         UomStatusResponse response = service.findById(id);
@@ -817,7 +817,7 @@ public class UomStatusController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64", minimum = "1")
         )
-        @PathVariable @NotNull @Positive(message = "validation.positive") Long id,
+        @PathVariable @NotNull @Positive Long id,
         @Parameter(
             description = "Update request containing the fields to modify (excludes isUsable)",
             required = true,
@@ -912,7 +912,7 @@ public class UomStatusController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64", minimum = "1")
         )
-        @PathVariable @NotNull @Positive(message = "validation.positive") Long id,
+        @PathVariable @NotNull @Positive Long id,
         @Parameter(
             description = "The new usability status (true for usable, false for unusable)",
             required = true,
