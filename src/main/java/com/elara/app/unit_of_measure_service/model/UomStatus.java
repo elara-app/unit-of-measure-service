@@ -46,14 +46,14 @@ public class UomStatus {
      * <p>Must be unique, not blank, and up to 50 characters.</p>
      */
     @NotBlank
-    @Size(max = 50, message = "validation.size.max")
+    @Size(max = 50)
     @Column(name = "name", unique = true, nullable = false, length = 50)
     private String name;
 
     /**
      * Optional description of the UOM status (up to 200 characters).
      */
-    @Size(max = 200, message = "validation.size.max")
+    @Size(max = 200)
     @Column(name = "description", length = 200)
     private String description;
 
