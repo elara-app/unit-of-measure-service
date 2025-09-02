@@ -13,7 +13,7 @@ public record UomStatusRequest(
         @Size(max = 200, message = "validation.size.max")
         String description,
 
-        @NotNull(message = "validation.not.null")
+        @NotNull
         Boolean isUsable
 
 ) {
