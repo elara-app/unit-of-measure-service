@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
-import java.util.stream.Collectors;
+import java.util.Arrays;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -35,13 +35,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException exception, HttpServletRequest request) {
-        String errors = exception.getBindingResult().getFieldErrors().stream()
-                .map(fieldError -> messageService.getMessage(fieldError.getDefaultMessage(), fieldError.getField()))
-                .collect(Collectors.joining(","));
         ErrorResponse errorResponse = createErrorResponse(
                 ErrorCode.INVALID_DATA.getCode(),
                 ErrorCode.INVALID_DATA.getValue(),
-                errors,
+                Arrays.stream(exception.getDetailMessageArguments()).toList().get(1).toString(),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
