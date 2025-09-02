@@ -308,7 +308,7 @@ public class UomStatusController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64", minimum = "1")
         )
-        @PathVariable @NotNull(message = "validation.not.null") @Positive(message = "validation.positive") Long id
+        @PathVariable @NotNull @Positive(message = "validation.positive") Long id
     ) {
         log.info("[getUomStatusById] Request to get UomStatus by id: {}", id);
         UomStatusResponse response = service.findById(id);
@@ -592,7 +592,7 @@ public class UomStatusController {
             example = "true",
             schema = @Schema(type = "boolean")
         )
-        @RequestParam @NotNull(message = "validation.not.null") Boolean isUsable,
+        @RequestParam @NotNull Boolean isUsable,
         @Parameter(
             description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
             schema = @Schema(
@@ -817,7 +817,7 @@ public class UomStatusController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64", minimum = "1")
         )
-        @PathVariable @NotNull(message = "validation.not.null") @Positive(message = "validation.positive") Long id,
+        @PathVariable @NotNull @Positive(message = "validation.positive") Long id,
         @Parameter(
             description = "Update request containing the fields to modify (excludes isUsable)",
             required = true,
@@ -912,14 +912,14 @@ public class UomStatusController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64", minimum = "1")
         )
-        @PathVariable @NotNull(message = "validation.not.null") @Positive(message = "validation.positive") Long id,
+        @PathVariable @NotNull @Positive(message = "validation.positive") Long id,
         @Parameter(
             description = "The new usability status (true for usable, false for unusable)",
             required = true,
             example = "false",
             schema = @Schema(type = "boolean")
         )
-        @RequestParam @NotNull(message = "validation.not.null") Boolean isUsable
+        @RequestParam @NotNull Boolean isUsable
     ) {
         log.info("[changeUomStatusUsability] Request to change usability for UomStatus id: {} to: {}", id, isUsable);
         service.changeStatus(id, isUsable);

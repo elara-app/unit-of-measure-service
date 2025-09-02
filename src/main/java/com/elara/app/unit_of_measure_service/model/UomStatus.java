@@ -62,7 +62,7 @@ public class UomStatus {
      * <p>Defaults to {@code true} and cannot be null.</p>
      */
     @Builder.Default
-    @NotNull(message = "validation.not.null")
+    @NotNull
     @Column(name = "is_usable", nullable = false)
     private Boolean isUsable = true;
 
