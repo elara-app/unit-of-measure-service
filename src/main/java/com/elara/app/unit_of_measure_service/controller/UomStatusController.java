@@ -488,7 +488,7 @@ public class UomStatusController {
             example = "active",
             schema = @Schema(type = "string", minLength = 1)
         )
-        @RequestParam @NotBlank() String name,
+        @RequestParam @NotBlank String name,
         @Parameter(
             description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
             schema = @Schema(
