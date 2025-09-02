@@ -6,14 +6,14 @@ import jakarta.validation.constraints.Size;
 
 public record UomStatusRequest(
 
-        @NotBlank(message = "validation.not.blank")
-        @Size(max = 50, message = "validation.size.max")
+        @NotBlank
+        @Size(max = 50)
         String name,
 
-        @Size(max = 200, message = "validation.size.max")
+        @Size(max = 200)
         String description,
 
-        @NotNull(message = "validation.not.null")
+        @NotNull
         Boolean isUsable
 
 ) {

@@ -50,22 +50,22 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public UomStatusResponse save(UomStatusRequest request) {
-        log.debug("[save] Attempting to create {} with name: {} and request: {}", ENTITY_NAME, request != null ? request.name() : null, request);
+        log.debug("[UomStatus-service-save] Attempting to create {} with name: {} and request: {}", ENTITY_NAME, request != null ? request.name() : null, request);
         if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
-            log.warn("[save] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
+            log.warn("[UomStatus-service-save] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
             throw new ResourceConflictException(new Object[]{"name", request.name()});
         }
         try {
             UomStatus entity = mapper.toEntity(request);
-            log.debug("[save] Mapped DTO to entity: {}", entity);
+            log.debug("[UomStatus-service-save] Mapped DTO to entity: {}", entity);
             UomStatus saved = repository.save(entity);
-            log.info("[save] {}", messageService.getMessage("crud.create.success", ENTITY_NAME));
+            log.debug("[UomStatus-service-save] {}", messageService.getMessage("crud.create.success", ENTITY_NAME));
             return mapper.toResponse(saved);
         } catch (DataIntegrityViolationException e) {
-            log.error("[save] Data integrity violation while saving {}: {}", ENTITY_NAME, e.getMessage(), e);
+            log.error("[UomStatus-service-save] Data integrity violation while saving {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         } catch (Exception e) {
-            log.error("[save] Unexpected error while saving {}: {}", ENTITY_NAME, e.getMessage(), e);
+            log.error("[UomStatus-service-save] Unexpected error while saving {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         }
     }
@@ -171,9 +171,9 @@ public class UomStatusServiceImp implements UomStatusService {
      */
     @Override
     public Page<UomStatusResponse> findAll(Pageable pageable) {
-        log.debug("[findAll] Fetching all {} entities with pagination: {}", ENTITY_NAME, pageable);
+        log.debug("[UomStatus-service-findAll] Fetching all {} entities with pagination: {}.", ENTITY_NAME, pageable);
         Page<UomStatusResponse> page = repository.findAll(pageable).map(mapper::toResponse);
-        log.info("[findAll] Fetched {} entities, page size: {}", ENTITY_NAME, page.getNumberOfElements());
+        log.debug("[UomStatus-service-findAll] Fetched {} entities, page size: {}.", ENTITY_NAME, page.getNumberOfElements());
         return page;
     }
 
@@ -214,9 +214,9 @@ public class UomStatusServiceImp implements UomStatusService {
      * @return true if exists, false otherwise
      */
     public Boolean isNameTaken(String name) {
-        log.debug("[isNameTaken] Checking if name '{}' is taken for {}", name, ENTITY_NAME);
+        log.debug("[UomStatus-service-isNameTaken] Checking if name '{}' is taken for {}", name, ENTITY_NAME);
         Boolean exists = repository.existsByName(name);
-        log.info("[isNameTaken] Name '{}' taken: {}", name, exists);
+        log.debug("[UomStatus-service-isNameTaken] Name '{}' taken: {}", name, exists);
         return exists;
     }
 
