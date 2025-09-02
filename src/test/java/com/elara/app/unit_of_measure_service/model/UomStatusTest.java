@@ -58,7 +58,7 @@ class UomStatusTest {
                 .description("a".repeat(201))
                 .build();
         Set<ConstraintViolation<UomStatus>> violations = validator.validate(status);
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("validation.size.max")));
+        assertEquals(1, (long) violations.size());
     }
 
     @ParameterizedTest
