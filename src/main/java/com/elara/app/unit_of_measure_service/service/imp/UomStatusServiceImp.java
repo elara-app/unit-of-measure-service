@@ -185,9 +185,9 @@ public class UomStatusServiceImp implements UomStatusService {
      */
     @Override
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
-        log.debug("[findAllByName] Fetching all {} entities with name containing: '{}' and pagination: {}", ENTITY_NAME, name, pageable);
+        log.debug("[UomStatus-service-findAllByName] Fetching all {} entities with name containing: '{}' and pagination: {}", ENTITY_NAME, name, pageable);
         Page<UomStatusResponse> page = repository.findAllByNameContainingIgnoreCase(name, pageable).map(mapper::toResponse);
-        log.info("[findAllByName] Fetched {} entities with name like '{}', page size: {}", ENTITY_NAME, name, page.getNumberOfElements());
+        log.info("[UomStatus-service-findAllByName] Fetched {} entities with name like '{}', page size: {}", ENTITY_NAME, name, page.getNumberOfElements());
         return page;
     }
 
