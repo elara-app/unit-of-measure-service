@@ -132,6 +132,20 @@ class UomStatusServiceImpTest {
         assertThat(result).isEqualTo(response);
     }
 
+    @Test
+    @DisplayName("save() should throw UnexpectedErrorException on generic Exception")
+    void save_shouldThrowUnexpectedErrorOnGenericException() {
+        UomStatusRequest request = new UomStatusRequest("Active", "desc", true);
+        UomStatus entity = UomStatus.builder().name("Active").description("desc").isUsable(true).build();
+        when(service.isNameTaken("Active")).thenReturn(false);
+        when(mapper.toEntity(request)).thenReturn(entity);
+        when(repository.save(entity)).thenThrow(new RuntimeException("boom"));
+
+        assertThatThrownBy(() -> service.save(request))
+                .isInstanceOf(UnexpectedErrorException.class)
+                .hasMessageContaining("boom");
+    }
+
     // --- Update method tests ---
 
     /**
@@ -201,6 +215,21 @@ class UomStatusServiceImpTest {
         assertThatThrownBy(() -> service.update(id, update))
                 .isInstanceOf(UnexpectedErrorException.class)
                 .hasMessageContaining("db error");
+    }
+
+    @Test
+    @DisplayName("update() should throw UnexpectedErrorException on generic Exception")
+    void update_shouldThrowUnexpectedErrorOnGenericException() {
+        Long id = 5L;
+        var update = new UomStatusUpdate("Name", "Desc");
+        var existing = UomStatus.builder().id(id).name("Old Name").description("Old Desc").isUsable(true).build();
+        when(repository.findById(id)).thenReturn(Optional.of(existing));
+        when(service.isNameTaken("Name")).thenReturn(false);
+        doThrow(new RuntimeException("boom")).when(mapper).updateEntityFromDto(existing, update);
+
+        assertThatThrownBy(() -> service.update(id, update))
+                .isInstanceOf(UnexpectedErrorException.class)
+                .hasMessageContaining("boom");
     }
 
     @Test
@@ -297,6 +326,18 @@ class UomStatusServiceImpTest {
         assertThatThrownBy(() -> service.deleteById(id))
                 .isInstanceOf(UnexpectedErrorException.class)
                 .hasMessageContaining("db error");
+    }
+
+    @Test
+    @DisplayName("deleteById() should throw UnexpectedErrorException on generic Exception")
+    void deleteById_shouldThrowUnexpectedErrorOnGenericException() {
+        Long id = 13L;
+        when(repository.existsById(id)).thenReturn(true);
+        doThrow(new RuntimeException("boom")).when(repository).deleteById(id);
+
+        assertThatThrownBy(() -> service.deleteById(id))
+                .isInstanceOf(UnexpectedErrorException.class)
+                .hasMessageContaining("boom");
     }
 
     // --- Find methods tests ---
