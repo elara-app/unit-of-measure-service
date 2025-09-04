@@ -200,9 +200,9 @@ public class UomStatusServiceImp implements UomStatusService {
      */
     @Override
     public Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable) {
-        log.debug("[findAllByIsUsable] Fetching all {} with isUsable: {} and pagination: {}", ENTITY_NAME, isUsable, pageable);
+        log.debug("[UomStatus-service-findAllByIsUsable] Fetching all {} with isUsable: {} and pagination: {}", ENTITY_NAME, isUsable, pageable);
         Page<UomStatusResponse> page = repository.findAllByIsUsable(isUsable, pageable).map(mapper::toResponse);
-        log.info("[findAllByIsUsable] Fetched {} entities with isUsable like '{}', page size: {}", ENTITY_NAME, isUsable, page.getNumberOfElements());
+        log.info("[UomStatus-service-findAllByIsUsable] Fetched {} entities with isUsable like '{}', page size: {}", ENTITY_NAME, isUsable, page.getNumberOfElements());
         return page;
     }
 
