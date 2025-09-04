@@ -387,4 +387,19 @@ class UomStatusControllerTest {
                 .andExpect(jsonPath("$.value").value("INVALID_DATA"));
         }
     }
+
+    @Nested
+    @DisplayName("DELETE /api/v1/uom-status/{id} - deleteUomStatus")
+    class DeleteTests {
+        @Test
+        @DisplayName("should return 204 on success")
+        void delete_shouldReturn204() throws Exception {
+            doNothing().when(service).deleteById(1L);
+
+            mockMvc.perform(delete(BASE_URL + "/{id}", 1))
+                .andExpect(status().isNoContent());
+
+            verify(service).deleteById(1L);
+        }
+    }
 }
