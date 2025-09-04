@@ -230,7 +230,7 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public void changeStatus(Long id, Boolean isUsable) {
-        log.debug("[changeStatus] Attempting to change status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
+        log.debug("[UomStatus-service-changeStatus] Attempting to change status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("[changeStatus] {} - Entity not found for id: {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id), id);
@@ -238,6 +238,6 @@ public class UomStatusServiceImp implements UomStatusService {
                 });
         Boolean oldStatus = existing.getIsUsable();
         existing.setIsUsable(isUsable);
-        log.info("[changeStatus] Changed status of {} with id: {} from isUsable with id: {} to: {}", ENTITY_NAME, id, oldStatus, isUsable);
+        log.debug("[UomStatus-service-changeStatus] Changed status of {} with id: {} from isUsable with id: {} to: {}", ENTITY_NAME, id, oldStatus, isUsable);
     }
 }
