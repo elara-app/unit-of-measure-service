@@ -87,29 +87,28 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public UomStatusResponse update(Long id, UomStatusUpdate request) {
-        log.debug("[update] Attempting to update {} with id: {} and request: {}", ENTITY_NAME, id, request);
+        log.debug("[UomStatus-service-update] Attempting to update {} with id: {} and request: {}", ENTITY_NAME, id, request);
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("[update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+                    log.warn("[UomStatus-service-update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
                     return new ResourceNotFoundException(new Object[]{"id", id.toString()});
                 });
 
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
-            log.warn("[update] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
+            log.warn("[UomStatus-service-update] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
             throw new ResourceConflictException("name", request.name());
         }
 
         try {
-            log.debug("[update] Mapping update DTO to entity. Before: {}", existing);
+            log.debug("[UomStatus-service-update] Mapping update DTO to entity. Before: {}", existing);
             mapper.updateEntityFromDto(existing, request);
-            log.debug("[update] After mapping: {}", existing);
-            log.info("[update] Successfully updated {} with id: {}", ENTITY_NAME, id);
+            log.debug("[UomStatus-service-update] {}", messageService.getMessage("crud.update.success", ENTITY_NAME));
             return mapper.toResponse(existing);
         } catch (DataIntegrityViolationException e) {
-            log.error("[update] Data integrity violation while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            log.error("[UomStatus-service-update] Data integrity violation while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         } catch (Exception e) {
-            log.error("[update] Unexpected error while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            log.error("[UomStatus-service-update] Unexpected error while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         }
     }
