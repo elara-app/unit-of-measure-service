@@ -151,14 +151,14 @@ public class UomStatusServiceImp implements UomStatusService {
      */
     @Override
     public UomStatusResponse findById(Long id) {
-        log.debug("[findById] Searching {} with id: {}", ENTITY_NAME, id);
+        log.debug("[UomStatus-service-findById] Searching {} with id: {}", ENTITY_NAME, id);
         Optional<UomStatusResponse> response = repository.findById(id)
                 .map(mapper::toResponse);
         if (response.isEmpty()) {
-            log.warn("[findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+            log.warn("[UomStatus-service-findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
             throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
         }
-        log.info("[findById] Successfully found {} with id: {}", ENTITY_NAME, id);
+        log.debug("[UomStatus-service-findById] {}", messageService.getMessage("crud.read.success", ENTITY_NAME));
         return response.get();
     }
 
