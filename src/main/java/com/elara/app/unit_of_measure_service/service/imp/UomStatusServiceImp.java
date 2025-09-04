@@ -124,19 +124,19 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        log.debug("[deleteById] Attempting to delete {} with id: {}", ENTITY_NAME, id);
+        log.debug("[UomStatus-service-deleteById] Attempting to delete {} with id: {}", ENTITY_NAME, id);
         if (!repository.existsById(id)) {
-            log.warn("[deleteById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+            log.warn("[UomStatus-service-deleteById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
             throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
         }
         try {
             repository.deleteById(id);
-            log.info("[deleteById] {} with id: {}", messageService.getMessage("crud.delete.success", ENTITY_NAME), id);
+            log.debug("[UomStatus-service-deleteById] {} with id: {}", messageService.getMessage("crud.delete.success", ENTITY_NAME), id);
         } catch (DataIntegrityViolationException e) {
-            log.error("[deleteById] {}", messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage()));
+            log.error("[UomStatus-service-deleteById] {}", messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage()));
             throw new UnexpectedErrorException(e.getMessage());
         } catch (Exception e) {
-            log.error("[deleteById] Unexpected error while deleting {}: {}", ENTITY_NAME, e.getMessage(), e);
+            log.error("[UomStatus-service-deleteById] Unexpected error while deleting {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         }
     }
