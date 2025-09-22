@@ -87,29 +87,28 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public UomStatusResponse update(Long id, UomStatusUpdate request) {
-        log.debug("[update] Attempting to update {} with id: {} and request: {}", ENTITY_NAME, id, request);
+        log.debug("[UomStatus-service-update] Attempting to update {} with id: {} and request: {}", ENTITY_NAME, id, request);
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("[update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+                    log.warn("[UomStatus-service-update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
                     return new ResourceNotFoundException(new Object[]{"id", id.toString()});
                 });
 
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
-            log.warn("[update] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
+            log.warn("[UomStatus-service-update] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
             throw new ResourceConflictException("name", request.name());
         }
 
         try {
-            log.debug("[update] Mapping update DTO to entity. Before: {}", existing);
+            log.debug("[UomStatus-service-update] Mapping update DTO to entity. Before: {}", existing);
             mapper.updateEntityFromDto(existing, request);
-            log.debug("[update] After mapping: {}", existing);
-            log.info("[update] Successfully updated {} with id: {}", ENTITY_NAME, id);
+            log.debug("[UomStatus-service-update] {}", messageService.getMessage("crud.update.success", ENTITY_NAME));
             return mapper.toResponse(existing);
         } catch (DataIntegrityViolationException e) {
-            log.error("[update] Data integrity violation while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            log.error("[UomStatus-service-update] Data integrity violation while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         } catch (Exception e) {
-            log.error("[update] Unexpected error while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            log.error("[UomStatus-service-update] Unexpected error while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         }
     }
@@ -125,19 +124,19 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        log.debug("[deleteById] Attempting to delete {} with id: {}", ENTITY_NAME, id);
+        log.debug("[UomStatus-service-deleteById] Attempting to delete {} with id: {}", ENTITY_NAME, id);
         if (!repository.existsById(id)) {
-            log.warn("[deleteById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+            log.warn("[UomStatus-service-deleteById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
             throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
         }
         try {
             repository.deleteById(id);
-            log.info("[deleteById] {} with id: {}", messageService.getMessage("crud.delete.success", ENTITY_NAME), id);
+            log.debug("[UomStatus-service-deleteById] {} with id: {}", messageService.getMessage("crud.delete.success", ENTITY_NAME), id);
         } catch (DataIntegrityViolationException e) {
-            log.error("[deleteById] {}", messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage()));
+            log.error("[UomStatus-service-deleteById] {}", messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage()));
             throw new UnexpectedErrorException(e.getMessage());
         } catch (Exception e) {
-            log.error("[deleteById] Unexpected error while deleting {}: {}", ENTITY_NAME, e.getMessage(), e);
+            log.error("[UomStatus-service-deleteById] Unexpected error while deleting {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         }
     }
@@ -152,14 +151,14 @@ public class UomStatusServiceImp implements UomStatusService {
      */
     @Override
     public UomStatusResponse findById(Long id) {
-        log.debug("[findById] Searching {} with id: {}", ENTITY_NAME, id);
+        log.debug("[UomStatus-service-findById] Searching {} with id: {}", ENTITY_NAME, id);
         Optional<UomStatusResponse> response = repository.findById(id)
                 .map(mapper::toResponse);
         if (response.isEmpty()) {
-            log.warn("[findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+            log.warn("[UomStatus-service-findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
             throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
         }
-        log.info("[findById] Successfully found {} with id: {}", ENTITY_NAME, id);
+        log.debug("[UomStatus-service-findById] {}", messageService.getMessage("crud.read.success", ENTITY_NAME));
         return response.get();
     }
 
@@ -186,9 +185,9 @@ public class UomStatusServiceImp implements UomStatusService {
      */
     @Override
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
-        log.debug("[findAllByName] Fetching all {} entities with name containing: '{}' and pagination: {}", ENTITY_NAME, name, pageable);
+        log.debug("[UomStatus-service-findAllByName] Fetching all {} entities with name containing: '{}' and pagination: {}", ENTITY_NAME, name, pageable);
         Page<UomStatusResponse> page = repository.findAllByNameContainingIgnoreCase(name, pageable).map(mapper::toResponse);
-        log.info("[findAllByName] Fetched {} entities with name like '{}', page size: {}", ENTITY_NAME, name, page.getNumberOfElements());
+        log.info("[UomStatus-service-findAllByName] Fetched {} entities with name like '{}', page size: {}", ENTITY_NAME, name, page.getNumberOfElements());
         return page;
     }
 
@@ -201,9 +200,9 @@ public class UomStatusServiceImp implements UomStatusService {
      */
     @Override
     public Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable) {
-        log.debug("[findAllByIsUsable] Fetching all {} with isUsable: {} and pagination: {}", ENTITY_NAME, isUsable, pageable);
+        log.debug("[UomStatus-service-findAllByIsUsable] Fetching all {} with isUsable: {} and pagination: {}", ENTITY_NAME, isUsable, pageable);
         Page<UomStatusResponse> page = repository.findAllByIsUsable(isUsable, pageable).map(mapper::toResponse);
-        log.info("[findAllByIsUsable] Fetched {} entities with isUsable like '{}', page size: {}", ENTITY_NAME, isUsable, page.getNumberOfElements());
+        log.debug("[UomStatus-service-findAllByIsUsable] Fetched {} entities with isUsable like '{}', page size: {}", ENTITY_NAME, isUsable, page.getNumberOfElements());
         return page;
     }
 
@@ -231,7 +230,7 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     @Transactional
     public void changeStatus(Long id, Boolean isUsable) {
-        log.debug("[changeStatus] Attempting to change status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
+        log.debug("[UomStatus-service-changeStatus] Attempting to change status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
         UomStatus existing = repository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("[changeStatus] {} - Entity not found for id: {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id), id);
@@ -239,6 +238,6 @@ public class UomStatusServiceImp implements UomStatusService {
                 });
         Boolean oldStatus = existing.getIsUsable();
         existing.setIsUsable(isUsable);
-        log.info("[changeStatus] Changed status of {} with id: {} from isUsable with id: {} to: {}", ENTITY_NAME, id, oldStatus, isUsable);
+        log.debug("[UomStatus-service-changeStatus] Changed status of {} with id: {} from isUsable with id: {} to: {}", ENTITY_NAME, id, oldStatus, isUsable);
     }
 }
