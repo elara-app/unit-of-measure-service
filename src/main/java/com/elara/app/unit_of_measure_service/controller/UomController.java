@@ -2,13 +2,10 @@ package com.elara.app.unit_of_measure_service.controller;
 
 import com.elara.app.unit_of_measure_service.dto.request.UomRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomResponse;
-import com.elara.app.unit_of_measure_service.dto.response.UomStatusResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomUpdate;
 import com.elara.app.unit_of_measure_service.service.interfaces.UomService;
-import com.elara.app.unit_of_measure_service.service.interfaces.UomStatusService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jdk.swing.interop.SwingInterOpUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
