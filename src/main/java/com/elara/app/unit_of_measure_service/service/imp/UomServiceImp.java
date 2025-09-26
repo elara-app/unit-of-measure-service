@@ -4,6 +4,7 @@ import com.elara.app.unit_of_measure_service.dto.request.UomRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomUpdate;
 import com.elara.app.unit_of_measure_service.exceptions.ResourceConflictException;
+import com.elara.app.unit_of_measure_service.exceptions.ResourceNotFoundException;
 import com.elara.app.unit_of_measure_service.exceptions.UnexpectedErrorException;
 import com.elara.app.unit_of_measure_service.mapper.UomMapper;
 import com.elara.app.unit_of_measure_service.model.Uom;
@@ -60,8 +61,31 @@ public class UomServiceImp implements UomService {
     }
 
     @Override
+    @Transactional
     public UomResponse update(Long id, UomUpdate request) {
-        return null;
+        log.debug("[Uom-service-update] Attempting to update {} with id: {} and request: {}", ENTITY_NAME, id, request);
+        Uom existing = repository.findById(id)
+            .orElseThrow(() -> {
+                log.warn("[Uom-service-update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+                return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+            });
+
+        if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
+            log.warn("[Uom-service-update] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
+            throw new ResourceConflictException(new Object[]{"name", request.name()});
+        }
+
+        try {
+            UomStatus status = existing.getUomStatus();
+            log.debug("[Uom-service-update] Mapping update DTO to entity. Before: {}", existing);
+            mapper.updateEntityFromDto(existing, request);
+            existing.setUomStatus(status);
+            log.debug("[Uom-service-update] {}", messageService.getMessage("crud.update.success", ENTITY_NAME));
+            return mapper.toResponse(existing);
+        } catch (DataIntegrityViolationException e) {
+            log.error("[Uom-service-update] Data integrity violation while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        }
     }
 
     @Override
