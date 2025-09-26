@@ -63,27 +63,32 @@ public class UomServiceImp implements UomService {
     @Override
     @Transactional
     public UomResponse update(Long id, UomUpdate request) {
-        log.debug("[Uom-service-update] Attempting to update {} with id: {} and request: {}", ENTITY_NAME, id, request);
-        Uom existing = repository.findById(id)
-            .orElseThrow(() -> {
-                log.warn("[Uom-service-update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
-                return new ResourceNotFoundException(new Object[]{"id", id.toString()});
-            });
-
-        if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
-            log.warn("[Uom-service-update] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
-            throw new ResourceConflictException(new Object[]{"name", request.name()});
-        }
-
         try {
+            log.debug("[Uom-service-update] Attempting to update {} with id: {} and request: {}", ENTITY_NAME, id, request);
+            Uom existing = repository.findById(id)
+                .orElseThrow(() -> {
+                    String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                    log.warn("[Uom-service-update] {}", msg);
+                    return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+                });
+            if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
+                String msg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
+                log.warn("[Uom-service-update] {}", msg);
+                throw new ResourceConflictException(new Object[]{"name", request.name()});
+            }
             UomStatus status = existing.getUomStatus();
             log.debug("[Uom-service-update] Mapping update DTO to entity. Before: {}", existing);
             mapper.updateEntityFromDto(existing, request);
             existing.setUomStatus(status);
             log.debug("[Uom-service-update] {}", messageService.getMessage("crud.update.success", ENTITY_NAME));
             return mapper.toResponse(existing);
+        } catch (ResourceNotFoundException | ResourceConflictException e) {
+            throw e;
         } catch (DataIntegrityViolationException e) {
             log.error("[Uom-service-update] Data integrity violation while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        } catch (Exception e) {
+            log.error("[Uom-service-update] Unexpected error while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         }
     }
