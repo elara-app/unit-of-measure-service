@@ -89,10 +89,10 @@ public class UomStatusServiceImp implements UomStatusService {
     public UomStatusResponse update(Long id, UomStatusUpdate request) {
         log.debug("[UomStatus-service-update] Attempting to update {} with id: {} and request: {}", ENTITY_NAME, id, request);
         UomStatus existing = repository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("[UomStatus-service-update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
-                    return new ResourceNotFoundException(new Object[]{"id", id.toString()});
-                });
+            .orElseThrow(() -> {
+                log.warn("[UomStatus-service-update] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+                return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+            });
 
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
             log.warn("[UomStatus-service-update] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
@@ -153,13 +153,25 @@ public class UomStatusServiceImp implements UomStatusService {
     public UomStatusResponse findById(Long id) {
         log.debug("[UomStatus-service-findById] Searching {} with id: {}", ENTITY_NAME, id);
         Optional<UomStatusResponse> response = repository.findById(id)
-                .map(mapper::toResponse);
+            .map(mapper::toResponse);
         if (response.isEmpty()) {
             log.warn("[UomStatus-service-findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
             throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
         }
         log.debug("[UomStatus-service-findById] {}", messageService.getMessage("crud.read.success", ENTITY_NAME));
         return response.get();
+    }
+
+    @Transactional
+    public UomStatus findByIdService(Long id) {
+        log.debug("[UomStatus-service-findByIdService] Searching {} with id: {}", ENTITY_NAME, id);
+        UomStatus entity = repository.findById(id)
+            .orElseThrow(() -> {
+                log.warn("[UomStatus-service-findByIdService] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+                return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+            });
+        log.debug("[UomStatus-service-findByIdService] {}", messageService.getMessage("crud.read.success", ENTITY_NAME));
+        return entity;
     }
 
     /**
@@ -232,10 +244,10 @@ public class UomStatusServiceImp implements UomStatusService {
     public void changeStatus(Long id, Boolean isUsable) {
         log.debug("[UomStatus-service-changeStatus] Attempting to change status of {} with id: {} to isUsable: {}", ENTITY_NAME, id, isUsable);
         UomStatus existing = repository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("[changeStatus] {} - Entity not found for id: {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id), id);
-                    return new ResourceNotFoundException(new Object[]{"id", id.toString()});
-                });
+            .orElseThrow(() -> {
+                log.warn("[changeStatus] {} - Entity not found for id: {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id), id);
+                return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+            });
         Boolean oldStatus = existing.getIsUsable();
         existing.setIsUsable(isUsable);
         log.debug("[UomStatus-service-changeStatus] Changed status of {} with id: {} from isUsable with id: {} to: {}", ENTITY_NAME, id, oldStatus, isUsable);
