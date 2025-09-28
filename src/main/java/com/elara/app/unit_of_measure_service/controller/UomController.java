@@ -130,4 +130,18 @@ public class UomController {
         return ResponseEntity.noContent().build();
     }
 
+    // ========================================
+    // DELETE OPERATIONS
+    // ========================================
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUomStatus(
+        @PathVariable @NotNull @Positive Long id
+    ) {
+        log.info("[Uom-controller-deleteById] Request to delete Uom id: {}", id);
+        service.deleteById(id);
+        log.info("[Uom-controller-deleteById] Uom deleted: {}", id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
