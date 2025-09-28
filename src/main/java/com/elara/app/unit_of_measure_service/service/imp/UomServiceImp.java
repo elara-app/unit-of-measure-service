@@ -1,0 +1,191 @@
+package com.elara.app.unit_of_measure_service.service.imp;
+
+import com.elara.app.unit_of_measure_service.dto.request.UomRequest;
+import com.elara.app.unit_of_measure_service.dto.response.UomResponse;
+import com.elara.app.unit_of_measure_service.dto.update.UomUpdate;
+import com.elara.app.unit_of_measure_service.exceptions.ResourceConflictException;
+import com.elara.app.unit_of_measure_service.exceptions.ResourceNotFoundException;
+import com.elara.app.unit_of_measure_service.exceptions.UnexpectedErrorException;
+import com.elara.app.unit_of_measure_service.mapper.UomMapper;
+import com.elara.app.unit_of_measure_service.model.Uom;
+import com.elara.app.unit_of_measure_service.model.UomStatus;
+import com.elara.app.unit_of_measure_service.repository.UomRepository;
+import com.elara.app.unit_of_measure_service.service.interfaces.UomService;
+import com.elara.app.unit_of_measure_service.service.interfaces.UomStatusService;
+import com.elara.app.unit_of_measure_service.utils.MessageService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+import java.util.Optional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class UomServiceImp implements UomService {
+
+    private static final String ENTITY_NAME = "Uom";
+    private final UomRepository repository;
+    private final UomMapper mapper;
+    private final MessageService messageService;
+    private final UomStatusService statusService;
+
+    @Override
+    @Transactional
+    public UomResponse save(UomRequest request) {
+        try {
+            log.debug("[Uom-service-save] Attempting to create {} with name: {} and request: {}", ENTITY_NAME, request != null ? request.name() : null, request);
+            if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
+                String msg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
+                log.warn("[Uom-service-save] {}", msg);
+                throw new ResourceConflictException(new Object[]{"name", request.name()});
+            }
+            Uom entity = mapper.toEntity(request);
+            log.debug("[Uom-service-save] Mapped DTO to entity: {}", entity);
+            UomStatus status = statusService.findByIdService(request.uomStatusId());
+            entity.setUomStatus(status);
+            Uom saved = repository.save(entity);
+            log.debug("[UomStatus-service-save] {}", messageService.getMessage("crud.create.success", ENTITY_NAME));
+            return mapper.toResponse(saved);
+        } catch (ResourceConflictException e) {
+            throw e;
+        } catch (DataIntegrityViolationException e) {
+            log.error("[Uom-service-save] Data integrity violation while saving {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        } catch (Exception e) {
+            log.error("[Uom-service-save] Unexpected error while saving {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public UomResponse update(Long id, UomUpdate request) {
+        try {
+            log.debug("[Uom-service-update] Attempting to update {} with id: {} and request: {}", ENTITY_NAME, id, request);
+            Uom existing = repository.findById(id)
+                .orElseThrow(() -> {
+                    String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                    log.warn("[Uom-service-update] {}", msg);
+                    return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+                });
+            if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
+                String msg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
+                log.warn("[Uom-service-update] {}", msg);
+                throw new ResourceConflictException(new Object[]{"name", request.name()});
+            }
+            UomStatus status = existing.getUomStatus();
+            log.debug("[Uom-service-update] Mapping update DTO to entity. Before: {}", existing);
+            mapper.updateEntityFromDto(existing, request);
+            existing.setUomStatus(status);
+            log.debug("[Uom-service-update] {}", messageService.getMessage("crud.update.success", ENTITY_NAME));
+            return mapper.toResponse(existing);
+        } catch (ResourceNotFoundException | ResourceConflictException e) {
+            throw e;
+        } catch (DataIntegrityViolationException e) {
+            log.error("[Uom-service-update] Data integrity violation while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        } catch (Exception e) {
+            log.error("[Uom-service-update] Unexpected error while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        try {
+            log.debug("[Uom-service-deleteById] Attempting to delete {} with id: {}", ENTITY_NAME, id);
+            if (!repository.existsById(id)) {
+                log.warn("[Uom-service-deleteById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+                throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
+            }
+            repository.deleteById(id);
+            log.debug("[Uom-service-deleteById] {} with id: {}", messageService.getMessage("crud.delete.success", ENTITY_NAME), id);
+        } catch (ResourceConflictException e) {
+            throw e;
+        } catch (DataIntegrityViolationException e) {
+            log.error("[Uom-service-deleteById] {}", messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage()));
+            throw new UnexpectedErrorException(e.getMessage());
+        } catch (Exception e) {
+            log.error("[Uom-service-deleteById] Unexpected error while deleting {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public UomResponse findById(Long id) {
+        log.debug("[Uom-service-findById] Searching {} with id: {}", ENTITY_NAME, id);
+        Optional<UomResponse> response = repository.findById(id)
+            .map(mapper::toResponse);
+        if (response.isEmpty()) {
+            log.warn("[Uom-service-findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+            throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
+        }
+        log.debug("[Uom-service-findById] {}", messageService.getMessage("crud.read.success", ENTITY_NAME));
+        return response.get();
+    }
+
+    @Override
+    public Page<UomResponse> findAll(Pageable pageable) {
+        log.debug("[Uom-service-findAll] Fetching all {} entities with pagination: {}.", ENTITY_NAME, pageable);
+        Page<UomResponse> page = repository.findAll(pageable).map(mapper::toResponse);
+        log.debug("[Uom-service-findAll] Fetched {} entities, page size: {}.", ENTITY_NAME, page.getNumberOfElements());
+        return page;
+    }
+
+    @Override
+    public Page<UomResponse> findAllByName(String name, Pageable pageable) {
+        log.debug("[Uom-service-findAllByName] Fetching all {} entities with name containing: '{}' and pagination: {}", ENTITY_NAME, name, pageable);
+        Page<UomResponse> page = repository.findAllByNameContainingIgnoreCase(name, pageable).map(mapper::toResponse);
+        log.info("[Uom-service-findAllByName] Fetched {} entities with name like '{}', page size: {}", ENTITY_NAME, name, page.getNumberOfElements());
+        return page;
+    }
+
+    @Override
+    public Page<UomResponse> findAllByUomStatusId(Long uomStatusId, Pageable pageable) {
+        log.debug("[Uom-service-findAllByUomStatusId] Fetching all {} entities with status id: '{}' and pagination: {}", ENTITY_NAME, uomStatusId, pageable);
+        Page<UomResponse> page = repository.findAllByUomStatusId(uomStatusId, pageable).map(mapper::toResponse);
+        log.info("[Uom-service-findAllByUomStatusId] Fetched {} entities with status id: '{}', page size: {}", ENTITY_NAME, uomStatusId, page.getNumberOfElements());
+        return page;
+    }
+
+    @Override
+    public Boolean isNameTaken(String name) {
+        log.debug("[Uom-service-isNameTaken] Checking if name '{}' is taken for {}", name, ENTITY_NAME);
+        Boolean exists = repository.existsByNameIgnoreCase(name);
+        log.debug("[Uom-service-isNameTaken] Name '{}' taken: {}", name, exists);
+        return exists;
+    }
+
+    @Override
+    @Transactional
+    public void changeStatus(Long id, Long uomStatusId) {
+        try {
+            log.debug("[Uom-service-changeStatus] Attempting to change status of {} with id: {} to the new status id: {}", ENTITY_NAME, id, uomStatusId);
+            Uom existing = repository.findById(id)
+                .orElseThrow(() -> {
+                    String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                    log.warn("[Uom-service-changeStatus] {} - Entity not found for id: {}", msg, id);
+                    return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+                });
+            Long oldStatusId = existing.getUomStatus().getId();
+            UomStatus newStatus = statusService.findByIdService(uomStatusId);
+            existing.setUomStatus(newStatus);
+            log.debug("[Uom-service-changeStatus] Changed status of {} with id: {} from uomStatus with id: {} to: {}", ENTITY_NAME, id, oldStatusId, newStatus.getId());
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (DataIntegrityViolationException e) {
+            log.error("[Uom-service-changeStatus] {}", messageService.getMessage("repository.update.error", ENTITY_NAME, e.getMessage()));
+            throw new UnexpectedErrorException(e.getMessage());
+        } catch (Exception e) {
+            log.error("[Uom-service-changeStatus] Unexpected error while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        }
+    }
+
+}
