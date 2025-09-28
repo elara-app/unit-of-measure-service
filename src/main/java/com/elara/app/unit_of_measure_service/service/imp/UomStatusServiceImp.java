@@ -96,7 +96,7 @@ public class UomStatusServiceImp implements UomStatusService {
 
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
             log.warn("[UomStatus-service-update] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
-            throw new ResourceConflictException("name", request.name());
+            throw new ResourceConflictException(new Object[]{"name", request.name()});
         }
 
         try {

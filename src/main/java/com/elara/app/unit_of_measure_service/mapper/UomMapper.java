@@ -13,6 +13,7 @@ public interface UomMapper {
 
     Uom toEntity(UomRequest request);
 
+    @Mapping(target = "uomStatusId", source = "uomStatus.id")
     UomResponse toResponse(Uom entity);
 
     @Mapping(target = "id", ignore = true)
