@@ -2,6 +2,7 @@ package com.elara.app.unit_of_measure_service.service.interfaces;
 
 import com.elara.app.unit_of_measure_service.dto.request.UomRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomResponse;
+import com.elara.app.unit_of_measure_service.dto.update.UomUpdate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,7 +10,7 @@ public interface UomService {
 
     UomResponse save(UomRequest request);
 
-    UomResponse update(Long id, UomRequest request);
+    UomResponse update(Long id, UomUpdate request);
 
     void deleteById(Long id);
 
