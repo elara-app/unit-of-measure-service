@@ -39,15 +39,15 @@ public class UomServiceImp implements UomService {
     public UomResponse save(UomRequest request) {
         log.debug("[Uom-service-save] Attempting to create {} with name: {} and request: {}", ENTITY_NAME, request != null ? request.name() : null, request);
         if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
-            log.warn("[Uom-service-save] {}", messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
-            throw new ResourceConflictException(new Object[]{"namem", request.name()});
+            String msg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
+            log.warn("[Uom-service-save] {}", msg);
+            throw new ResourceConflictException(new Object[]{"name", request.name()});
         }
         try {
             Uom entity = mapper.toEntity(request);
             log.debug("[Uom-service-save] Mapped DTO to entity: {}", entity);
             UomStatus status = statusService.findByIdService(request.uomStatusId());
             entity.setUomStatus(status);
-            System.out.println(entity.getUomStatus().getName());
             Uom saved = repository.save(entity);
             log.debug("[UomStatus-service-save] {}", messageService.getMessage("crud.create.success", ENTITY_NAME));
             return mapper.toResponse(saved);
