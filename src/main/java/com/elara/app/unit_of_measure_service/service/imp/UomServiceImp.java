@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -97,27 +98,60 @@ public class UomServiceImp implements UomService {
 
     @Override
     public void deleteById(Long id) {
-
+        try {
+            log.debug("[Uom-service-deleteById] Attempting to delete {} with id: {}", ENTITY_NAME, id);
+            if (!repository.existsById(id)) {
+                log.warn("[Uom-service-deleteById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+                throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
+            }
+            repository.deleteById(id);
+            log.debug("[Uom-service-deleteById] {} with id: {}", messageService.getMessage("crud.delete.success", ENTITY_NAME), id);
+        } catch (ResourceConflictException e) {
+            throw e;
+        } catch (DataIntegrityViolationException e) {
+            log.error("[Uom-service-deleteById] {}", messageService.getMessage("repository.delete.error", ENTITY_NAME, e.getMessage()));
+            throw new UnexpectedErrorException(e.getMessage());
+        } catch (Exception e) {
+            log.error("[Uom-service-deleteById] Unexpected error while deleting {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        }
     }
 
     @Override
     public UomResponse findById(Long id) {
-        return null;
+        log.debug("[Uom-service-findById] Searching {} with id: {}", ENTITY_NAME, id);
+        Optional<UomResponse> response = repository.findById(id)
+            .map(mapper::toResponse);
+        if (response.isEmpty()) {
+            log.warn("[Uom-service-findById] {}", messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id));
+            throw new ResourceNotFoundException(new Object[]{"id", id.toString()});
+        }
+        log.debug("[Uom-service-findById] {}", messageService.getMessage("crud.read.success", ENTITY_NAME));
+        return response.get();
     }
 
     @Override
     public Page<UomResponse> findAll(Pageable pageable) {
-        return null;
+        log.debug("[Uom-service-findAll] Fetching all {} entities with pagination: {}.", ENTITY_NAME, pageable);
+        Page<UomResponse> page = repository.findAll(pageable).map(mapper::toResponse);
+        log.debug("[Uom-service-findAll] Fetched {} entities, page size: {}.", ENTITY_NAME, page.getNumberOfElements());
+        return page;
     }
 
     @Override
     public Page<UomResponse> findAllByName(String name, Pageable pageable) {
-        return null;
+        log.debug("[Uom-service-findAllByName] Fetching all {} entities with name containing: '{}' and pagination: {}", ENTITY_NAME, name, pageable);
+        Page<UomResponse> page = repository.findAllByNameContainingIgnoreCase(name, pageable).map(mapper::toResponse);
+        log.info("[Uom-service-findAllByName] Fetched {} entities with name like '{}', page size: {}", ENTITY_NAME, name, page.getNumberOfElements());
+        return page;
     }
 
     @Override
     public Page<UomResponse> findAllByUomStatusId(Long uomStatusId, Pageable pageable) {
-        return null;
+        log.debug("[Uom-service-findAllByUomStatusId] Fetching all {} entities with status id: '{}' and pagination: {}", ENTITY_NAME, uomStatusId, pageable);
+        Page<UomResponse> page = repository.findAllByUomStatusId(uomStatusId, pageable).map(mapper::toResponse);
+        log.info("[Uom-service-findAllByUomStatusId] Fetched {} entities with status id: '{}', page size: {}", ENTITY_NAME, uomStatusId, page.getNumberOfElements());
+        return page;
     }
 
     @Override
@@ -129,8 +163,29 @@ public class UomServiceImp implements UomService {
     }
 
     @Override
+    @Transactional
     public void changeStatus(Long id, Long uomStatusId) {
-
+        try {
+            log.debug("[Uom-service-changeStatus] Attempting to change status of {} with id: {} to the new status id: {}", ENTITY_NAME, id, uomStatusId);
+            Uom existing = repository.findById(id)
+                .orElseThrow(() -> {
+                    String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                    log.warn("[Uom-service-changeStatus] {} - Entity not found for id: {}", msg, id);
+                    return new ResourceNotFoundException(new Object[]{"id", id.toString()});
+                });
+            Long oldStatusId = existing.getUomStatus().getId();
+            UomStatus newStatus = statusService.findByIdService(uomStatusId);
+            existing.setUomStatus(newStatus);
+            log.debug("[Uom-service-changeStatus] Changed status of {} with id: {} from uomStatus with id: {} to: {}", ENTITY_NAME, id, oldStatusId, newStatus.getId());
+        } catch (ResourceConflictException e) {
+            throw e;
+        } catch (DataIntegrityViolationException e) {
+            log.error("[Uom-service-changeStatus] {}", messageService.getMessage("repository.update.error", ENTITY_NAME, e.getMessage()));
+            throw new UnexpectedErrorException(e.getMessage());
+        } catch (Exception e) {
+            log.error("[Uom-service-changeStatus] Unexpected error while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
+            throw new UnexpectedErrorException(e.getMessage());
+        }
     }
 
 }
