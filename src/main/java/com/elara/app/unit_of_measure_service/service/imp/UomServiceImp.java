@@ -37,13 +37,13 @@ public class UomServiceImp implements UomService {
     @Override
     @Transactional
     public UomResponse save(UomRequest request) {
-        log.debug("[Uom-service-save] Attempting to create {} with name: {} and request: {}", ENTITY_NAME, request != null ? request.name() : null, request);
-        if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
-            String msg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
-            log.warn("[Uom-service-save] {}", msg);
-            throw new ResourceConflictException(new Object[]{"name", request.name()});
-        }
         try {
+            log.debug("[Uom-service-save] Attempting to create {} with name: {} and request: {}", ENTITY_NAME, request != null ? request.name() : null, request);
+            if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
+                String msg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
+                log.warn("[Uom-service-save] {}", msg);
+                throw new ResourceConflictException(new Object[]{"name", request.name()});
+            }
             Uom entity = mapper.toEntity(request);
             log.debug("[Uom-service-save] Mapped DTO to entity: {}", entity);
             UomStatus status = statusService.findByIdService(request.uomStatusId());
@@ -51,6 +51,8 @@ public class UomServiceImp implements UomService {
             Uom saved = repository.save(entity);
             log.debug("[UomStatus-service-save] {}", messageService.getMessage("crud.create.success", ENTITY_NAME));
             return mapper.toResponse(saved);
+        } catch (ResourceConflictException e) {
+            throw e;
         } catch (DataIntegrityViolationException e) {
             log.error("[Uom-service-save] Data integrity violation while saving {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
