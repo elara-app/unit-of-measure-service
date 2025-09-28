@@ -177,7 +177,7 @@ public class UomServiceImp implements UomService {
             UomStatus newStatus = statusService.findByIdService(uomStatusId);
             existing.setUomStatus(newStatus);
             log.debug("[Uom-service-changeStatus] Changed status of {} with id: {} from uomStatus with id: {} to: {}", ENTITY_NAME, id, oldStatusId, newStatus.getId());
-        } catch (ResourceConflictException e) {
+        } catch (ResourceNotFoundException e) {
             throw e;
         } catch (DataIntegrityViolationException e) {
             log.error("[Uom-service-changeStatus] {}", messageService.getMessage("repository.update.error", ENTITY_NAME, e.getMessage()));
