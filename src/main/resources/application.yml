@@ -19,22 +19,21 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-#    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 server:
-  port: 0 # Use 0 to let Spring Boot assign a random available port at startup (useful for testing, avoiding port conflicts, or running multiple instances)
+  port: 0
 eureka:
   instance:
-    instance-id: ${spring.application.name}:${random.uuid} # Unique identifier for this service instance in Eureka
-    lease-expiration-duration-in-seconds: 90 # Time (seconds) Eureka waits before removing an instance if no heartbeat is received
-    lease-renewal-interval-in-seconds: 30 # Interval (seconds) for sending heartbeats to Eureka to renew registration
-    prefer-ip-address: true # Register service using IP address instead of hostname
+    instance-id: ${spring.application.name}:${random.uuid}
+    lease-expiration-duration-in-seconds: 90
+    lease-renewal-interval-in-seconds: 30
+    prefer-ip-address: true
     metadata-map:
-      version: 1.0.0 # Custom metadata: service version
-      environment: production # Custom metadata: environment (e.g., production, staging)
-      region: us-east # Custom metadata: region/location of the service
+      version: 1.0.0
+      environment: production
+      region: us-east
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/ # Eureka server URL for service registration and discovery
+      defaultZone: http://localhost:8761/eureka/
