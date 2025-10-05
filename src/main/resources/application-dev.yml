@@ -1,0 +1,9 @@
+spring:
+  config:
+    import:
+      - vault://secret/unit-of-measure-service/dev
+  cloud:
+    vault:
+      uri: http://localhost:8200
+      authentication: TOKEN
+      token: 00000000-0000-0000-0000-000000000000
