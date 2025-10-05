@@ -1,11 +1,8 @@
 server:
   port: 0
 spring:
-  application:
-    name: unit-of-measure-service
   config:
     import:
-      - optional:configserver:http://localhost:8888
       - vault://secret/unit-of-measure-service/dev
   cloud:
     vault:
