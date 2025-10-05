@@ -2,13 +2,19 @@ spring:
   profiles:
     active: dev
   config:
-    import: optional:configserver:http://localhost:8888
+    import:
+    - optional:configserver:http://localhost:8888
+    - vault://secret/unit-of-measure-service/dev
+  cloud:
+    vault:
+      application-name: ${spring.application.name}
+      uri: http://localhost:8200
+      authentication: TOKEN
+      token: 00000000-0000-0000-0000-000000000000
   application:
     name: unit-of-measure-service
   datasource:
-    url: ${DB_URL:}
-    username: ${DB_USERNAME:}
-    password: ${DB_PASSWORD:}
+    url: jdbc:postgresql://localhost:5432/unit_of_measure_db
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -31,4 +37,4 @@ eureka:
       region: us-east # Custom metadata: region/location of the service
   client:
     service-url:
-      defaultZone: ${EUREKA_URL:} # Eureka server URL for service registration and discovery
+      defaultZone: http://localhost:8761/eureka/ # Eureka server URL for service registration and discovery
