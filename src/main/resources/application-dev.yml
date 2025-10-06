@@ -1,7 +1,6 @@
 spring:
   config:
-    import:
-      - vault://secret/unit-of-measure-service/dev
+    import: vault://secret/unit-of-measure-service/dev
   cloud:
     vault:
       uri: http://localhost:8200
