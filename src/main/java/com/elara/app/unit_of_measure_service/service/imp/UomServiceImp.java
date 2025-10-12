@@ -3,6 +3,7 @@ package com.elara.app.unit_of_measure_service.service.imp;
 import com.elara.app.unit_of_measure_service.dto.request.UomRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomUpdate;
+import com.elara.app.unit_of_measure_service.exceptions.DatabaseException;
 import com.elara.app.unit_of_measure_service.exceptions.ResourceConflictException;
 import com.elara.app.unit_of_measure_service.exceptions.ResourceNotFoundException;
 import com.elara.app.unit_of_measure_service.exceptions.UnexpectedErrorException;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -56,7 +59,8 @@ public class UomServiceImp implements UomService {
             throw e;
         } catch (DataIntegrityViolationException e) {
             log.error("[Uom-service-save] Data integrity violation while saving {}: {}", ENTITY_NAME, e.getMessage(), e);
-            throw new UnexpectedErrorException(e.getMessage());
+            String[] data = getDataFromDataIntegrityExceptionMessage(e.getMessage());
+            throw new DatabaseException(new Object[]{data[0], data[1]});
         } catch (Exception e) {
             log.error("[Uom-service-save] Unexpected error while saving {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
@@ -186,6 +190,15 @@ public class UomServiceImp implements UomService {
             log.error("[Uom-service-changeStatus] Unexpected error while updating {}: {}", ENTITY_NAME, e.getMessage(), e);
             throw new UnexpectedErrorException(e.getMessage());
         }
+    }
+
+    private static String[] getDataFromDataIntegrityExceptionMessage(String exceptionMessage) {
+        String notAvailable = "<>";
+        Matcher errorMatcher = Pattern.compile("ERROR:\\s*([^\\n]+)").matcher(exceptionMessage);
+        String error = errorMatcher.find() ? errorMatcher.group(1).trim() : notAvailable;
+        Matcher detailMatcher = Pattern.compile("Detail:\\s*([^.]+)").matcher(exceptionMessage);
+        String detail = detailMatcher.find() ? detailMatcher.group(1).trim() : notAvailable;
+        return new String[]{error, detail};
     }
 
 }
