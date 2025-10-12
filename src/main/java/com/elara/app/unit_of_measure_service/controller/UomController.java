@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 )
 public class UomController {
 
+    private static final String NOMENCLATURE = "Uom-controller";
     private final UomService service;
 
     // ========================================
@@ -38,11 +39,14 @@ public class UomController {
     // ========================================
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UomResponse> createUom(@Valid @RequestBody UomRequest request) {
-        log.info("[Uom-controller-create] Request to create Uom: {}.", request);
+    public ResponseEntity<UomResponse> createUom(
+        @Valid @RequestBody UomRequest request
+    ) {
+        final String methodNomenclature = NOMENCLATURE + "-createUom";
+        log.info("[{}] Request to create Uom: {}.", methodNomenclature, request);
         UomResponse response = service.save(request);
         System.out.println(response);
-        log.info("[Uom-controller-service] Uom created with id: {}.", response.id());
+        log.info("[{}] Uom created with id: {}.", methodNomenclature, response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -54,9 +58,10 @@ public class UomController {
     public ResponseEntity<UomResponse> getUomStatusById(
         @PathVariable @NotNull @Positive Long id
     ) {
-        log.info("[Uom-controller-getUomById] Request to get Uom by id: {}", id);
+        final String methodNomenclature = NOMENCLATURE + "-getUomStatusById";
+        log.info("[{}] Request to get Uom by id: {}", methodNomenclature, id);
         UomResponse response = service.findById(id);
-        log.info("[Uom-controller-getUomById] Uom found: {}", response);
+        log.info("[{}] Uom found: {}", methodNomenclature, response);
         return ResponseEntity.ok(response);
     }
 
@@ -64,9 +69,10 @@ public class UomController {
     public ResponseEntity<Page<UomResponse>> getAllUomStatuses(
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        log.info("[Uom-controller-getAll] Request to get all Uom.");
+        final String methodNomenclature = NOMENCLATURE + "-getAllUomStatuses";
+        log.info("[{}] Request to get all Uom.", methodNomenclature);
         Page<UomResponse> response = service.findAll(pageable);
-        log.info("[Uom-controller-getAll] Fetched {} Uom.", response.getNumberOfElements());
+        log.info("[{}] Fetched {} Uom.", methodNomenclature, response.getNumberOfElements());
         return ResponseEntity.ok(response);
     }
 
@@ -75,9 +81,10 @@ public class UomController {
         @RequestParam @NotBlank String name,
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        log.info("[Uom-controller-searchByName] Request to search Uoms by name: '{}'", name);
+        final String methodNomenclature = NOMENCLATURE + "-searchUomStatusesByName";
+        log.info("[{}] Request to search Uoms by name: '{}'", methodNomenclature, name);
         Page<UomResponse> response = service.findAllByName(name, pageable);
-        log.info("[Uom-controller-searchByName] Fetched {} Uoms for name: '{}'",
+        log.info("[{}] Fetched {} Uoms for name: '{}'", methodNomenclature,
             response.getNumberOfElements(), name);
         return ResponseEntity.ok(response);
     }
@@ -87,9 +94,10 @@ public class UomController {
         @PathVariable @NotNull @Positive Long uomStatusId,
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        log.info("[Uom-controller-filterByUomStatusId] Request to filter all Uoms by status id: {}", uomStatusId);
+        final String methodNomenclature = NOMENCLATURE + "-filterUomStatusesByUsability";
+        log.info("[{}] Request to filter all Uoms by status id: {}", methodNomenclature, uomStatusId);
         Page<UomResponse> response = service.findAllByUomStatusId(uomStatusId, pageable);
-        log.info("[Uom-controller-filterByUomStatusId] Fetched {} Uoms for uom status id: {}",
+        log.info("[{}] Fetched {} Uoms for uom status id: {}", methodNomenclature,
             response.getNumberOfElements(), uomStatusId);
         return ResponseEntity.ok(response);
     }
@@ -98,9 +106,10 @@ public class UomController {
     public ResponseEntity<Boolean> isNameTaken(
         @RequestParam @NotBlank() String name
     ) {
-        log.info("[Uom-controller-isNameTaken] Request to check if name is taken: '{}'", name);
+        final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
+        log.info("[{}] Request to check if name is taken: '{}'", methodNomenclature, name);
         Boolean isTaken = service.isNameTaken(name);
-        log.info("[Uom-controller-isNameTaken] Name '{}' taken: {}", name, isTaken);
+        log.info("[{}] Name '{}' taken: {}", methodNomenclature, name, isTaken);
         return ResponseEntity.ok(isTaken);
     }
 
@@ -113,9 +122,10 @@ public class UomController {
         @PathVariable Long id,
         @Valid @RequestBody UomUpdate update
     ) {
-        log.info("[Uom-controller-update] Request to update Uom id: {} with data: {}", id, update);
+        final String methodNomenclature = NOMENCLATURE + "-updateUom";
+        log.info("[{}] Request to update Uom id: {} with data: {}", methodNomenclature, id, update);
         UomResponse response = service.update(id, update);
-        log.info("[Uom-controller-update] Uom updated: {}", response);
+        log.info("[{}] Uom updated: {}", methodNomenclature, response);
         return ResponseEntity.ok(response);
     }
 
@@ -124,9 +134,10 @@ public class UomController {
         @PathVariable @NotNull @Positive Long id,
         @RequestParam @NotNull @Positive Long newUomStatusId
     ) {
-        log.info("[Uom-controller-changeStatus] Request to change status for UOm with id: {} to: {}", id, newUomStatusId);
+        final String methodNomenclature = NOMENCLATURE + "-changeUomStatusUsability";
+        log.info("[{}] Request to change status for UOm with id: {} to: {}", methodNomenclature, id, newUomStatusId);
         service.changeStatus(id, newUomStatusId);
-        log.info("[Uom-controller-changeStatus] Usability changed for Uom with id: {}", id);
+        log.info("[{}] Usability changed for Uom with id: {}", methodNomenclature, id);
         return ResponseEntity.noContent().build();
     }
 
@@ -138,9 +149,10 @@ public class UomController {
     public ResponseEntity<Void> deleteUomStatus(
         @PathVariable @NotNull @Positive Long id
     ) {
-        log.info("[Uom-controller-deleteById] Request to delete Uom id: {}", id);
+        final String methodNomenclature = NOMENCLATURE + "-deleteUomStatus";
+        log.info("[{}] Request to delete Uom id: {}", methodNomenclature, id);
         service.deleteById(id);
-        log.info("[Uom-controller-deleteById] Uom deleted: {}", id);
+        log.info("[{}] Uom deleted: {}", methodNomenclature, id);
         return ResponseEntity.noContent().build();
     }
 
