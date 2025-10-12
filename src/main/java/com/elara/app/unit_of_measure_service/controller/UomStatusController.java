@@ -68,7 +68,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2025-08-06
  */
 @RestController
-@RequestMapping(value = "/api/v1/uom-status", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "states", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Validated
 @Slf4j
