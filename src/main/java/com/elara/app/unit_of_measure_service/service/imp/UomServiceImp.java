@@ -193,8 +193,8 @@ public class UomServiceImp implements UomService {
             Uom existing = repository.findById(id)
                 .orElseThrow(() -> {
                     String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-                    log.warn("[{}] {} - Entity not found for id: {}", methodNomenclature, msg, id);
-                    return new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
+                    log.warn("[{}] {}", methodNomenclature, msg);
+                    return new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id});
                 });
             Long oldStatusId = existing.getUomStatus().getId();
             UomStatus newStatus = statusService.findByIdService(uomStatusId);
