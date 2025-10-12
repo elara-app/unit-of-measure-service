@@ -160,7 +160,7 @@ public class UomServiceImp implements UomService {
     @Override
     public Page<UomResponse> findAllByName(String name, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByName";
-        log.debug("[{}] Fetching all {} entities with name containing: '{}' and pagination: {}", methodNomenclature, ENTITY_NAME, name, pageable);
+        log.debug("[{}] Fetching all {} entities with name containing: '{}'", methodNomenclature, ENTITY_NAME, name);
         Page<UomResponse> page = repository.findAllByNameContainingIgnoreCase(name, pageable).map(mapper::toResponse);
         log.info("[{}] Fetched {} entities with name like '{}', page size: {}", methodNomenclature, ENTITY_NAME, name, page.getNumberOfElements());
         return page;
@@ -169,7 +169,7 @@ public class UomServiceImp implements UomService {
     @Override
     public Page<UomResponse> findAllByUomStatusId(Long uomStatusId, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByUomStatusId";
-        log.debug("[{}] Fetching all {} entities with status id: '{}' and pagination: {}", methodNomenclature, ENTITY_NAME, uomStatusId, pageable);
+        log.debug("[{}] Fetching all {} entities with status id: '{}'", methodNomenclature, ENTITY_NAME, uomStatusId);
         Page<UomResponse> page = repository.findAllByUomStatusId(uomStatusId, pageable).map(mapper::toResponse);
         log.info("[{}] Fetched {} entities with status id: '{}', page size: {}", methodNomenclature, ENTITY_NAME, uomStatusId, page.getNumberOfElements());
         return page;
