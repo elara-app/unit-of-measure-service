@@ -75,7 +75,7 @@ public class UomController {
         final String methodNomenclature = NOMENCLATURE + "-getAllUomStatuses";
         log.info("[{}] Request to retrieve all {} records.", methodNomenclature, ENTITY_NAME);
         Page<UomResponse> response = service.findAll(pageable);
-        log.info("[{}] {} {} records retrieved.", methodNomenclature, response.getNumberOfElements(), ENTITY_NAME);
+        log.info("[{}] {} records retrieved.", methodNomenclature, ENTITY_NAME);
         return ResponseEntity.ok(response);
     }
 
