@@ -68,7 +68,7 @@ public class UomServiceImp implements UomService {
                 .orElseThrow(() -> {
                     String notFoundMsg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
                     log.warn("[{}] {}", methodNomenclature, notFoundMsg);
-                    return new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
+                    return new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id});
                 });
             if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
                 String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
