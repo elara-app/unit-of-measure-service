@@ -49,9 +49,9 @@ public class UomServiceImp implements UomService {
             UomStatus status = statusService.findByIdService(request.uomStatusId());
             entity.setUomStatus(status);
             Uom saved = repository.save(entity);
-            String msg = messageService.getMessage("crud.save.success", ENTITY_NAME);
-            log.info("[{}] {}", methodNomenclature, msg);
-            return mapper.toResponse(saved);
+            UomResponse response = mapper.toResponse(saved);
+            log.info("[{}] {} record created with id: {}.", methodNomenclature, ENTITY_NAME, response.id());
+            return response;
         } catch (ResourceConflictException | ResourceNotFoundException e) {
             String saveErrorMsg = messageService.getMessage("crud.save.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, saveErrorMsg);
@@ -80,7 +80,7 @@ public class UomServiceImp implements UomService {
             mapper.updateEntityFromDto(existing, request);
             existing.setUomStatus(status);
             String msg = messageService.getMessage("crud.update.success", ENTITY_NAME);
-            log.debug("[{}] {}", methodNomenclature, msg);
+            log.info("[{}] {}", methodNomenclature, msg);
             return mapper.toResponse(existing);
         } catch (ResourceNotFoundException | ResourceConflictException e) {
             String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME);

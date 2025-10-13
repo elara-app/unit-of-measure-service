@@ -4,6 +4,7 @@ import com.elara.app.unit_of_measure_service.dto.request.UomRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomUpdate;
 import com.elara.app.unit_of_measure_service.service.interfaces.UomService;
+import com.elara.app.unit_of_measure_service.utils.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +35,7 @@ public class UomController {
     private static final String ENTITY_NAME = "Uom";
     private static final String NOMENCLATURE = "Uom-controller";
     private final UomService service;
+    private final MessageService messageService;
 
     // ========================================
     // CREATE OPERATIONS
@@ -46,7 +48,8 @@ public class UomController {
         final String methodNomenclature = NOMENCLATURE + "-create";
         log.info("[{}] Request to create a new {} record.", methodNomenclature, ENTITY_NAME);
         UomResponse response = service.save(request);
-        log.info("[{}] {} record created with id: {}.", methodNomenclature, ENTITY_NAME, response.id());
+        String msg = messageService.getMessage("crud.save.success", ENTITY_NAME);
+        log.info("[{}] {}", methodNomenclature, msg);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
