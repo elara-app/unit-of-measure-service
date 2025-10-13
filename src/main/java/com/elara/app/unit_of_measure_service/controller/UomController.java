@@ -111,7 +111,7 @@ public class UomController {
         final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
         log.info("[{}] Request to check if name is taken.", methodNomenclature);
         Boolean isTaken = service.isNameTaken(name);
-        log.info("[{}] Validation completed", methodNomenclature);
+        log.info("[{}] Validation completed.", methodNomenclature);
         return ResponseEntity.ok(isTaken);
     }
 
