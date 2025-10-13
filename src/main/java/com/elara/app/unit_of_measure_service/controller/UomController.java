@@ -42,7 +42,7 @@ public class UomController {
     // ========================================
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UomResponse> createUom(
+    public ResponseEntity<UomResponse> create(
         @Valid @RequestBody UomRequest request
     ) {
         final String methodNomenclature = NOMENCLATURE + "-create";
@@ -58,10 +58,10 @@ public class UomController {
     // ========================================
 
     @GetMapping("/{id}")
-    public ResponseEntity<UomResponse> getUomStatusById(
+    public ResponseEntity<UomResponse> getById(
         @PathVariable @NotNull @Positive Long id
     ) {
-        final String methodNomenclature = NOMENCLATURE + "-getUomStatusById";
+        final String methodNomenclature = NOMENCLATURE + "-getById";
         log.info("[{}] Request to retrieve {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
         UomResponse response = service.findById(id);
         log.info("[{}] {} record with id {} found: {}", methodNomenclature, ENTITY_NAME, id, response);
@@ -69,10 +69,10 @@ public class UomController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UomResponse>> getAllUomStatuses(
+    public ResponseEntity<Page<UomResponse>> getAll(
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        final String methodNomenclature = NOMENCLATURE + "-getAllUomStatuses";
+        final String methodNomenclature = NOMENCLATURE + "-getAll";
         log.info("[{}] Request to retrieve all {} records.", methodNomenclature, ENTITY_NAME);
         Page<UomResponse> response = service.findAll(pageable);
         log.info("[{}] {} records retrieved.", methodNomenclature, ENTITY_NAME);
@@ -80,11 +80,11 @@ public class UomController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<UomResponse>> searchUomStatusesByName(
+    public ResponseEntity<Page<UomResponse>> searchByNameContaining(
         @RequestParam @NotBlank String name,
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        final String methodNomenclature = NOMENCLATURE + "-searchUomStatusesByName";
+        final String methodNomenclature = NOMENCLATURE + "-searchByNameContaining";
         log.info("[{}] Request to retrieve {} records with content in their name.", methodNomenclature, ENTITY_NAME);
         Page<UomResponse> response = service.findAllByName(name, pageable);
         log.info("[{}] {} records retrieved.", methodNomenclature, ENTITY_NAME);
@@ -92,7 +92,7 @@ public class UomController {
     }
 
     @GetMapping("/filter/{uomStatusId}")
-    public ResponseEntity<Page<UomResponse>> filterUomStatusesByUsability(
+    public ResponseEntity<Page<UomResponse>> filterByStateId(
         @PathVariable @NotNull @Positive Long uomStatusId,
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
@@ -119,11 +119,11 @@ public class UomController {
     // ========================================
 
     @PutMapping("/{id}")
-    public ResponseEntity<UomResponse> updateUom(
+    public ResponseEntity<UomResponse> update(
         @PathVariable Long id,
         @Valid @RequestBody UomUpdate update
     ) {
-        final String methodNomenclature = NOMENCLATURE + "-updateUom";
+        final String methodNomenclature = NOMENCLATURE + "-update";
         log.info("[{}] Request to update {} record.", methodNomenclature, ENTITY_NAME);
         UomResponse response = service.update(id, update);
         String msg = messageService.getMessage("crud.update.success", ENTITY_NAME);
@@ -132,11 +132,11 @@ public class UomController {
     }
 
     @PatchMapping("/{id}/change-status")
-    public ResponseEntity<Void> changeUomStatusUsability(
+    public ResponseEntity<Void> changeStateId(
         @PathVariable @NotNull @Positive Long id,
         @RequestParam @NotNull @Positive Long newUomStatusId
     ) {
-        final String methodNomenclature = NOMENCLATURE + "-changeUomStatusUsability";
+        final String methodNomenclature = NOMENCLATURE + "-changeStateId";
         log.info("[{}] Request to change status for {} record.", methodNomenclature, ENTITY_NAME);
         service.changeStatus(id, newUomStatusId);
         log.info("[{}] Usability changed for {} record.", methodNomenclature, ENTITY_NAME);
@@ -148,10 +148,10 @@ public class UomController {
     // ========================================
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUomStatus(
+    public ResponseEntity<Void> delete(
         @PathVariable @NotNull @Positive Long id
     ) {
-        final String methodNomenclature = NOMENCLATURE + "-deleteUomStatus";
+        final String methodNomenclature = NOMENCLATURE + "-delete";
         log.info("[{}] Request to delete a {} record.", methodNomenclature, ENTITY_NAME);
         service.deleteById(id);
         String msg = messageService.getMessage("crud.delete.success", ENTITY_NAME);
