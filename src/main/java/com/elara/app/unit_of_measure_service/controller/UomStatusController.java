@@ -836,9 +836,10 @@ public class UomStatusController {
         @Valid @RequestBody UomStatusUpdate request
     ) {
         final String methodNomenclature = NOMENCLATURE + "-update";
-        log.info("[{}] Request to update UomStatus id: {} with data: {}", methodNomenclature, id, request);
+        log.info("[{}] Request to update {} record.", methodNomenclature, ENTITY_NAME);
         UomStatusResponse response = service.update(id, request);
-        log.info("[{}] UomStatus updated: {}", methodNomenclature, response);
+        String msg = messageService.getMessage("crud.update.success", ENTITY_NAME);
+        log.info("[{}] {}", methodNomenclature, msg);
         return ResponseEntity.ok(response);
     }
 
