@@ -59,9 +59,9 @@ public class UomController {
         @PathVariable @NotNull @Positive Long id
     ) {
         final String methodNomenclature = NOMENCLATURE + "-getUomStatusById";
-        log.info("[{}] Request to get Uom by id: {}", methodNomenclature, id);
+        log.info("[{}] Request to retrieve {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
         UomResponse response = service.findById(id);
-        log.info("[{}] Uom found: {}", methodNomenclature, response);
+        log.info("[{}] {} record with id {} found: {}", methodNomenclature, ENTITY_NAME, id, response);
         return ResponseEntity.ok(response);
     }
 
