@@ -317,9 +317,10 @@ public class UomStatusController {
         @PathVariable @NotNull @Positive Long id
     ) {
         final String methodNomenclature = NOMENCLATURE + "-getById";
-        log.info("[{}] Request to get UomStatus by id: {}", methodNomenclature, id);
+        log.info("[{}] Request to retrieve {} record by id.", methodNomenclature, ENTITY_NAME);
         UomStatusResponse response = service.findById(id);
-        log.info("[{}] UomStatus found: {}", methodNomenclature, response);
+        String msg = messageService.getMessage("crud.retrieve.success", ENTITY_NAME);
+        log.info("[{}] {}", methodNomenclature, msg);
         return ResponseEntity.ok(response);
     }
 
