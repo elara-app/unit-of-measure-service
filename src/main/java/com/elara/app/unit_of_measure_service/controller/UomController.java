@@ -62,9 +62,10 @@ public class UomController {
         @PathVariable @NotNull @Positive Long id
     ) {
         final String methodNomenclature = NOMENCLATURE + "-getById";
-        log.info("[{}] Request to retrieve {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
+        log.info("[{}] Request to retrieve {} record by id.", methodNomenclature, ENTITY_NAME);
         UomResponse response = service.findById(id);
-        log.info("[{}] {} record with id {} found: {}", methodNomenclature, ENTITY_NAME, id, response);
+        String msg = messageService.getMessage("crud.retrieve.success", ENTITY_NAME);
+        log.info("[{}] {}", methodNomenclature, msg);
         return ResponseEntity.ok(response);
     }
 
