@@ -133,9 +133,9 @@ public class UomServiceImp implements UomService {
     @Override
     public Page<UomResponse> findAll(Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAll";
-        log.debug("[{}] Fetching all {} entities with pagination: {}.", methodNomenclature, ENTITY_NAME, pageable);
+        log.debug("[{}] Fetch all {} records.", methodNomenclature, ENTITY_NAME);
         Page<UomResponse> page = repository.findAll(pageable).map(mapper::toResponse);
-        log.debug("[{}] Fetched {} entities, page size: {}.", methodNomenclature, ENTITY_NAME, page.getNumberOfElements());
+        log.debug("[{}] Fetched {} {} records.", methodNomenclature, page.getNumberOfElements(), ENTITY_NAME);
         return page;
     }
 
