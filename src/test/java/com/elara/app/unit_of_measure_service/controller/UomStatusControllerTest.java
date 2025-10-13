@@ -59,7 +59,7 @@ class UomStatusControllerTest {
     @Autowired
     private MessageService messageService;
 
-    private static final String BASE_URL = "/api/v1/uom-status";
+    private static final String BASE_URL = "/states";
 
     @TestConfiguration
     static class TestConfig {
@@ -74,7 +74,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("POST /api/v1/uom-status - createUomStatus")
+    @DisplayName("POST /states - createUomStatus")
     class CreateUomStatusTests {
         @Test
         @DisplayName("should return 201 with created resource")
@@ -148,7 +148,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/uom-status/{id} - getUomStatusById")
+    @DisplayName("GET /states/{id} - getUomStatusById")
     class GetByIdTests {
         @Test
         @DisplayName("should return 200 with resource")
@@ -176,7 +176,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/uom-status - getAllUomStatuses")
+    @DisplayName("GET /states - getAllUomStatuses")
     class GetAllTests {
         @Test
         @DisplayName("should return 200 with paged content")
@@ -207,7 +207,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/uom-status/search - searchUomStatusesByName")
+    @DisplayName("GET /states/search - searchUomStatusesByName")
     class SearchByNameTests {
         @Test
         @DisplayName("should return 200 with results")
@@ -236,7 +236,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/uom-status/filter - filterUomStatusesByUsability")
+    @DisplayName("GET /states/filter - filterUomStatusesByUsability")
     class FilterByUsabilityTests {
         @Test
         @DisplayName("should return 200 with filtered results")
@@ -264,7 +264,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/uom-status/check-name - isNameTaken")
+    @DisplayName("GET /states/check-name - isNameTaken")
     class CheckNameTests {
         @Test
         @DisplayName("should return 200 with true/false")
@@ -289,7 +289,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("PUT /api/v1/uom-status/{id} - updateUomStatus")
+    @DisplayName("PUT /states/{id} - updateUomStatus")
     class UpdateTests {
         @Test
         @DisplayName("should return 200 with updated resource")
@@ -352,7 +352,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("PATCH /api/v1/uom-status/{id}/status - changeUomStatusUsability")
+    @DisplayName("PATCH /states/{id}/status - changeUomStatusUsability")
     class ChangeStatusTests {
         @Test
         @DisplayName("should return 204 on success")
@@ -389,7 +389,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("DELETE /api/v1/uom-status/{id} - deleteUomStatus")
+    @DisplayName("DELETE /states/{id} - deleteUomStatus")
     class DeleteTests {
         @Test
         @DisplayName("should return 204 on success")
