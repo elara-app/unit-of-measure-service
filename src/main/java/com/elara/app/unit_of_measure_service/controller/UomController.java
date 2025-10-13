@@ -85,9 +85,9 @@ public class UomController {
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
         final String methodNomenclature = NOMENCLATURE + "-searchUomStatusesByName";
-        log.info("[{}] Request to retrieve {} records with name like name: '{}'", methodNomenclature, ENTITY_NAME, name);
+        log.info("[{}] Request to retrieve {} records with content in their name.", methodNomenclature, ENTITY_NAME);
         Page<UomResponse> response = service.findAllByName(name, pageable);
-        log.info("[{}] {} {} records retrieved with name like: '{}'", methodNomenclature, response.getNumberOfElements(), ENTITY_NAME, name);
+        log.info("[{}] {} records retrieved.", methodNomenclature, ENTITY_NAME);
         return ResponseEntity.ok(response);
     }
 
@@ -97,9 +97,9 @@ public class UomController {
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
         final String methodNomenclature = NOMENCLATURE + "-filterUomStatusesByUsability";
-        log.info("[{}] Request to filter all {} records with status id: {}", methodNomenclature, ENTITY_NAME, uomStatusId);
+        log.info("[{}] Request to filter all {} records by status id.", methodNomenclature, ENTITY_NAME);
         Page<UomResponse> response = service.findAllByUomStatusId(uomStatusId, pageable);
-        log.info("[{}] {} {} records with status id: {}", methodNomenclature, response.getNumberOfElements(), ENTITY_NAME, uomStatusId);
+        log.info("[{}] {} records filtered.", methodNomenclature, ENTITY_NAME);
         return ResponseEntity.ok(response);
     }
 
