@@ -8,14 +8,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.3</version>
+<!--        <version>3.5.3</version>-->
         <relativePath/> <!-- lookup parent from a repository -->
     </parent>
 
     <!-- - - - - - - - - - - - - -->
     <groupId>com.elara.app</groupId>
     <artifactId>unit-of-measure-service</artifactId>
-    <version>1.1</version>
+<!--    <version>1.1</version>-->
     <name>unit-of-measure-service</name>
     <description>Manage the unit of measure for the inventory and product services</description>
     <url/>
@@ -57,7 +57,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
+<!--                <version>${spring-cloud.version}</version>-->
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -82,12 +82,12 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
+<!--            <version>${mapstruct.version}</version>-->
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
+<!--            <version>${lombok.version}</version>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -110,13 +110,13 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
+<!--            <version>${postgresql.version}</version>-->
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
+<!--            <version>${h2.version}</version>-->
             <scope>runtime</scope>
         </dependency>
 
@@ -131,7 +131,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.openapi.version}</version>
+<!--            <version>${springdoc.openapi.version}</version>-->
         </dependency>
     </dependencies>
 
@@ -142,18 +142,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.version}</version>
+<!--                <version>${maven.compiler.version}</version>-->
                 <configuration>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
+<!--                            <version>${lombok.version}</version>-->
                         </path>
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
+<!--                            <version>${mapstruct.version}</version>-->
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -175,7 +175,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
+<!--                <version>${jacoco.version}</version>-->
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -251,7 +251,7 @@
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
-                <version>${sonar.scanner.version}</version>
+<!--                <version>${sonar.scanner.version}</version>-->
             </plugin>
         </plugins>
     </build>
