@@ -5,6 +5,7 @@ import com.elara.app.unit_of_measure_service.dto.request.UomStatusRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomStatusResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomStatusUpdate;
 import com.elara.app.unit_of_measure_service.service.interfaces.UomStatusService;
+import com.elara.app.unit_of_measure_service.utils.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -80,7 +81,10 @@ import org.springframework.web.bind.annotation.*;
 )
 public class UomStatusController {
 
+    private static final String ENTITY_NAME = "State";
+    private static final String NOMENCLATURE = ENTITY_NAME + "-controller";
     private final UomStatusService service;
+    private final MessageService messageService;
 
     // ========================================
     // CREATE OPERATIONS
@@ -195,7 +199,7 @@ public class UomStatusController {
             )
         )
     })
-    public ResponseEntity<UomStatusResponse> createUomStatus(
+    public ResponseEntity<UomStatusResponse> create(
         @Parameter(
             description = "UOM Status creation request with name, description, and usability flag",
             required = true,
@@ -203,9 +207,10 @@ public class UomStatusController {
         )
         @Valid @RequestBody UomStatusRequest request
     ) {
-        log.info("[UomStatus-controller-create] Request to create UomStatus: {}.", request);
+        final String methodNomenclature = NOMENCLATURE + "-create";
+        log.info("[{}] Request to create UomStatus: {}.", methodNomenclature, request);
         UomStatusResponse response = service.save(request);
-        log.info("[UomStatus-controller-create] UomStatus created with id: {}.", response.id());
+        log.info("[{}] UomStatus created with id: {}.", methodNomenclature, response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -301,7 +306,7 @@ public class UomStatusController {
             )
         )
     })
-    public ResponseEntity<UomStatusResponse> getUomStatusById(
+    public ResponseEntity<UomStatusResponse> getById(
         @Parameter(
             description = "The unique identifier of the UOM Status to retrieve",
             required = true,
@@ -310,9 +315,10 @@ public class UomStatusController {
         )
         @PathVariable @NotNull @Positive Long id
     ) {
-        log.info("[getUomStatusById] Request to get UomStatus by id: {}", id);
+        final String methodNomenclature = NOMENCLATURE + "-getById";
+        log.info("[{}] Request to get UomStatus by id: {}", methodNomenclature, id);
         UomStatusResponse response = service.findById(id);
-        log.info("[getUomStatusById] UomStatus found: {}", response);
+        log.info("[{}] UomStatus found: {}", methodNomenclature, response);
         return ResponseEntity.ok(response);
     }
 
@@ -384,7 +390,7 @@ public class UomStatusController {
             )
         )
     })
-    public ResponseEntity<Page<UomStatusResponse>> getAllUomStatuses(
+    public ResponseEntity<Page<UomStatusResponse>> getAll(
         @Parameter(
             description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
             schema = @Schema(
@@ -395,9 +401,10 @@ public class UomStatusController {
         )
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        log.info("[UomStatus-controller-getAll] Request to get all UomStatuses.");
+        final String methodNomenclature = NOMENCLATURE + "-getAll";
+        log.info("[{}] Request to get all UomStatuses.", methodNomenclature);
         Page<UomStatusResponse> response = service.findAll(pageable);
-        log.info("[UomStatus-controller-getAll] Fetched {} UomStatuses.", response.getNumberOfElements());
+        log.info("[{}] Fetched {} UomStatuses.", methodNomenclature, response.getNumberOfElements());
         return ResponseEntity.ok(response);
     }
 
@@ -481,7 +488,7 @@ public class UomStatusController {
             )
         )
     })
-    public ResponseEntity<Page<UomStatusResponse>> searchUomStatusesByName(
+    public ResponseEntity<Page<UomStatusResponse>> getByNameContaining(
         @Parameter(
             description = "The name to search for (case-insensitive partial matching)",
             required = true,
@@ -499,9 +506,10 @@ public class UomStatusController {
         )
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        log.info("[searchUomStatusesByName] Request to search UomStatuses by name: '{}'", name);
+        final String methodNomenclature = NOMENCLATURE + "-getByNameContaining";
+        log.info("[{}] Request to search UomStatuses by name: '{}'", methodNomenclature, name);
         Page<UomStatusResponse> response = service.findAllByName(name, pageable);
-        log.info("[searchUomStatusesByName] Fetched {} UomStatuses for name: '{}'",
+        log.info("[{}] Fetched {} UomStatuses for name: '{}'", methodNomenclature,
             response.getNumberOfElements(), name);
         return ResponseEntity.ok(response);
     }
@@ -585,7 +593,7 @@ public class UomStatusController {
             )
         )
     })
-    public ResponseEntity<Page<UomStatusResponse>> filterUomStatusesByUsability(
+    public ResponseEntity<Page<UomStatusResponse>> filterByIsUsable(
         @Parameter(
             description = "The usability status to filter by (true for usable, false for unusable)",
             required = true,
@@ -603,9 +611,10 @@ public class UomStatusController {
         )
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        log.info("[filterUomStatusesByUsability] Request to filter UomStatuses by isUsable: {}", isUsable);
+        final String methodNomenclature = NOMENCLATURE + "-filterByIsUsable";
+        log.info("[{}] Request to filter UomStatuses by isUsable: {}", methodNomenclature, isUsable);
         Page<UomStatusResponse> response = service.findAllByIsUsable(isUsable, pageable);
-        log.info("[filterUomStatusesByUsability] Fetched {} UomStatuses for isUsable: {}",
+        log.info("[{}] Fetched {} UomStatuses for isUsable: {}", methodNomenclature,
             response.getNumberOfElements(), isUsable);
         return ResponseEntity.ok(response);
     }
@@ -686,9 +695,10 @@ public class UomStatusController {
         )
         @RequestParam @NotBlank() String name
     ) {
-        log.info("[isNameTaken] Request to check if name is taken: '{}'", name);
+        final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
+        log.info("[{}] Request to check if name is taken: '{}'", methodNomenclature, name);
         Boolean isTaken = service.isNameTaken(name);
-        log.info("[isNameTaken] Name '{}' taken: {}", name, isTaken);
+        log.info("[{}] Name '{}' taken: {}", methodNomenclature, name, isTaken);
         return ResponseEntity.ok(isTaken);
     }
 
@@ -810,7 +820,7 @@ public class UomStatusController {
             )
         )
     })
-    public ResponseEntity<UomStatusResponse> updateUomStatus(
+    public ResponseEntity<UomStatusResponse> update(
         @Parameter(
             description = "The unique identifier of the UOM Status to update",
             required = true,
@@ -825,9 +835,10 @@ public class UomStatusController {
         )
         @Valid @RequestBody UomStatusUpdate request
     ) {
-        log.info("[updateUomStatus] Request to update UomStatus id: {} with data: {}", id, request);
+        final String methodNomenclature = NOMENCLATURE + "-update";
+        log.info("[{}] Request to update UomStatus id: {} with data: {}", methodNomenclature, id, request);
         UomStatusResponse response = service.update(id, request);
-        log.info("[updateUomStatus] UomStatus updated: {}", response);
+        log.info("[{}] UomStatus updated: {}", methodNomenclature, response);
         return ResponseEntity.ok(response);
     }
 
@@ -905,7 +916,7 @@ public class UomStatusController {
             )
         )
     })
-    public ResponseEntity<Void> changeUomStatusUsability(
+    public ResponseEntity<Void> changeUsability(
         @Parameter(
             description = "The unique identifier of the UOM Status to update",
             required = true,
@@ -921,9 +932,10 @@ public class UomStatusController {
         )
         @RequestParam @NotNull Boolean isUsable
     ) {
-        log.info("[changeUomStatusUsability] Request to change usability for UomStatus id: {} to: {}", id, isUsable);
+        final String methodNomenclature = NOMENCLATURE + "-changeUsability";
+        log.info("[{}] Request to change usability for UomStatus id: {} to: {}", methodNomenclature, id, isUsable);
         service.changeStatus(id, isUsable);
-        log.info("[changeUomStatusUsability] Usability changed for UomStatus id: {}", id);
+        log.info("[{}] Usability changed for UomStatus id: {}", methodNomenclature, id);
         return ResponseEntity.noContent().build();
     }
 
@@ -1027,7 +1039,7 @@ public class UomStatusController {
             )
         )
     })
-    public ResponseEntity<Void> deleteUomStatus(
+    public ResponseEntity<Void> delete(
         @Parameter(
             description = "The unique identifier of the UOM Status to delete",
             required = true,
@@ -1036,9 +1048,10 @@ public class UomStatusController {
         )
         @PathVariable @NotNull @Positive Long id
     ) {
-        log.info("[deleteUomStatus] Request to delete UomStatus id: {}", id);
+        final String methodNomenclature = NOMENCLATURE + "-delete";
+        log.info("[{}] Request to delete UomStatus id: {}", methodNomenclature, id);
         service.deleteById(id);
-        log.info("[deleteUomStatus] UomStatus deleted: {}", id);
+        log.info("[{}] UomStatus deleted: {}", methodNomenclature, id);
         return ResponseEntity.noContent().build();
     }
 }
