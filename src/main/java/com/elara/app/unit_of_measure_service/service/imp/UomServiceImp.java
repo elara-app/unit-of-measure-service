@@ -170,17 +170,22 @@ public class UomServiceImp implements UomService {
     @Transactional
     public void changeStatus(Long id, Long uomStatusId) {
         final String methodNomenclature = NOMENCLATURE + "-changeStatus";
-        log.debug("[{}] Attempting to change status of {} with id: {} to the new status id: {}", methodNomenclature, ENTITY_NAME, id, uomStatusId);
-        Uom existing = repository.findById(id)
-            .orElseThrow(() -> {
-                String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-                log.warn("[{}] {}", methodNomenclature, msg);
-                return new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id});
-            });
-        Long oldStatusId = existing.getUomStatus().getId();
-        UomStatus newStatus = statusService.findByIdService(uomStatusId);
-        existing.setUomStatus(newStatus);
-        log.debug("[{}] Changed status of {} with id: {} from uomStatus with id: {} to: {}", methodNomenclature, ENTITY_NAME, id, oldStatusId, newStatus.getId());
+        log.debug("[{}] Change status id of {} record with id: {} to: {}", methodNomenclature, ENTITY_NAME, id, uomStatusId);
+        try {
+            Uom existing = repository.findById(id)
+                .orElseThrow(() -> {
+                    String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                    log.warn("[{}] {}", methodNomenclature, msg);
+                    return new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id});
+                });
+            UomStatus newStatus = statusService.findByIdService(uomStatusId);
+            existing.setUomStatus(newStatus);
+            log.debug("[{}] Changed status id of {} record with id: {} to: {}", methodNomenclature, ENTITY_NAME, id, newStatus.getId());
+        } catch (ResourceNotFoundException e) {
+            String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME);
+            log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
+            throw e;
+        }
     }
 
 }
