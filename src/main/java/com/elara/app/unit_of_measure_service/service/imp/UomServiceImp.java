@@ -38,22 +38,25 @@ public class UomServiceImp implements UomService {
     @Transactional
     public UomResponse save(UomRequest request) {
         final String methodNomenclature = NOMENCLATURE + "-save";
-        log.debug("[{}] Attempting to create {} with name: {} and request: {}", methodNomenclature, ENTITY_NAME, request != null ? request.name() : null, request);
-        if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
-            String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
-            log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
+        log.info("[{}] {} record to save: {}", methodNomenclature, ENTITY_NAME, request);
+        try {
+            if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
+                String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
+                log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
+                throw new ResourceConflictException(new Object[]{alreadyExistsMsg});
+            }
+            Uom entity = mapper.toEntity(request);
+            UomStatus status = statusService.findByIdService(request.uomStatusId());
+            entity.setUomStatus(status);
+            Uom saved = repository.save(entity);
+            String msg = messageService.getMessage("crud.save.success", ENTITY_NAME);
+            log.info("[{}] {}", methodNomenclature, msg);
+            return mapper.toResponse(saved);
+        } catch (ResourceConflictException | ResourceNotFoundException e) {
             String saveErrorMsg = messageService.getMessage("crud.save.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, saveErrorMsg);
-            throw new ResourceConflictException(new Object[]{alreadyExistsMsg});
+            throw e;
         }
-        Uom entity = mapper.toEntity(request);
-        log.debug("[{}] Mapped DTO to entity: {}", methodNomenclature, entity);
-        UomStatus status = statusService.findByIdService(request.uomStatusId());
-        entity.setUomStatus(status);
-        Uom saved = repository.save(entity);
-        String msg = messageService.getMessage("crud.save.success", ENTITY_NAME);
-        log.debug("[{}] {}", methodNomenclature, msg);
-        return mapper.toResponse(saved);
     }
 
     @Override
@@ -142,9 +145,9 @@ public class UomServiceImp implements UomService {
     @Override
     public Boolean isNameTaken(String name) {
         final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
-        log.debug("[{}] Checking if name '{}' is taken for {}", methodNomenclature, name, ENTITY_NAME);
+        log.info("[{}] Check if name '{}' is taken.", methodNomenclature, name);
         Boolean exists = repository.existsByNameIgnoreCase(name);
-        log.debug("[{}] Name '{}' taken: {}", methodNomenclature, name, exists);
+        log.info("[{}] Name '{}' {} taken.", methodNomenclature, name, exists ? "is" : "is not");
         return exists;
     }
 
