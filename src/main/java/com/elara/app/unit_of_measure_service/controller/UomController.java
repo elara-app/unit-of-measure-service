@@ -94,10 +94,9 @@ public class UomController {
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
         final String methodNomenclature = NOMENCLATURE + "-filterUomStatusesByUsability";
-        log.info("[{}] Request to filter all Uoms by status id: {}", methodNomenclature, uomStatusId);
+        log.info("[{}] Request to filter all {} records with status id: {}", methodNomenclature, ENTITY_NAME, uomStatusId);
         Page<UomResponse> response = service.findAllByUomStatusId(uomStatusId, pageable);
-        log.info("[{}] Fetched {} Uoms for uom status id: {}", methodNomenclature,
-            response.getNumberOfElements(), uomStatusId);
+        log.info("[{}] {} {} records with status id: {}", methodNomenclature, response.getNumberOfElements(), ENTITY_NAME, uomStatusId);
         return ResponseEntity.ok(response);
     }
 
