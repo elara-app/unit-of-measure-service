@@ -934,9 +934,9 @@ public class UomStatusController {
         @RequestParam @NotNull Boolean isUsable
     ) {
         final String methodNomenclature = NOMENCLATURE + "-changeUsability";
-        log.info("[{}] Request to change usability for UomStatus id: {} to: {}", methodNomenclature, id, isUsable);
+        log.info("[{}] Request to change status for {} record.", methodNomenclature, ENTITY_NAME);
         service.changeStatus(id, isUsable);
-        log.info("[{}] Usability changed for UomStatus id: {}", methodNomenclature, id);
+        log.info("[{}] Usability changed for {} record.", methodNomenclature, ENTITY_NAME);
         return ResponseEntity.noContent().build();
     }
 
