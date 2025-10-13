@@ -109,17 +109,16 @@ public class UomServiceImp implements UomService {
     @Override
     public UomResponse findById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-findById";
-        log.debug("[{}] Searching {} with id: {}", methodNomenclature, ENTITY_NAME, id);
+        log.info("[{}] Fetch {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
         try {
-            Optional<UomResponse> response = repository.findById(id)
-                .map(mapper::toResponse);
-            if (response.isEmpty()) {
+            Optional<Uom> entity = repository.findById(id);
+            if (entity.isEmpty()) {
                 String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
                 log.warn("[{}] {}", methodNomenclature, msg);
                 throw new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
             }
-            log.debug("[{}] {}", methodNomenclature, messageService.getMessage("crud.read.success", ENTITY_NAME));
-            return response.get();
+            log.debug("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity.get());
+            return mapper.toResponse(entity.get());
         } catch (ResourceNotFoundException e) {
             String retrieveErrorMsg = messageService.getMessage("crud.retrieve.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, retrieveErrorMsg);
