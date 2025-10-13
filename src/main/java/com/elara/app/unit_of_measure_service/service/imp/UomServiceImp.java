@@ -79,8 +79,7 @@ public class UomServiceImp implements UomService {
             UomStatus status = existing.getUomStatus();
             mapper.updateEntityFromDto(existing, request);
             existing.setUomStatus(status);
-            String msg = messageService.getMessage("crud.update.success", ENTITY_NAME);
-            log.info("[{}] {}", methodNomenclature, msg);
+            log.info("[{}] {} record updated with data: {}", methodNomenclature, ENTITY_NAME, existing);
             return mapper.toResponse(existing);
         } catch (ResourceNotFoundException | ResourceConflictException e) {
             String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME);
