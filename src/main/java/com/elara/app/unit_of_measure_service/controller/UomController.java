@@ -70,9 +70,9 @@ public class UomController {
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
         final String methodNomenclature = NOMENCLATURE + "-getAllUomStatuses";
-        log.info("[{}] Request to get all Uom.", methodNomenclature);
+        log.info("[{}] Request to retrieve all {} records.", methodNomenclature, ENTITY_NAME);
         Page<UomResponse> response = service.findAll(pageable);
-        log.info("[{}] Fetched {} Uom.", methodNomenclature, response.getNumberOfElements());
+        log.info("[{}] {} {} records retrieved.", methodNomenclature, response.getNumberOfElements(), ENTITY_NAME);
         return ResponseEntity.ok(response);
     }
 
@@ -82,10 +82,9 @@ public class UomController {
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
         final String methodNomenclature = NOMENCLATURE + "-searchUomStatusesByName";
-        log.info("[{}] Request to search Uoms by name: '{}'", methodNomenclature, name);
+        log.info("[{}] Request to retrieve {} records with name like name: '{}'", methodNomenclature, ENTITY_NAME, name);
         Page<UomResponse> response = service.findAllByName(name, pageable);
-        log.info("[{}] Fetched {} Uoms for name: '{}'", methodNomenclature,
-            response.getNumberOfElements(), name);
+        log.info("[{}] {} {} records retrieved with name like: '{}'", methodNomenclature, response.getNumberOfElements(), ENTITY_NAME, name);
         return ResponseEntity.ok(response);
     }
 
