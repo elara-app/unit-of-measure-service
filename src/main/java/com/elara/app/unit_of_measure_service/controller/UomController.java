@@ -152,9 +152,10 @@ public class UomController {
         @PathVariable @NotNull @Positive Long id
     ) {
         final String methodNomenclature = NOMENCLATURE + "-deleteUomStatus";
-        log.info("[{}] Request to delete Uom id: {}", methodNomenclature, id);
+        log.info("[{}] Request to delete a {} record.", methodNomenclature, ENTITY_NAME);
         service.deleteById(id);
-        log.info("[{}] Uom deleted: {}", methodNomenclature, id);
+        String msg = messageService.getMessage("crud.delete.success", ENTITY_NAME);
+        log.info("[{}] {}", methodNomenclature, msg);
         return ResponseEntity.noContent().build();
     }
 
