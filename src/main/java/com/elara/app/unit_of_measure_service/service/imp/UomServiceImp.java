@@ -40,7 +40,7 @@ public class UomServiceImp implements UomService {
         final String methodNomenclature = NOMENCLATURE + "-save";
         log.debug("[{}] Attempting to create {} with name: {} and request: {}", methodNomenclature, ENTITY_NAME, request != null ? request.name() : null, request);
         if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
-            String conflictMsg = messageService.getMessage("global.error.conflict", ENTITY_NAME, "name", request.name());
+            String conflictMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
             log.warn("[{}] {}", methodNomenclature, conflictMsg);
             String saveErrorMsg = messageService.getMessage("crud.save.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, saveErrorMsg);
@@ -68,7 +68,7 @@ public class UomServiceImp implements UomService {
                 return new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
             });
         if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
-            String msg = messageService.getMessage("global.error.conflict", ENTITY_NAME, "name", request.name());
+            String msg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
             log.warn("[{}] {}", methodNomenclature, msg);
             String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME, "id", id);
             log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
