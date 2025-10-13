@@ -81,11 +81,11 @@ public class UomController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<UomResponse>> searchByNameContaining(
+    public ResponseEntity<Page<UomResponse>> getByNameContaining(
         @RequestParam @NotBlank String name,
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
-        final String methodNomenclature = NOMENCLATURE + "-searchByNameContaining";
+        final String methodNomenclature = NOMENCLATURE + "-getByNameContaining";
         log.info("[{}] Request to retrieve {} records with content in their name.", methodNomenclature, ENTITY_NAME);
         Page<UomResponse> response = service.findAllByName(name, pageable);
         log.info("[{}] {} records retrieved.", methodNomenclature, ENTITY_NAME);
