@@ -151,9 +151,9 @@ public class UomServiceImp implements UomService {
     @Override
     public Page<UomResponse> findAllByUomStatusId(Long uomStatusId, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByUomStatusId";
-        log.debug("[{}] Fetching all {} entities with status id: '{}'", methodNomenclature, ENTITY_NAME, uomStatusId);
+        log.debug("[{}] Fetch all {} records with status id: '{}'", methodNomenclature, ENTITY_NAME, uomStatusId);
         Page<UomResponse> page = repository.findAllByUomStatusId(uomStatusId, pageable).map(mapper::toResponse);
-        log.info("[{}] Fetched {} entities with status id: '{}', page size: {}", methodNomenclature, ENTITY_NAME, uomStatusId, page.getNumberOfElements());
+        log.info("[{}] Fetched {} {} records with status id: '{}'", methodNomenclature, page.getNumberOfElements(), ENTITY_NAME, uomStatusId);
         return page;
     }
 
