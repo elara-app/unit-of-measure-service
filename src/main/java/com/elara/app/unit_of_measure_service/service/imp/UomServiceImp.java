@@ -102,7 +102,7 @@ public class UomServiceImp implements UomService {
             repository.deleteById(id);
             String msg = messageService.getMessage("crud.delete.success", ENTITY_NAME);
             log.debug("[{}] {} with id: {}", methodNomenclature, msg, id);
-        } catch (Exception e) {
+        } catch (ResourceNotFoundException e) {
             String deleteErrorMsg = messageService.getMessage("crud.delete.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, deleteErrorMsg);
             throw e;
