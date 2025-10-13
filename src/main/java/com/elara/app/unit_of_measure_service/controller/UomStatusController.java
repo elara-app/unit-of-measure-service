@@ -404,9 +404,9 @@ public class UomStatusController {
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
         final String methodNomenclature = NOMENCLATURE + "-getAll";
-        log.info("[{}] Request to get all UomStatuses.", methodNomenclature);
+        log.info("[{}] Request to retrieve all {} records.", methodNomenclature, ENTITY_NAME);
         Page<UomStatusResponse> response = service.findAll(pageable);
-        log.info("[{}] Fetched {} UomStatuses.", methodNomenclature, response.getNumberOfElements());
+        log.info("[{}] {} records retrieved.", methodNomenclature, ENTITY_NAME);
         return ResponseEntity.ok(response);
     }
 
