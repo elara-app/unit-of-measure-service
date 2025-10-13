@@ -113,15 +113,21 @@ public class UomServiceImp implements UomService {
     public UomResponse findById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-findById";
         log.debug("[{}] Searching {} with id: {}", methodNomenclature, ENTITY_NAME, id);
-        Optional<UomResponse> response = repository.findById(id)
-            .map(mapper::toResponse);
-        if (response.isEmpty()) {
-            String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-            log.warn("[{}] {}", methodNomenclature, msg);
-            throw new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
+        try {
+            Optional<UomResponse> response = repository.findById(id)
+                .map(mapper::toResponse);
+            if (response.isEmpty()) {
+                String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                log.warn("[{}] {}", methodNomenclature, msg);
+                throw new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
+            }
+            log.debug("[{}] {}", methodNomenclature, messageService.getMessage("crud.read.success", ENTITY_NAME));
+            return response.get();
+        } catch (ResourceNotFoundException e) {
+            String retrieveErrorMsg = messageService.getMessage("crud.retrieve.error", ENTITY_NAME);
+            log.warn("[{}] {}", methodNomenclature, retrieveErrorMsg);
+            throw e;
         }
-        log.debug("[{}] {}", methodNomenclature, messageService.getMessage("crud.read.success", ENTITY_NAME));
-        return response.get();
     }
 
     @Override
