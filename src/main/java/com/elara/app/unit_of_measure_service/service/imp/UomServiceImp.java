@@ -83,7 +83,7 @@ public class UomServiceImp implements UomService {
             log.debug("[{}] {}", methodNomenclature, msg);
             return mapper.toResponse(existing);
         } catch (ResourceNotFoundException | ResourceConflictException e) {
-            String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME, "id", id);
+            String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
             throw e;
         }
@@ -92,15 +92,21 @@ public class UomServiceImp implements UomService {
     @Override
     public void deleteById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-deleteById";
-        log.debug("[{}] Attempting to delete {} with id: {}", methodNomenclature, ENTITY_NAME, id);
-        if (!repository.existsById(id)) {
-            String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-            log.warn("[{}] {}", methodNomenclature, msg);
-            throw new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
+        log.debug("[{}] Delete {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
+        try {
+            if (!repository.existsById(id)) {
+                String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                log.warn("[{}] {}", methodNomenclature, msg);
+                throw new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
+            }
+            repository.deleteById(id);
+            String msg = messageService.getMessage("crud.delete.success", ENTITY_NAME);
+            log.debug("[{}] {} with id: {}", methodNomenclature, msg, id);
+        } catch (Exception e) {
+            String deleteErrorMsg = messageService.getMessage("crud.delete.error", ENTITY_NAME);
+            log.warn("[{}] {}", methodNomenclature, deleteErrorMsg);
+            throw e;
         }
-        repository.deleteById(id);
-        String msg = messageService.getMessage("crud.delete.success", ENTITY_NAME);
-        log.debug("[{}] {} with id: {}", methodNomenclature, msg, id);
     }
 
     @Override
