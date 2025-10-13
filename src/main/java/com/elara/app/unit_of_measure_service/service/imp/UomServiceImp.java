@@ -98,8 +98,7 @@ public class UomServiceImp implements UomService {
                 throw new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
             }
             repository.deleteById(id);
-            String msg = messageService.getMessage("crud.delete.success", ENTITY_NAME);
-            log.debug("[{}] {} with id: {}", methodNomenclature, msg, id);
+            log.debug("[{}] {} record with id: {}, deleted.", methodNomenclature, ENTITY_NAME, id);
         } catch (ResourceNotFoundException e) {
             String deleteErrorMsg = messageService.getMessage("crud.delete.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, deleteErrorMsg);
