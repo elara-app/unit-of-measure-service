@@ -8,14 +8,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-<!--        <version>3.5.3</version>-->
+        <version>3.5.3</version>
         <relativePath/> <!-- lookup parent from a repository -->
     </parent>
 
     <!-- - - - - - - - - - - - - -->
     <groupId>com.elara.app</groupId>
     <artifactId>unit-of-measure-service</artifactId>
-<!--    <version>1.1</version>-->
+    <!--    <version>1.1</version>-->
     <name>unit-of-measure-service</name>
     <description>Manage the unit of measure for the inventory and product services</description>
     <url/>
@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-<!--                <version>${spring-cloud.version}</version>-->
+                <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -67,128 +67,12 @@
 
     <!-- - - - - - - - - - - - - -->
     <dependencies>
-        <!-- Compile dependencies -->
+
     </dependencies>
 
     <!-- - - - - - - - - - - - - -->
     <build>
-        <plugins>
-            <!-- + + + + -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-<!--                <version>${maven.compiler.version}</version>-->
-                <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-<!--                            <version>${lombok.version}</version>-->
-                        </path>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-<!--                            <version>${mapstruct.version}</version>-->
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-            <!-- + + + + -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <!-- + + + + -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-<!--                <version>${jacoco.version}</version>-->
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>check</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <rule>
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>LINE</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum>
-                                        </limit>
-                                        <limit>
-                                            <counter>BRANCH</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.70</minimum>
-                                        </limit>
-                                        <limit>
-                                            <counter>CLASS</counter>
-                                            <value>MISSEDCOUNT</value>
-                                            <maximum>0</maximum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                                <rule>
-                                    <element>PACKAGE</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>LINE</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.70</minimum>
-                                        </limit>
-                                    </limits>
-                                    <excludes>
-                                        <exclude>com.elara.app.UnitOfMeasureServiceApplication.configuration.*</exclude>
-                                    </excludes>
-                                </rule>
-                            </rules>
-                            <excludes>
-                                <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
-                                <exclude>**/dto/**</exclude>
-                            </excludes>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
-                    <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
-                    <excludes>
-                        <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
-                        <exclude>**/dto/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <!-- + + + + -->
-            <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-<!--                <version>${sonar.scanner.version}</version>-->
-            </plugin>
-        </plugins>
+
     </build>
 
 </project>
