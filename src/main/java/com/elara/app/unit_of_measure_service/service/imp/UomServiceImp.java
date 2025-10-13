@@ -63,27 +63,30 @@ public class UomServiceImp implements UomService {
     @Transactional
     public UomResponse update(Long id, UomUpdate request) {
         final String methodNomenclature = NOMENCLATURE + "-update";
-        log.debug("[{}] Attempting to update {} with id: {} and request: {}", methodNomenclature, ENTITY_NAME, id, request);
-        Uom existing = repository.findById(id)
-            .orElseThrow(() -> {
-                String notFoundMsg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-                log.warn("[{}] {}", methodNomenclature, notFoundMsg);
-                return new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
-            });
-        if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
-            String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
-            log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
+        log.info("[{}] {} record to update with id: {} and request: {}", methodNomenclature, ENTITY_NAME, id, request);
+        try {
+            Uom existing = repository.findById(id)
+                .orElseThrow(() -> {
+                    String notFoundMsg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                    log.warn("[{}] {}", methodNomenclature, notFoundMsg);
+                    return new ResourceNotFoundException(new Object[]{ENTITY_NAME, "id", id.toString()});
+                });
+            if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
+                String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
+                log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
+                throw new ResourceConflictException(new Object[]{alreadyExistsMsg});
+            }
+            UomStatus status = existing.getUomStatus();
+            mapper.updateEntityFromDto(existing, request);
+            existing.setUomStatus(status);
+            String msg = messageService.getMessage("crud.update.success", ENTITY_NAME);
+            log.debug("[{}] {}", methodNomenclature, msg);
+            return mapper.toResponse(existing);
+        } catch (ResourceNotFoundException | ResourceConflictException e) {
             String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME, "id", id);
             log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
-            throw new ResourceConflictException(new Object[]{alreadyExistsMsg});
+            throw e;
         }
-        UomStatus status = existing.getUomStatus();
-        log.debug("[{}] Mapping update DTO to entity. Before: {}", methodNomenclature, existing);
-        mapper.updateEntityFromDto(existing, request);
-        existing.setUomStatus(status);
-        String msg = messageService.getMessage("crud.update.success", ENTITY_NAME);
-        log.debug("[{}] {}", methodNomenclature, msg);
-        return mapper.toResponse(existing);
     }
 
     @Override
