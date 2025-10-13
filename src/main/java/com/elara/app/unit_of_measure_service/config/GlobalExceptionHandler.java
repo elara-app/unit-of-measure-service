@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = createErrorResponse(
             ErrorCode.DATABASE_ERROR.getCode(),
             ErrorCode.DATABASE_ERROR.getValue(),
-            messageService.getMessage("global.error.database", detail),
+            "Integrity violation: " + messageService.getMessage("global.error.database", detail),
             request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
