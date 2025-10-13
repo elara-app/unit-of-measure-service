@@ -509,10 +509,9 @@ public class UomStatusController {
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
         final String methodNomenclature = NOMENCLATURE + "-getByNameContaining";
-        log.info("[{}] Request to search UomStatuses by name: '{}'", methodNomenclature, name);
+        log.info("[{}] Request to retrieve {} records with content in their name.", methodNomenclature, ENTITY_NAME);
         Page<UomStatusResponse> response = service.findAllByName(name, pageable);
-        log.info("[{}] Fetched {} UomStatuses for name: '{}'", methodNomenclature,
-            response.getNumberOfElements(), name);
+        log.info("[{}] {} records retrieved.", methodNomenclature, ENTITY_NAME);
         return ResponseEntity.ok(response);
     }
 
