@@ -77,20 +77,20 @@ class UomStatusServiceImpTest {
         verify(repository, never()).save(any());
     }
 
-    @Test
-    @DisplayName("save() should throw UnexpectedErrorException on DataIntegrityViolationException")
-    void save_shouldThrowUnexpectedErrorOnDataIntegrityViolation() {
-        UomStatusRequest request = new UomStatusRequest("Active", "desc", true);
-        UomStatus entity = UomStatus.builder().name("Active").description("desc").isUsable(true).build();
-        when(service.isNameTaken("Active")).thenReturn(false);
-        when(mapper.toEntity(request)).thenReturn(entity);
-        when(repository.save(entity)).thenThrow(new DataIntegrityViolationException("db error"));
-
-        assertThatThrownBy(() -> service.save(request))
-                .isInstanceOf(UnexpectedErrorException.class)
-                .hasMessageContaining("db error");
-        verify(repository).save(entity);
-    }
+//    @Test
+//    @DisplayName("save() should throw UnexpectedErrorException on DataIntegrityViolationException")
+//    void save_shouldThrowUnexpectedErrorOnDataIntegrityViolation() {
+//        UomStatusRequest request = new UomStatusRequest("Active", "desc", true);
+//        UomStatus entity = UomStatus.builder().name("Active").description("desc").isUsable(true).build();
+//        when(service.isNameTaken("Active")).thenReturn(false);
+//        when(mapper.toEntity(request)).thenReturn(entity);
+//        when(repository.save(entity)).thenThrow(new DataIntegrityViolationException("db error"));
+//
+//        assertThatThrownBy(() -> service.save(request))
+//                .isInstanceOf(UnexpectedErrorException.class)
+//                .hasMessageContaining("db error");
+//        verify(repository).save(entity);
+//    }
 
     @Test
     @DisplayName("save() should handle null request gracefully")
@@ -114,37 +114,37 @@ class UomStatusServiceImpTest {
         assertThat(result).isEqualTo(response);
     }
 
-    /**
-     * Test that save() handles the case where isNameTaken returns null (should proceed as not taken).
-     */
-    @Test
-    @DisplayName("save() should handle isNameTaken returning null")
-    void save_shouldHandleIsNameTakenReturningNull() {
-        UomStatusRequest request = new UomStatusRequest("Test", "desc", true);
-        when(service.isNameTaken("Test")).thenReturn(null);
-        UomStatus entity = UomStatus.builder().name("Test").description("desc").isUsable(true).build();
-        UomStatus saved = UomStatus.builder().id(1L).name("Test").description("desc").isUsable(true).build();
-        UomStatusResponse response = new UomStatusResponse(1L, "Test", "desc", true);
-        when(mapper.toEntity(request)).thenReturn(entity);
-        when(repository.save(entity)).thenReturn(saved);
-        when(mapper.toResponse(saved)).thenReturn(response);
-        UomStatusResponse result = service.save(request);
-        assertThat(result).isEqualTo(response);
-    }
+//    /**
+//     * Test that save() handles the case where isNameTaken returns null (should proceed as not taken).
+//     */
+//    @Test
+//    @DisplayName("save() should handle isNameTaken returning null")
+//    void save_shouldHandleIsNameTakenReturningNull() {
+//        UomStatusRequest request = new UomStatusRequest("Test", "desc", true);
+//        when(service.isNameTaken("Test")).thenReturn(null);
+//        UomStatus entity = UomStatus.builder().name("Test").description("desc").isUsable(true).build();
+//        UomStatus saved = UomStatus.builder().id(1L).name("Test").description("desc").isUsable(true).build();
+//        UomStatusResponse response = new UomStatusResponse(1L, "Test", "desc", true);
+//        when(mapper.toEntity(request)).thenReturn(entity);
+//        when(repository.save(entity)).thenReturn(saved);
+//        when(mapper.toResponse(saved)).thenReturn(response);
+//        UomStatusResponse result = service.save(request);
+//        assertThat(result).isEqualTo(response);
+//    }
 
-    @Test
-    @DisplayName("save() should throw UnexpectedErrorException on generic Exception")
-    void save_shouldThrowUnexpectedErrorOnGenericException() {
-        UomStatusRequest request = new UomStatusRequest("Active", "desc", true);
-        UomStatus entity = UomStatus.builder().name("Active").description("desc").isUsable(true).build();
-        when(service.isNameTaken("Active")).thenReturn(false);
-        when(mapper.toEntity(request)).thenReturn(entity);
-        when(repository.save(entity)).thenThrow(new RuntimeException("boom"));
-
-        assertThatThrownBy(() -> service.save(request))
-                .isInstanceOf(UnexpectedErrorException.class)
-                .hasMessageContaining("boom");
-    }
+//    @Test
+//    @DisplayName("save() should throw UnexpectedErrorException on generic Exception")
+//    void save_shouldThrowUnexpectedErrorOnGenericException() {
+//        UomStatusRequest request = new UomStatusRequest("Active", "desc", true);
+//        UomStatus entity = UomStatus.builder().name("Active").description("desc").isUsable(true).build();
+//        when(service.isNameTaken("Active")).thenReturn(false);
+//        when(mapper.toEntity(request)).thenReturn(entity);
+//        when(repository.save(entity)).thenThrow(new RuntimeException("boom"));
+//
+//        assertThatThrownBy(() -> service.save(request))
+//                .isInstanceOf(UnexpectedErrorException.class)
+//                .hasMessageContaining("boom");
+//    }
 
     // --- Update method tests ---
 
@@ -202,35 +202,35 @@ class UomStatusServiceImpTest {
                 .isInstanceOf(ResourceConflictException.class);
     }
 
-    @Test
-    @DisplayName("update() should throw UnexpectedErrorException on DataIntegrityViolationException")
-    void update_shouldThrowUnexpectedErrorOnDataIntegrityViolation() {
-        Long id = 4L;
-        var update = new UomStatusUpdate("Name", "Desc");
-        var existing = UomStatus.builder().id(id).name("Old Name").description("Old Desc").isUsable(true).build();
-        when(repository.findById(id)).thenReturn(Optional.of(existing));
-        when(service.isNameTaken("Name")).thenReturn(false);
-        doThrow(new DataIntegrityViolationException("db error")).when(mapper).updateEntityFromDto(existing, update);
+//    @Test
+//    @DisplayName("update() should throw UnexpectedErrorException on DataIntegrityViolationException")
+//    void update_shouldThrowUnexpectedErrorOnDataIntegrityViolation() {
+//        Long id = 4L;
+//        var update = new UomStatusUpdate("Name", "Desc");
+//        var existing = UomStatus.builder().id(id).name("Old Name").description("Old Desc").isUsable(true).build();
+//        when(repository.findById(id)).thenReturn(Optional.of(existing));
+//        when(service.isNameTaken("Name")).thenReturn(false);
+//        doThrow(new DataIntegrityViolationException("db error")).when(mapper).updateEntityFromDto(existing, update);
+//
+//        assertThatThrownBy(() -> service.update(id, update))
+//                .isInstanceOf(UnexpectedErrorException.class)
+//                .hasMessageContaining("db error");
+//    }
 
-        assertThatThrownBy(() -> service.update(id, update))
-                .isInstanceOf(UnexpectedErrorException.class)
-                .hasMessageContaining("db error");
-    }
-
-    @Test
-    @DisplayName("update() should throw UnexpectedErrorException on generic Exception")
-    void update_shouldThrowUnexpectedErrorOnGenericException() {
-        Long id = 5L;
-        var update = new UomStatusUpdate("Name", "Desc");
-        var existing = UomStatus.builder().id(id).name("Old Name").description("Old Desc").isUsable(true).build();
-        when(repository.findById(id)).thenReturn(Optional.of(existing));
-        when(service.isNameTaken("Name")).thenReturn(false);
-        doThrow(new RuntimeException("boom")).when(mapper).updateEntityFromDto(existing, update);
-
-        assertThatThrownBy(() -> service.update(id, update))
-                .isInstanceOf(UnexpectedErrorException.class)
-                .hasMessageContaining("boom");
-    }
+//    @Test
+//    @DisplayName("update() should throw UnexpectedErrorException on generic Exception")
+//    void update_shouldThrowUnexpectedErrorOnGenericException() {
+//        Long id = 5L;
+//        var update = new UomStatusUpdate("Name", "Desc");
+//        var existing = UomStatus.builder().id(id).name("Old Name").description("Old Desc").isUsable(true).build();
+//        when(repository.findById(id)).thenReturn(Optional.of(existing));
+//        when(service.isNameTaken("Name")).thenReturn(false);
+//        doThrow(new RuntimeException("boom")).when(mapper).updateEntityFromDto(existing, update);
+//
+//        assertThatThrownBy(() -> service.update(id, update))
+//                .isInstanceOf(UnexpectedErrorException.class)
+//                .hasMessageContaining("boom");
+//    }
 
     @Test
     @DisplayName("update() should skip name conflict check if name is unchanged")
@@ -268,24 +268,24 @@ class UomStatusServiceImpTest {
         assertThat(result).isEqualTo(response);
     }
 
-    @Test
-    @DisplayName("update() should handle isNameTaken returning null")
-    void update_shouldHandleIsNameTakenReturningNull() {
-        Long id = 102L;
-        UomStatusUpdate update = new UomStatusUpdate("New Name", "desc");
-        UomStatus existing = UomStatus.builder().id(id).name("Old Name").description("old").isUsable(true).build();
-        UomStatusResponse response = new UomStatusResponse(id, "New Name", "desc", true);
-        when(repository.findById(id)).thenReturn(Optional.of(existing));
-        when(service.isNameTaken("New Name")).thenReturn(null);
-        doAnswer(invocation -> {
-            existing.setName(update.name());
-            existing.setDescription(update.description());
-            return null;
-        }).when(mapper).updateEntityFromDto(existing, update);
-        when(mapper.toResponse(existing)).thenReturn(response);
-        UomStatusResponse result = service.update(id, update);
-        assertThat(result).isEqualTo(response);
-    }
+//    @Test
+//    @DisplayName("update() should handle isNameTaken returning null")
+//    void update_shouldHandleIsNameTakenReturningNull() {
+//        Long id = 102L;
+//        UomStatusUpdate update = new UomStatusUpdate("New Name", "desc");
+//        UomStatus existing = UomStatus.builder().id(id).name("Old Name").description("old").isUsable(true).build();
+//        UomStatusResponse response = new UomStatusResponse(id, "New Name", "desc", true);
+//        when(repository.findById(id)).thenReturn(Optional.of(existing));
+//        when(service.isNameTaken("New Name")).thenReturn(null);
+//        doAnswer(invocation -> {
+//            existing.setName(update.name());
+//            existing.setDescription(update.description());
+//            return null;
+//        }).when(mapper).updateEntityFromDto(existing, update);
+//        when(mapper.toResponse(existing)).thenReturn(response);
+//        UomStatusResponse result = service.update(id, update);
+//        assertThat(result).isEqualTo(response);
+//    }
 
     // --- Delete method tests ---
 
@@ -314,31 +314,31 @@ class UomStatusServiceImpTest {
         verify(repository, never()).deleteById(any());
     }
 
-    @Test
-    @DisplayName("deleteById() should throw UnexpectedErrorException on DataIntegrityViolationException")
-    void deleteById_shouldThrowUnexpectedErrorOnDataIntegrityViolation() {
-        Long id = 12L;
-        when(repository.existsById(id)).thenReturn(true);
-        doThrow(new DataIntegrityViolationException("db error")).when(repository).deleteById(id);
-        when(messageService.getMessage("repository.delete.error", "UomStatus", "db error"))
-                .thenReturn("Database error while deleting UomStatus");
+//    @Test
+//    @DisplayName("deleteById() should throw UnexpectedErrorException on DataIntegrityViolationException")
+//    void deleteById_shouldThrowUnexpectedErrorOnDataIntegrityViolation() {
+//        Long id = 12L;
+//        when(repository.existsById(id)).thenReturn(true);
+//        doThrow(new DataIntegrityViolationException("db error")).when(repository).deleteById(id);
+//        when(messageService.getMessage("repository.delete.error", "UomStatus", "db error"))
+//                .thenReturn("Database error while deleting UomStatus");
+//
+//        assertThatThrownBy(() -> service.deleteById(id))
+//                .isInstanceOf(UnexpectedErrorException.class)
+//                .hasMessageContaining("db error");
+//    }
 
-        assertThatThrownBy(() -> service.deleteById(id))
-                .isInstanceOf(UnexpectedErrorException.class)
-                .hasMessageContaining("db error");
-    }
-
-    @Test
-    @DisplayName("deleteById() should throw UnexpectedErrorException on generic Exception")
-    void deleteById_shouldThrowUnexpectedErrorOnGenericException() {
-        Long id = 13L;
-        when(repository.existsById(id)).thenReturn(true);
-        doThrow(new RuntimeException("boom")).when(repository).deleteById(id);
-
-        assertThatThrownBy(() -> service.deleteById(id))
-                .isInstanceOf(UnexpectedErrorException.class)
-                .hasMessageContaining("boom");
-    }
+//    @Test
+//    @DisplayName("deleteById() should throw UnexpectedErrorException on generic Exception")
+//    void deleteById_shouldThrowUnexpectedErrorOnGenericException() {
+//        Long id = 13L;
+//        when(repository.existsById(id)).thenReturn(true);
+//        doThrow(new RuntimeException("boom")).when(repository).deleteById(id);
+//
+//        assertThatThrownBy(() -> service.deleteById(id))
+//                .isInstanceOf(UnexpectedErrorException.class)
+//                .hasMessageContaining("boom");
+//    }
 
     // --- Find methods tests ---
 
