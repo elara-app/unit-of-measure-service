@@ -137,9 +137,9 @@ public class UomController {
         @RequestParam @NotNull @Positive Long newUomStatusId
     ) {
         final String methodNomenclature = NOMENCLATURE + "-changeUomStatusUsability";
-        log.info("[{}] Request to change status for UOm with id: {} to: {}", methodNomenclature, id, newUomStatusId);
+        log.info("[{}] Request to change status for {} record.", methodNomenclature, ENTITY_NAME);
         service.changeStatus(id, newUomStatusId);
-        log.info("[{}] Usability changed for Uom with id: {}", methodNomenclature, id);
+        log.info("[{}] Usability changed for {} record.", methodNomenclature, ENTITY_NAME);
         return ResponseEntity.noContent().build();
     }
 
