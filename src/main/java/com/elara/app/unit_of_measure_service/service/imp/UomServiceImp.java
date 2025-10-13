@@ -63,7 +63,7 @@ public class UomServiceImp implements UomService {
     @Transactional
     public UomResponse update(Long id, UomUpdate request) {
         final String methodNomenclature = NOMENCLATURE + "-update";
-        log.info("[{}] {} record to update with id: {} and request: {}", methodNomenclature, ENTITY_NAME, id, request);
+        log.info("[{}] Update {} record with id: {} and request: {}", methodNomenclature, ENTITY_NAME, id, request);
         try {
             Uom existing = repository.findById(id)
                 .orElseThrow(() -> {
