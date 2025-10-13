@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 )
 public class UomController {
 
+    private static final String ENTITY_NAME = "Uom";
     private static final String NOMENCLATURE = "Uom-controller";
     private final UomService service;
 
@@ -42,11 +43,10 @@ public class UomController {
     public ResponseEntity<UomResponse> createUom(
         @Valid @RequestBody UomRequest request
     ) {
-        final String methodNomenclature = NOMENCLATURE + "-createUom";
-        log.info("[{}] Request to create Uom: {}.", methodNomenclature, request);
+        final String methodNomenclature = NOMENCLATURE + "-create";
+        log.info("[{}] Request to create a new {} record.", methodNomenclature, ENTITY_NAME);
         UomResponse response = service.save(request);
-        System.out.println(response);
-        log.info("[{}] Uom created with id: {}.", methodNomenclature, response.id());
+        log.info("[{}] {} record created with id: {}.", methodNomenclature, ENTITY_NAME, response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
