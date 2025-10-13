@@ -208,9 +208,10 @@ public class UomStatusController {
         @Valid @RequestBody UomStatusRequest request
     ) {
         final String methodNomenclature = NOMENCLATURE + "-create";
-        log.info("[{}] Request to create UomStatus: {}.", methodNomenclature, request);
+        log.info("[{}] Request to create a new {} record.", methodNomenclature, ENTITY_NAME);
         UomStatusResponse response = service.save(request);
-        log.info("[{}] UomStatus created with id: {}.", methodNomenclature, response.id());
+        String msg = messageService.getMessage("crud.save.success", ENTITY_NAME);
+        log.info("[{}] {}", methodNomenclature, msg);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
