@@ -613,10 +613,9 @@ public class UomStatusController {
         @PageableDefault(size = 20, sort = "name") Pageable pageable
     ) {
         final String methodNomenclature = NOMENCLATURE + "-filterByIsUsable";
-        log.info("[{}] Request to filter UomStatuses by isUsable: {}", methodNomenclature, isUsable);
+        log.info("[{}] Request to filter all {} records by usability.", methodNomenclature, ENTITY_NAME);
         Page<UomStatusResponse> response = service.findAllByIsUsable(isUsable, pageable);
-        log.info("[{}] Fetched {} UomStatuses for isUsable: {}", methodNomenclature,
-            response.getNumberOfElements(), isUsable);
+        log.info("[{}] {} records filtered.", methodNomenclature, ENTITY_NAME);
         return ResponseEntity.ok(response);
     }
 
