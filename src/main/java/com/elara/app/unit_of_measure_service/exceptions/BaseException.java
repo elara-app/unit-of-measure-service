@@ -15,10 +15,10 @@ public class BaseException extends RuntimeException {
     public BaseException(ErrorCode errorCode, Object... args) {
         this.code = errorCode.getCode();
         this.value = errorCode.getValue();
-        this.message = getLocalizeMessage(errorCode, args);
+        this.message = getLocalizedMessage(errorCode, args);
     }
 
-    private String getLocalizeMessage(ErrorCode errorCode, Object... args) {
+    private String getLocalizedMessage(ErrorCode errorCode, Object... args) {
         try {
             MessageService messageService = ApplicationContextHolder.getBean(MessageService.class);
             return messageService.getMessage(errorCode, args);
