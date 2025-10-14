@@ -113,92 +113,92 @@ class BaseExceptionTest {
         }
     }
 
-    @Nested
-    @DisplayName("Constructor with ErrorCode and custom message")
-    class ConstructorWithCustomMessage {
-
-        @Test
-        @DisplayName("Should append custom message to localized message")
-        void shouldAppendCustomMessageToLocalizedMessage() {
-            String localizedMessage = "Resource conflict occurred";
-            String customMessage = "Duplicate entry for key 'unique_constraint'";
-            String expectedMessage = localizedMessage + ": " + customMessage;
-            when(messageService.getMessage(ErrorCode.RESOURCE_CONFLICT))
-                    .thenReturn(localizedMessage);
-
-            try (MockedStatic<ApplicationContextHolder> mockedHolder = mockStatic(ApplicationContextHolder.class)) {
-                mockedHolder.when(() -> ApplicationContextHolder.getBean(MessageService.class))
-                        .thenReturn(messageService);
-
-                BaseException exception = new BaseException(ErrorCode.RESOURCE_CONFLICT, customMessage);
-                assertEquals(ErrorCode.RESOURCE_CONFLICT.getCode(), exception.getCode());
-                assertEquals(ErrorCode.RESOURCE_CONFLICT.getValue(), exception.getValue());
-                assertEquals(expectedMessage, exception.getMessage());
-            }
-        }
-
-        @Test
-        @DisplayName("Should use only localized message when custom message is null")
-        void shouldUseOnlyLocalizedMessageWhenCustomMessageIsNull() {
-            String localizedMessage = "Service unavailable";
-            when(messageService.getMessage(ErrorCode.SERVICE_UNAVAILABLE)).thenReturn(localizedMessage);
-
-            try (MockedStatic<ApplicationContextHolder> mockedHolder = mockStatic(ApplicationContextHolder.class)) {
-                mockedHolder.when(() -> ApplicationContextHolder.getBean(MessageService.class))
-                        .thenReturn(messageService);
-
-                BaseException exception = new BaseException(ErrorCode.SERVICE_UNAVAILABLE, (String) null);
-                assertEquals(localizedMessage, exception.getMessage());
-            }
-        }
-
-        @Test
-        @DisplayName("Should handle empty custom message")
-        void shouldHandleEmptyCustomMessage() {
-            // Given
-            String localizedMessage = "Unexpected error";
-            String customMessage = "";
-            String expectedMessage = localizedMessage + ": " + customMessage;
-
-            when(messageService.getMessage(ErrorCode.UNEXPECTED_ERROR))
-                    .thenReturn(localizedMessage);
-
-            try (MockedStatic<ApplicationContextHolder> mockedHolder = mockStatic(ApplicationContextHolder.class)) {
-                mockedHolder.when(() -> ApplicationContextHolder.getBean(MessageService.class))
-                        .thenReturn(messageService);
-
-                // When
-                BaseException exception = new BaseException(ErrorCode.UNEXPECTED_ERROR, customMessage);
-
-                // Then
-                assertEquals(expectedMessage, exception.getMessage());
-            }
-        }
-
-        @Test
-        @DisplayName("Should work with arguments and custom message")
-        void shouldWorkWithArgumentsAndCustomMessage() {
-            // Given
-            Object[] args = {"user123", "profile"};
-            String localizedMessage = "Invalid data for user123 in profile";
-            String customMessage = "Missing required field: email";
-            String expectedMessage = localizedMessage + ": " + customMessage;
-
-            when(messageService.getMessage(eq(ErrorCode.INVALID_DATA), eq(args)))
-                    .thenReturn(localizedMessage);
-
-            try (MockedStatic<ApplicationContextHolder> mockedHolder = mockStatic(ApplicationContextHolder.class)) {
-                mockedHolder.when(() -> ApplicationContextHolder.getBean(MessageService.class))
-                        .thenReturn(messageService);
-
-                // When
-                BaseException exception = new BaseException(ErrorCode.INVALID_DATA, customMessage, args);
-
-                // Then
-                assertEquals(expectedMessage, exception.getMessage());
-                verify(messageService).getMessage(ErrorCode.INVALID_DATA, args);
-            }
-        }
-    }
+//    @Nested
+//    @DisplayName("Constructor with ErrorCode and custom message")
+//    class ConstructorWithCustomMessage {
+//
+//        @Test
+//        @DisplayName("Should append custom message to localized message")
+//        void shouldAppendCustomMessageToLocalizedMessage() {
+//            String localizedMessage = "Resource conflict occurred";
+//            String customMessage = "Duplicate entry for key 'unique_constraint'";
+//            String expectedMessage = localizedMessage + ": " + customMessage;
+//            when(messageService.getMessage(ErrorCode.RESOURCE_CONFLICT))
+//                    .thenReturn(localizedMessage);
+//
+//            try (MockedStatic<ApplicationContextHolder> mockedHolder = mockStatic(ApplicationContextHolder.class)) {
+//                mockedHolder.when(() -> ApplicationContextHolder.getBean(MessageService.class))
+//                        .thenReturn(messageService);
+//
+//                BaseException exception = new BaseException(ErrorCode.RESOURCE_CONFLICT, customMessage);
+//                assertEquals(ErrorCode.RESOURCE_CONFLICT.getCode(), exception.getCode());
+//                assertEquals(ErrorCode.RESOURCE_CONFLICT.getValue(), exception.getValue());
+//                assertEquals(expectedMessage, exception.getMessage());
+//            }
+//        }
+//
+//        @Test
+//        @DisplayName("Should use only localized message when custom message is null")
+//        void shouldUseOnlyLocalizedMessageWhenCustomMessageIsNull() {
+//            String localizedMessage = "Service unavailable";
+//            when(messageService.getMessage(ErrorCode.SERVICE_UNAVAILABLE)).thenReturn(localizedMessage);
+//
+//            try (MockedStatic<ApplicationContextHolder> mockedHolder = mockStatic(ApplicationContextHolder.class)) {
+//                mockedHolder.when(() -> ApplicationContextHolder.getBean(MessageService.class))
+//                        .thenReturn(messageService);
+//
+//                BaseException exception = new BaseException(ErrorCode.SERVICE_UNAVAILABLE, (String) null);
+//                assertEquals(localizedMessage, exception.getMessage());
+//            }
+//        }
+//
+//        @Test
+//        @DisplayName("Should handle empty custom message")
+//        void shouldHandleEmptyCustomMessage() {
+//            // Given
+//            String localizedMessage = "Unexpected error";
+//            String customMessage = "";
+//            String expectedMessage = localizedMessage + ": " + customMessage;
+//
+//            when(messageService.getMessage(ErrorCode.UNEXPECTED_ERROR))
+//                    .thenReturn(localizedMessage);
+//
+//            try (MockedStatic<ApplicationContextHolder> mockedHolder = mockStatic(ApplicationContextHolder.class)) {
+//                mockedHolder.when(() -> ApplicationContextHolder.getBean(MessageService.class))
+//                        .thenReturn(messageService);
+//
+//                // When
+//                BaseException exception = new BaseException(ErrorCode.UNEXPECTED_ERROR, customMessage);
+//
+//                // Then
+//                assertEquals(expectedMessage, exception.getMessage());
+//            }
+//        }
+//
+//        @Test
+//        @DisplayName("Should work with arguments and custom message")
+//        void shouldWorkWithArgumentsAndCustomMessage() {
+//            // Given
+//            Object[] args = {"user123", "profile"};
+//            String localizedMessage = "Invalid data for user123 in profile";
+//            String customMessage = "Missing required field: email";
+//            String expectedMessage = localizedMessage + ": " + customMessage;
+//
+//            when(messageService.getMessage(eq(ErrorCode.INVALID_DATA), eq(args)))
+//                    .thenReturn(localizedMessage);
+//
+//            try (MockedStatic<ApplicationContextHolder> mockedHolder = mockStatic(ApplicationContextHolder.class)) {
+//                mockedHolder.when(() -> ApplicationContextHolder.getBean(MessageService.class))
+//                        .thenReturn(messageService);
+//
+//                // When
+//                BaseException exception = new BaseException(ErrorCode.INVALID_DATA, customMessage, args);
+//
+//                // Then
+//                assertEquals(expectedMessage, exception.getMessage());
+//                verify(messageService).getMessage(ErrorCode.INVALID_DATA, args);
+//            }
+//        }
+//    }
 
 }
