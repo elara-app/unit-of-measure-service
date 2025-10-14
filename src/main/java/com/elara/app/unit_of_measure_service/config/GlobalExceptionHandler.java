@@ -36,6 +36,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, determineHttpStatus(exception.getCode()));
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+            ErrorCode.UNEXPECTED_ERROR.getCode(),
+            ErrorCode.UNEXPECTED_ERROR.getValue(),
+            messageService.getMessage("global.error.unexpected", exception.getMessage()),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
@@ -81,16 +92,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception exception, HttpServletRequest request) {
-        ErrorResponse errorResponse = createErrorResponse(
-            ErrorCode.UNEXPECTED_ERROR.getCode(),
-            ErrorCode.UNEXPECTED_ERROR.getValue(),
-            messageService.getMessage("global.error.unexpected", exception.getMessage()),
-            request.getRequestURI()
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 
     private static String getDataFromDataIntegrityExceptionMessage(String exceptionMessage) {
         String notAvailable = "<>";
