@@ -40,7 +40,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-
     private ErrorResponse createErrorResponse(int code, String value, String message, String path) {
         return ErrorResponse.builder()
             .code(code)
