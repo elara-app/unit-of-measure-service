@@ -20,31 +20,17 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Service implementation for managing UomStatus entities.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UomStatusServiceImp implements UomStatusService {
 
-    /**
-     * Name of the entity managed by this service.
-     */
     private static final String ENTITY_NAME = "UomStatus";
     private static final String NOMENCLATURE = ENTITY_NAME + "-service";
     private final UomStatusRepository repository;
     private final UomStatusMapper mapper;
     private final MessageService messageService;
 
-    /**
-     * Saves a new UomStatus entity.
-     * Logs the attempt, warns if a conflict exists, and logs success or error.
-     *
-     * @param request the UomStatusRequest DTO
-     * @return the saved UomStatusResponse
-     * @throws ResourceConflictException if a UomStatus with the same name exists
-     */
     @Override
     @Transactional
     public UomStatusResponse save(UomStatusRequest request) {
@@ -67,18 +53,6 @@ public class UomStatusServiceImp implements UomStatusService {
         }
     }
 
-    /**
-     * Updates an existing UomStatus entity.
-     * <p>
-     * <b>Transactional:</b> This method is transactional. All changes are committed atomically.
-     * <b>Edge Cases:</b> If the entity does not exist, a ResourceNotFoundException is thrown. If the new name is already taken, a ResourceConflictException is thrown.
-     * <b>Hibernate Behavior:</b> The entity is managed by the persistence context. Changes are flushed automatically at transaction commit. Explicit save is not required unless using a detached entity.
-     *
-     * @param id      the id of the UomStatus to update (must not be null)
-     * @param request the UomStatusUpdate DTO (must not be null)
-     * @return the updated UomStatusResponse
-     * @throws ResourceNotFoundException if no UomStatus found with the given id
-     */
     @Override
     @Transactional
     public UomStatusResponse update(Long id, UomStatusUpdate request) {
@@ -106,13 +80,6 @@ public class UomStatusServiceImp implements UomStatusService {
         }
     }
 
-    /**
-     * Deletes a UomStatus entity by its id.
-     * Logs the attempt and success or error.
-     *
-     * @param id the id of the UomStatus to delete
-     * @throws ResourceNotFoundException if no UomStatus found with the given id
-     */
     @Override
     @Transactional
     public void deleteById(Long id) {
@@ -133,14 +100,6 @@ public class UomStatusServiceImp implements UomStatusService {
         }
     }
 
-    /**
-     * Finds a UomStatus entity by its id.
-     * Logs the search and result or error.
-     *
-     * @param id the id of the UomStatus to find
-     * @return an Optional containing the found UomStatusResponse, or empty if not found
-     * @throws ResourceNotFoundException if no UomStatus found with the given id
-     */
     @Override
     public UomStatusResponse findById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-findById";
@@ -175,12 +134,6 @@ public class UomStatusServiceImp implements UomStatusService {
         return entity;
     }
 
-    /**
-     * Finds all UomStatus entities with pagination.
-     *
-     * @param pageable the pagination information
-     * @return a page of UomStatusResponse
-     */
     @Override
     public Page<UomStatusResponse> findAll(Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAll";
@@ -190,13 +143,6 @@ public class UomStatusServiceImp implements UomStatusService {
         return page;
     }
 
-    /**
-     * Finds all UomStatus entities by name with pagination.
-     *
-     * @param name     the name to search for
-     * @param pageable the pagination information
-     * @return a page of UomStatusResponse
-     */
     @Override
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByName";
@@ -206,13 +152,6 @@ public class UomStatusServiceImp implements UomStatusService {
         return page;
     }
 
-    /**
-     * Finds all UomStatus entities by usability status with pagination.
-     *
-     * @param isUsable the usability status to filter by
-     * @param pageable the pagination information
-     * @return a page of UomStatusResponse
-     */
     @Override
     public Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByIsUsable";
@@ -222,12 +161,6 @@ public class UomStatusServiceImp implements UomStatusService {
         return page;
     }
 
-    /**
-     * Checks if a UomStatus entity exists by its name.
-     *
-     * @param name the name of the UomStatus to check
-     * @return true if exists, false otherwise
-     */
     public Boolean isNameTaken(String name) {
         final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
         log.info("[{}] Check if name '{}' is taken.", methodNomenclature, name);
@@ -236,14 +169,6 @@ public class UomStatusServiceImp implements UomStatusService {
         return exists;
     }
 
-    /**
-     * Changes the usability status of a UomStatus entity.
-     * Logs the attempt and result.
-     *
-     * @param id       the id of the UomStatus to update
-     * @param isUsable the new usability status
-     * @throws ResourceNotFoundException if no UomStatus found with the given id
-     */
     @Override
     @Transactional
     public void changeStatus(Long id, Boolean isUsable) {
