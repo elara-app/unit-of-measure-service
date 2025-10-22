@@ -130,23 +130,23 @@ public class UomStatusServiceImp implements UomStatusService {
                 log.warn("[{}] {}", methodNomenclature, msg);
                 return new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
             });
-        log.debug("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity);
+        log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity);
         return entity;
     }
 
     @Override
     public Page<UomStatusResponse> findAll(Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAll";
-        log.debug("[{}] Fetch all {} records.", methodNomenclature, ENTITY_NAME);
+        log.info("[{}] Fetch all {} records.", methodNomenclature, ENTITY_NAME);
         Page<UomStatusResponse> page = repository.findAll(pageable).map(mapper::toResponse);
-        log.debug("[{}] Fetched {} {} records.", methodNomenclature, page.getNumberOfElements(), ENTITY_NAME);
+        log.info("[{}] Fetched {} {} records.", methodNomenclature, page.getNumberOfElements(), ENTITY_NAME);
         return page;
     }
 
     @Override
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByName";
-        log.debug("[{}] Fetch all {} records that contain in their name: '{}'", methodNomenclature, ENTITY_NAME, name);
+        log.info("[{}] Fetch all {} records that contain in their name: '{}'", methodNomenclature, ENTITY_NAME, name);
         Page<UomStatusResponse> page = repository.findAllByNameContainingIgnoreCase(name, pageable).map(mapper::toResponse);
         log.info("[{}] Fetched {} {} entities with name like '{}'.", methodNomenclature, page.getNumberOfElements(), ENTITY_NAME, name);
         return page;
