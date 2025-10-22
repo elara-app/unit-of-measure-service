@@ -3,7 +3,6 @@ package com.elara.app.unit_of_measure_service.service.interfaces;
 import com.elara.app.unit_of_measure_service.dto.request.UomStatusRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomStatusResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomStatusUpdate;
-import com.elara.app.unit_of_measure_service.model.UomStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
