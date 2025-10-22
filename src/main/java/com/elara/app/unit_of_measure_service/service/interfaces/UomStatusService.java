@@ -17,8 +17,6 @@ public interface UomStatusService {
 
     UomStatusResponse findById(Long id);
 
-    UomStatus findByIdService(Long id);
-
     Page<UomStatusResponse> findAll(Pageable pageable);
 
     Page<UomStatusResponse> findAllByName(String name, Pageable pageable);
