@@ -120,6 +120,7 @@ public class UomStatusServiceImp implements UomStatusService {
         }
     }
 
+    @Override
     @Transactional
     public UomStatus findByIdService(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-findByIdService";
