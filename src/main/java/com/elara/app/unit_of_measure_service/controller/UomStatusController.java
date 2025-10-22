@@ -29,56 +29,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * REST Controller for managing Unit of Measure Status (UomStatus) entities.
- *
- * <p>This controller provides comprehensive CRUD operations for UOM Status management,
- * including creation, retrieval, updating, deletion, and specialized operations like
- * status changes and name availability checks. All operations include proper validation,
- * error handling, and comprehensive API documentation.</p>
- *
- * <p><b>Key Features:</b></p>
- * <ul>
- *   <li>Full CRUD operations with validation</li>
- *   <li>Pagination support for list operations</li>
- *   <li>Search and filtering capabilities</li>
- *   <li>Dedicated status change endpoint for data integrity</li>
- *   <li>Name availability validation</li>
- *   <li>Comprehensive error handling with proper HTTP status codes</li>
- * </ul>
- *
- * <p><b>Error Handling:</b></p>
- * <ul>
- *   <li>400 Bad Request - Invalid input data or validation errors</li>
- *   <li>404 Not Found - Resource not found</li>
- *   <li>409 Conflict - Resource already exists or conflicts with existing data</li>
- *   <li>500 Internal Server Error - Unexpected server errors</li>
- * </ul>
- *
- * <p><b>Service Layer Integration:</b></p>
- * <p>This controller integrates with the UomStatusService layer and handles the following exceptions:</p>
- * <ul>
- *   <li>ResourceNotFoundException (404) - When ID does not find entities</li>
- *   <li>ResourceConflictException (409) - When duplicate names or conflicts occur</li>
- *   <li>UnexpectedErrorException (500) - For database and unexpected errors</li>
- *   <li>ValidationException (400) - For Bean Validation errors</li>
- * </ul>
- *
- * @author Elara Development Team
- * @version 1.0
- * @since 2025-08-06
- */
 @RestController
 @RequestMapping(value = "states", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-@Tag(
-    name = "UOM Status Management",
-    description = "Complete API for managing Unit of Measure Status entities. " +
-        "Provides operations for creating, reading, updating, and deleting UOM status records, " +
-        "along with specialized functionality for status management and validation."
-)
 public class UomStatusController {
 
     private static final String ENTITY_NAME = "State";
