@@ -1,4 +1,4 @@
-package com.elara.app.unit_of_measure_service.service.imp;
+package com.elara.app.unit_of_measure_service.service.implementation;
 
 import com.elara.app.unit_of_measure_service.dto.request.UomStatusRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomStatusResponse;
