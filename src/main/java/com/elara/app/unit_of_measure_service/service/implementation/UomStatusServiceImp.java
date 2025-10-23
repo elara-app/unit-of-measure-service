@@ -117,7 +117,7 @@ public class UomStatusServiceImp implements UomStatusService {
     @Transactional
     public void deleteById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-deleteById";
-        log.debug("[{}] Delete {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
+        log.info("[{}] Delete {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
         try {
             if (!repository.existsById(id)) {
                 String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
@@ -125,7 +125,7 @@ public class UomStatusServiceImp implements UomStatusService {
                 throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
             }
             repository.deleteById(id);
-            log.debug("[{}] {} record with id: {}, deleted.", methodNomenclature, ENTITY_NAME, id);
+            log.info("[{}] {} record with id: {}, deleted.", methodNomenclature, ENTITY_NAME, id);
         } catch (ResourceNotFoundException e) {
             String deleteErrorMsg = messageService.getMessage("crud.delete.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, deleteErrorMsg);
@@ -152,7 +152,7 @@ public class UomStatusServiceImp implements UomStatusService {
                 log.warn("[{}] {}", methodNomenclature, msg);
                 throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
             }
-            log.debug("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity.get());
+            log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity.get());
             return mapper.toResponse(entity.get());
         } catch (ResourceNotFoundException e) {
             String retrieveErrorMsg = messageService.getMessage("crud.retrieve.error", ENTITY_NAME);
@@ -171,7 +171,7 @@ public class UomStatusServiceImp implements UomStatusService {
                 log.warn("[{}] {}", methodNomenclature, msg);
                 return new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
             });
-        log.debug("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity);
+        log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity);
         return entity;
     }
 
@@ -184,9 +184,9 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     public Page<UomStatusResponse> findAll(Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAll";
-        log.debug("[{}] Fetch all {} records.", methodNomenclature, ENTITY_NAME);
+        log.info("[{}] Fetch all {} records.", methodNomenclature, ENTITY_NAME);
         Page<UomStatusResponse> page = repository.findAll(pageable).map(mapper::toResponse);
-        log.debug("[{}] Fetched {} {} records.", methodNomenclature, page.getNumberOfElements(), ENTITY_NAME);
+        log.info("[{}] Fetched {} {} records.", methodNomenclature, page.getNumberOfElements(), ENTITY_NAME);
         return page;
     }
 
@@ -200,7 +200,7 @@ public class UomStatusServiceImp implements UomStatusService {
     @Override
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByName";
-        log.debug("[{}] Fetch all {} records that contain in their name: '{}'", methodNomenclature, ENTITY_NAME, name);
+        log.info("[{}] Fetch all {} records that contain in their name: '{}'", methodNomenclature, ENTITY_NAME, name);
         Page<UomStatusResponse> page = repository.findAllByNameContainingIgnoreCase(name, pageable).map(mapper::toResponse);
         log.info("[{}] Fetched {} {} entities with name like '{}'.", methodNomenclature, page.getNumberOfElements(), ENTITY_NAME, name);
         return page;
