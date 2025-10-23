@@ -26,20 +26,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-@Tag(
-    name = "Uom Management",
-    description = ""
-)
 public class UomController {
 
     private static final String ENTITY_NAME = "Uom";
     private static final String NOMENCLATURE = "Uom-controller";
     private final UomService service;
     private final MessageService messageService;
-
-    // ========================================
-    // CREATE OPERATIONS
-    // ========================================
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UomResponse> create(
@@ -52,10 +44,6 @@ public class UomController {
         log.info("[{}] {}", methodNomenclature, msg);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-    // ========================================
-    // READ OPERATIONS
-    // ========================================
 
     @GetMapping("/{id}")
     public ResponseEntity<UomResponse> getById(
@@ -115,10 +103,6 @@ public class UomController {
         return ResponseEntity.ok(isTaken);
     }
 
-    // ========================================
-    // UPDATE OPERATIONS
-    // ========================================
-
     @PutMapping("/{id}")
     public ResponseEntity<UomResponse> update(
         @PathVariable Long id,
@@ -143,10 +127,6 @@ public class UomController {
         log.info("[{}] Usability changed for {} record.", methodNomenclature, ENTITY_NAME);
         return ResponseEntity.noContent().build();
     }
-
-    // ========================================
-    // DELETE OPERATIONS
-    // ========================================
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
