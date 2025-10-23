@@ -20,9 +20,9 @@ public interface UomService {
 
     Page<UomResponse> findAllByName(String name, Pageable pageable);
 
-    Page<UomResponse> findAllByUomStatusId(Long uomStatusId, Pageable pageable);
-
     Boolean isNameTaken(String name);
+
+    Page<UomResponse> findAllByUomStatusId(Long uomStatusId, Pageable pageable);
 
     void changeStatus(Long id, Long uomStatusId);
 
