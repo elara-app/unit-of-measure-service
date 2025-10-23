@@ -5,7 +5,6 @@ import com.elara.app.unit_of_measure_service.dto.response.UomResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomUpdate;
 import com.elara.app.unit_of_measure_service.service.interfaces.UomService;
 import com.elara.app.unit_of_measure_service.utils.MessageService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
