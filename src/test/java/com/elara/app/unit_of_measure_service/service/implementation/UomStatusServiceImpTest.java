@@ -1,11 +1,10 @@
-package com.elara.app.unit_of_measure_service.service.imp;
+package com.elara.app.unit_of_measure_service.service.implementation;
 
 import com.elara.app.unit_of_measure_service.dto.request.UomStatusRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomStatusResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomStatusUpdate;
 import com.elara.app.unit_of_measure_service.exceptions.ResourceConflictException;
 import com.elara.app.unit_of_measure_service.exceptions.ResourceNotFoundException;
-import com.elara.app.unit_of_measure_service.exceptions.UnexpectedErrorException;
 import com.elara.app.unit_of_measure_service.mapper.UomStatusMapper;
 import com.elara.app.unit_of_measure_service.model.UomStatus;
 import com.elara.app.unit_of_measure_service.repository.UomStatusRepository;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
