@@ -13,8 +13,8 @@ public interface UomRepository extends JpaRepository<Uom, Long> {
 
     Page<Uom> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
 
-    Page<Uom> findAllByUomStatusId(Long uomStatusId, Pageable pageable);
-
     Boolean existsByNameIgnoreCase(String name);
+
+    Page<Uom> findAllByUomStatusId(Long uomStatusId, Pageable pageable);
 
 }
