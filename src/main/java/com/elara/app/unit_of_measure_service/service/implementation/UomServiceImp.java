@@ -28,7 +28,7 @@ import java.util.Optional;
 public class UomServiceImp implements UomService {
 
     private static final String ENTITY_NAME = "Uom";
-    private static final String NOMENCLATURE = "Uom-service";
+    private static final String NOMENCLATURE = ENTITY_NAME + "-service";
     private final UomRepository repository;
     private final UomMapper mapper;
     private final MessageService messageService;
