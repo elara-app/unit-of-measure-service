@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
 public class UomController {
 
     private static final String ENTITY_NAME = "Uom";
-    private static final String NOMENCLATURE = "Uom-controller";
+    private static final String NOMENCLATURE = ENTITY_NAME + "-controller";
     private final UomService service;
     private final MessageService messageService;
 
