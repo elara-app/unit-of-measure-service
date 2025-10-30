@@ -47,7 +47,7 @@ public class UomServiceImp implements UomService {
             }
             Uom entity = mapper.toEntity(request);
             UomStatus status = statusService.findByIdService(request.uomStatusId());
-            entity.setUomStatus(status);
+            entity.setUomStatus(status); // This can be avoided using @Context in the mapper and receive the request and UomStatus as parameters
             Uom saved = repository.save(entity);
             log.info("[{}] {} record created with id: {}.", methodNomenclature, ENTITY_NAME, saved.getId());
             return mapper.toResponse(saved);
