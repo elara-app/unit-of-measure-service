@@ -139,20 +139,14 @@ public class UomStatusServiceImp implements UomStatusService {
     public UomStatusResponse findById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-findById";
         log.info("[{}] Fetch {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
-        try {
-            Optional<UomStatus> entity = repository.findById(id);
-            if (entity.isEmpty()) {
-                String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id.toString());
-                log.warn("[{}] {}", methodNomenclature, msg);
-                throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
-            }
-            log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity.get());
-            return mapper.toResponse(entity.get());
-        } catch (ResourceNotFoundException e) {
-            String retrieveErrorMsg = messageService.getMessage("crud.retrieve.error", ENTITY_NAME);
-            log.warn("[{}] {}", methodNomenclature, retrieveErrorMsg);
-            throw e;
+        Optional<UomStatus> entity = repository.findById(id);
+        if (entity.isEmpty()) {
+            String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id.toString());
+            log.warn("[{}] {}", methodNomenclature, msg);
+            throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
         }
+        log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity.get());
+        return mapper.toResponse(entity.get());
     }
 
     @Transactional
