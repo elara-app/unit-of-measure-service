@@ -116,19 +116,15 @@ public class UomStatusServiceImp implements UomStatusService {
     public void deleteById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-deleteById";
         log.info("[{}] Delete {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
-        try {
-            if (!repository.existsById(id)) {
-                String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-                log.warn("[{}] {}", methodNomenclature, msg);
-                throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
-            }
-            repository.deleteById(id);
-            log.info("[{}] {} record with id: {}, deleted.", methodNomenclature, ENTITY_NAME, id);
-        } catch (ResourceNotFoundException e) {
+        if (!repository.existsById(id)) {
+            String notFoundMsg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
             String deleteErrorMsg = messageService.getMessage("crud.delete.error", ENTITY_NAME);
+            log.warn("[{}] {}", methodNomenclature, notFoundMsg);
             log.warn("[{}] {}", methodNomenclature, deleteErrorMsg);
-            throw e;
+            throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
         }
+        repository.deleteById(id);
+        log.info("[{}] {} record with id: {}, deleted.", methodNomenclature, ENTITY_NAME, id);
     }
 
     /**
