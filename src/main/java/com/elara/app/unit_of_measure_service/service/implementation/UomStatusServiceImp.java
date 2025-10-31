@@ -50,21 +50,17 @@ public class UomStatusServiceImp implements UomStatusService {
     public UomStatusResponse save(UomStatusRequest request) {
         final String methodNomenclature = NOMENCLATURE + "-save";
         log.info("[{}] {} record to save: {}", methodNomenclature, ENTITY_NAME, request);
-        try {
-            if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
-                String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
-                log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
-                throw new ResourceConflictException(alreadyExistsMsg);
-            }
-            UomStatus entity = mapper.toEntity(request);
-            UomStatus saved = repository.save(entity);
-            log.info("[{}] {} record created with id: {}.", methodNomenclature, ENTITY_NAME, saved.getId());
-            return mapper.toResponse(saved);
-        } catch (ResourceConflictException e) {
+        if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
+            String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
             String saveErrorMsg = messageService.getMessage("crud.save.error", ENTITY_NAME);
+            log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
             log.warn("[{}] {}", methodNomenclature, saveErrorMsg);
-            throw e;
+            throw new ResourceConflictException(alreadyExistsMsg);
         }
+        UomStatus entity = mapper.toEntity(request);
+        UomStatus saved = repository.save(entity);
+        log.info("[{}] {} record created with id: {}.", methodNomenclature, ENTITY_NAME, saved.getId());
+        return mapper.toResponse(saved);
     }
 
     /**
@@ -148,7 +144,7 @@ public class UomStatusServiceImp implements UomStatusService {
         try {
             Optional<UomStatus> entity = repository.findById(id);
             if (entity.isEmpty()) {
-                String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id.toString());
                 log.warn("[{}] {}", methodNomenclature, msg);
                 throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
             }
