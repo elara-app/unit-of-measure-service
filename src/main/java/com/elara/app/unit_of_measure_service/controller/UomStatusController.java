@@ -333,7 +333,7 @@ public class UomStatusController {
      * @param pageable pagination and sorting parameters
      * @return ResponseEntity containing a paginated list of UOM Status responses
      */
-    @GetMapping
+    @GetMapping("/")
     @Operation(
         summary = "Get all UOM Statuses",
         description = "Retrieves all Unit of Measure Status entities with pagination and sorting support. " +
