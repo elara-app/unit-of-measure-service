@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("config-server-test")
-@RefreshScope
 public class ConfigServerTestController {
 
     @Value("${uom.property}")
