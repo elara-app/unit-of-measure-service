@@ -106,7 +106,7 @@ public class UomController {
 
     @GetMapping("check-name")
     public ResponseEntity<Boolean> isNameTaken(
-        @RequestParam @NotBlank() String name
+        @RequestParam @NotBlank String name
     ) {
         final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
         log.info("[{}] Request to check if name is taken.", methodNomenclature);
