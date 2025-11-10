@@ -92,7 +92,7 @@ public class UomController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("filter/{uomStatusId}")
+    @GetMapping("filter/status/{uomStatusId}")
     public ResponseEntity<Page<UomResponse>> filterByStateId(
         @PathVariable @NotNull @Positive Long uomStatusId,
         @PageableDefault(size = 20, sort = "name") Pageable pageable
