@@ -69,7 +69,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2025-08-06
  */
 @RestController
-@RequestMapping(value = "states", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "states/", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -228,7 +228,7 @@ public class UomStatusController {
      * @param id the unique identifier of the UOM Status (must be positive)
      * @return ResponseEntity containing the requested UOM Status
      */
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     @Operation(
         summary = "Get UOM Status by ID",
         description = "Retrieves a specific Unit of Measure Status by its unique identifier. " +
@@ -333,7 +333,7 @@ public class UomStatusController {
      * @param pageable pagination and sorting parameters
      * @return ResponseEntity containing a paginated list of UOM Status responses
      */
-    @GetMapping("/")
+    @GetMapping
     @Operation(
         summary = "Get all UOM Statuses",
         description = "Retrieves all Unit of Measure Status entities with pagination and sorting support. " +
@@ -420,7 +420,7 @@ public class UomStatusController {
      * @param pageable pagination and sorting parameters
      * @return ResponseEntity containing a paginated list of matching UOM Status responses
      */
-    @GetMapping("/search")
+    @GetMapping("search")
     @Operation(
         summary = "Search UOM Statuses by name",
         description = "Searches for Unit of Measure Status entities by name with case-insensitive partial matching. " +
@@ -525,7 +525,7 @@ public class UomStatusController {
      * @param pageable pagination and sorting parameters
      * @return ResponseEntity containing a paginated list of filtered UOM Status responses
      */
-    @GetMapping("/filter")
+    @GetMapping("filter")
     @Operation(
         summary = "Filter UOM Statuses by usability",
         description = "Retrieves Unit of Measure Status entities filtered by their usability status. " +
@@ -628,7 +628,7 @@ public class UomStatusController {
      * @param name the name to check for availability
      * @return ResponseEntity containing boolean indicating if the name is taken
      */
-    @GetMapping("/check-name")
+    @GetMapping("check-name")
     @Operation(
         summary = "Check name availability",
         description = "Checks if a Unit of Measure Status name is already taken. " +
@@ -720,7 +720,7 @@ public class UomStatusController {
      * @param request the update request containing the fields to modify
      * @return ResponseEntity containing the updated UOM Status
      */
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     @Operation(
         summary = "Update UOM Status",
         description = "Updates an existing Unit of Measure Status entity. Note: usability status " +
@@ -854,7 +854,7 @@ public class UomStatusController {
      * @param isUsable the new usability status
      * @return ResponseEntity with no content indicating a successful status change
      */
-    @PatchMapping("/{id}/status")
+    @PatchMapping("{id}/change-status/")
     @Operation(
         summary = "Change UOM Status usability",
         description = "Changes the usability status of a Unit of Measure Status entity. " +
@@ -956,7 +956,7 @@ public class UomStatusController {
      * @param id the unique identifier of the UOM Status to delete
      * @return ResponseEntity with no content indicating successful deletion
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     @Operation(
         summary = "Delete UOM Status",
         description = "Permanently deletes a Unit of Measure Status entity. This operation cannot be undone. " +
