@@ -22,7 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -57,7 +57,7 @@ public class UomController {
     // READ OPERATIONS
     // ========================================
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<UomResponse> getById(
         @PathVariable @NotNull @Positive Long id
     ) {
@@ -80,7 +80,7 @@ public class UomController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/search")
+    @GetMapping("search")
     public ResponseEntity<Page<UomResponse>> getByNameContaining(
         @RequestParam @NotBlank String name,
         @PageableDefault(size = 20, sort = "name") Pageable pageable
@@ -92,7 +92,7 @@ public class UomController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/filter/{uomStatusId}")
+    @GetMapping("filter/{uomStatusId}")
     public ResponseEntity<Page<UomResponse>> filterByStateId(
         @PathVariable @NotNull @Positive Long uomStatusId,
         @PageableDefault(size = 20, sort = "name") Pageable pageable
@@ -104,7 +104,7 @@ public class UomController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/check-name")
+    @GetMapping("check-name")
     public ResponseEntity<Boolean> isNameTaken(
         @RequestParam @NotBlank() String name
     ) {
@@ -119,7 +119,7 @@ public class UomController {
     // UPDATE OPERATIONS
     // ========================================
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<UomResponse> update(
         @PathVariable Long id,
         @Valid @RequestBody UomUpdate update
@@ -132,7 +132,7 @@ public class UomController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}/change-status")
+    @PatchMapping("{id}/change-state")
     public ResponseEntity<Void> changeStateId(
         @PathVariable @NotNull @Positive Long id,
         @RequestParam @NotNull @Positive Long newUomStatusId
@@ -148,7 +148,7 @@ public class UomController {
     // DELETE OPERATIONS
     // ========================================
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(
         @PathVariable @NotNull @Positive Long id
     ) {
