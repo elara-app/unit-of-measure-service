@@ -854,7 +854,7 @@ public class UomStatusController {
      * @param isUsable the new usability status
      * @return ResponseEntity with no content indicating a successful status change
      */
-    @PatchMapping("{id}/change-status/")
+    @PatchMapping("{id}/change-usability/")
     @Operation(
         summary = "Change UOM Status usability",
         description = "Changes the usability status of a Unit of Measure Status entity. " +
