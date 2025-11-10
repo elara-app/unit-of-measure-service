@@ -358,7 +358,7 @@ class UomStatusServiceImpTest {
     void findById_shouldThrowResourceNotFoundIfNotFound() {
         Long id = 21L;
         when(repository.findById(id)).thenReturn(Optional.empty());
-        when(messageService.getMessage("crud.not.found", "UomStatus", "id", id)).thenReturn("Not found");
+//        when(messageService.getMessage("crud.not.found", "UomStatus", "id", id)).thenReturn("Not found");
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(ResourceNotFoundException.class);
