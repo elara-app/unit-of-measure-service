@@ -1,0 +1,8 @@
+{
+  "id": 1,
+  "name": "Kilogram",
+  "description": "Base unit of mass in SI",
+  "conversionFactorToBase": 1.000,
+  "uomStatusId": 1
+}
+

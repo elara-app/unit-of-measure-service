@@ -1,0 +1,7 @@
+{
+  "code": 1004,
+  "value": "RESOURCE_NOT_FOUND",
+  "message": "UomStatus with ID 999 not found",
+  "timestamp": "2025-08-06T10:30:15",
+  "path": "/states/999"
+}
