@@ -1,6 +1,5 @@
 package com.elara.app.unit_of_measure_service.controller;
 
-import com.elara.app.unit_of_measure_service.config.ErrorResponse;
 import com.elara.app.unit_of_measure_service.dto.request.UomStatusRequest;
 import com.elara.app.unit_of_measure_service.dto.response.UomStatusResponse;
 import com.elara.app.unit_of_measure_service.dto.update.UomStatusUpdate;
@@ -29,45 +28,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * REST Controller for managing Unit of Measure Status (UomStatus) entities.
- *
- * <p>This controller provides comprehensive CRUD operations for UOM Status management,
- * including creation, retrieval, updating, deletion, and specialized operations like
- * status changes and name availability checks. All operations include proper validation,
- * error handling, and comprehensive API documentation.</p>
- *
- * <p><b>Key Features:</b></p>
- * <ul>
- *   <li>Full CRUD operations with validation</li>
- *   <li>Pagination support for list operations</li>
- *   <li>Search and filtering capabilities</li>
- *   <li>Dedicated status change endpoint for data integrity</li>
- *   <li>Name availability validation</li>
- *   <li>Comprehensive error handling with proper HTTP status codes</li>
- * </ul>
- *
- * <p><b>Error Handling:</b></p>
- * <ul>
- *   <li>400 Bad Request - Invalid input data or validation errors</li>
- *   <li>404 Not Found - Resource not found</li>
- *   <li>409 Conflict - Resource already exists or conflicts with existing data</li>
- *   <li>500 Internal Server Error - Unexpected server errors</li>
- * </ul>
- *
- * <p><b>Service Layer Integration:</b></p>
- * <p>This controller integrates with the UomStatusService layer and handles the following exceptions:</p>
- * <ul>
- *   <li>ResourceNotFoundException (404) - When ID does not find entities</li>
- *   <li>ResourceConflictException (409) - When duplicate names or conflicts occur</li>
- *   <li>UnexpectedErrorException (500) - For database and unexpected errors</li>
- *   <li>ValidationException (400) - For Bean Validation errors</li>
- * </ul>
- *
- * @author Elara Development Team
- * @version 1.0
- * @since 2025-08-06
- */
 @RestController
 @RequestMapping(value = "states/", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -75,9 +35,9 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Tag(
     name = "UOM Status Management",
-    description = "Complete API for managing Unit of Measure Status entities. " +
-        "Provides operations for creating, reading, updating, and deleting UOM status records, " +
-        "along with specialized functionality for status management and validation."
+    description = "Complete API for managing Unit of Measure Status entities. Provides full CRUD operations, " +
+                  "pagination, search, filtering, and status lifecycle management with dedicated endpoints for " +
+                  "ensuring audit integrity and data consistency."
 )
 public class UomStatusController {
 
@@ -86,127 +46,44 @@ public class UomStatusController {
     private final UomStatusService service;
     private final MessageService messageService;
 
-    // ========================================
-    // CREATE OPERATIONS
-    // ========================================
-
-    /**
-     * Creates a new UOM Status entity.
-     *
-     * <p>This endpoint creates a new Unit of Measure Status with the provided information.
-     * The name must be unique across all UOM statuses. The isUsable flag determines whether
-     * this status can be actively used in the system.</p>
-     *
-     * <p><b>Validation Rules:</b></p>
-     * <ul>
-     *   <li>Name: Required, non-blank, maximum 50 characters</li>
-     *   <li>Description: Optional, maximum 200 characters</li>
-     *   <li>IsUsable: Required, boolean value</li>
-     * </ul>
-     *
-     * @param request the UOM Status creation request
-     * @return ResponseEntity containing the created UOM Status
-     */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-        summary = "Create new UOM Status",
-        description = "Creates a new Unit of Measure Status entity with the provided information. " +
-            "The name must be unique and will be validated before creation.",
-        tags = {"UOM Status Management"}
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "UOM Status created successfully",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = UomStatusResponse.class),
-                examples = @ExampleObject(
-                    name = "Created UOM Status",
-                    summary = "Example of a successfully created UOM Status",
-                    value = """
-                        {
-                            "id": 1,
-                            "name": "Active",
-                            "description": "Status for active unit of measures",
-                            "isUsable": true
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid input data or validation errors",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Validation Error",
-                    summary = "Example of validation error response",
-                    value = """
-                        {
-                            "code": 1002,
-                            "value": "INVALID_DATA",
-                            "message": "Name is required and cannot be blank",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            description = "UOM Status with the same name already exists",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Resource Conflict",
-                    summary = "Example of name conflict error",
-                    value = """
-                        {
-                            "code": 1003,
-                            "value": "RESOURCE_CONFLICT",
-                            "message": "UomStatus already exists with name: Active",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Server Error",
-                    summary = "Example of server error response",
-                    value = """
-                        {
-                            "code": 1006,
-                            "value": "UNEXPECTED_ERROR",
-                            "message": "An unexpected error occurred while processing the request",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status"
-                        }
-                        """
-                )
-            )
-        )
+    @Operation(summary = "Create new UOM Status", 
+        description = """
+                Creates a new Unit of Measure Status record.
+                
+                **Validation Rules:**
+                - `name`: Required, 1-50 characters, must be unique
+                - `description`: Optional, max 200 characters
+                - `isUsable`: Required boolean field
+                
+                **Request Body:** `UomStatusRequest`""")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Created successfully - Returns the newly created status",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusResponse"),
+                examples = @ExampleObject(name = "Success", ref = "#/components/examples/UomStatusCreated"))),
+        @ApiResponse(responseCode = "400", description = "Bad Request - Validation failed (missing fields, name too long, etc.)", 
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Validation Error", ref = "#/components/examples/ErrorBadRequest"))),
+        @ApiResponse(responseCode = "409", description = "Conflict - A status with this name already exists",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Name Conflict", ref = "#/components/examples/ErrorConflict"))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error - Unexpected server error",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
     public ResponseEntity<UomStatusResponse> create(
-        @Parameter(
-            description = "UOM Status creation request with name, description, and usability flag",
-            required = true,
-            schema = @Schema(implementation = UomStatusRequest.class)
-        )
-        @Valid @RequestBody UomStatusRequest request
-    ) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                required = true,
+                description = "Payload for creating a UOM status",
+                content = @Content(
+                    schema = @Schema(ref = "#/components/schemas/UomStatusRequest"),
+                    examples = @ExampleObject(
+                        name = "Create Request",
+                        value = "{\"name\":\"Active\",\"description\":\"Unit of measure is currently active and can be used in transactions\",\"isUsable\":true}"
+                    )
+                )
+            )
+            @Valid @RequestBody UomStatusRequest request) {
         final String methodNomenclature = NOMENCLATURE + "-create";
         log.info("[{}] Request to create a new {} record.", methodNomenclature, ENTITY_NAME);
         UomStatusResponse response = service.save(request);
@@ -215,107 +92,30 @@ public class UomStatusController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // ========================================
-    // READ OPERATIONS
-    // ========================================
-
-    /**
-     * Retrieves a UOM Status by its unique identifier.
-     *
-     * <p>This endpoint fetches a specific Unit of Measure Status using its ID.
-     * If no status exists with the provided ID, a 404 Not Found response is returned.</p>
-     *
-     * @param id the unique identifier of the UOM Status (must be positive)
-     * @return ResponseEntity containing the requested UOM Status
-     */
     @GetMapping("{id}")
-    @Operation(
-        summary = "Get UOM Status by ID",
-        description = "Retrieves a specific Unit of Measure Status by its unique identifier. " +
-            "Returns detailed information about the status including its usability state.",
-        tags = {"UOM Status Management"}
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "UOM Status found and returned successfully",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = UomStatusResponse.class),
-                examples = @ExampleObject(
-                    name = "Found UOM Status",
-                    summary = "Example of a successfully retrieved UOM Status",
-                    value = """
-                        {
-                            "id": 1,
-                            "name": "Active",
-                            "description": "Status for active unit of measures",
-                            "isUsable": true
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid ID format (must be a positive number)",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Invalid ID",
-                    summary = "Example of invalid ID error",
-                    value = """
-                        {
-                            "code": 1002,
-                            "value": "INVALID_DATA",
-                            "message": "ID must be a positive number",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/invalid"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "UOM Status not found with the specified ID",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Not Found",
-                    summary = "Example of resource not found error",
-                    value = """
-                        {
-                            "code": 1004,
-                            "value": "RESOURCE_NOT_FOUND",
-                            "message": "UomStatus not found with id: 999",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/999"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
-        )
+    @Operation(summary = "Get UOM Status by ID", 
+        description = """
+                Retrieves a specific Unit of Measure Status record by its unique identifier.
+                
+                **Parameters:**
+                - `id`: Status identifier (positive integer)""")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Found successfully - Returns the status details",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusResponse"),
+                examples = @ExampleObject(name = "Success", ref = "#/components/examples/UomStatusCreated"))),
+        @ApiResponse(responseCode = "400", description = "Bad Request - Invalid ID format or invalid parameters",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Invalid ID", ref = "#/components/examples/ErrorBadRequest"))),
+        @ApiResponse(responseCode = "404", description = "Not Found - Status with given ID does not exist",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Not Found", ref = "#/components/examples/ErrorNotFound"))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
     public ResponseEntity<UomStatusResponse> getById(
-        @Parameter(
-            description = "The unique identifier of the UOM Status to retrieve",
-            required = true,
-            example = "1",
-            schema = @Schema(type = "integer", format = "int64", minimum = "1")
-        )
-        @PathVariable @NotNull @Positive Long id
-    ) {
+            @Parameter(description = "UOM Status ID", example = "1", required = true)
+            @PathVariable @NotNull @Positive Long id) {
         final String methodNomenclature = NOMENCLATURE + "-getById";
         log.info("[{}] Request to retrieve {} record by id.", methodNomenclature, ENTITY_NAME);
         UomStatusResponse response = service.findById(id);
@@ -324,85 +124,26 @@ public class UomStatusController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Retrieves all UOM Status entities with pagination support.
-     *
-     * <p>This endpoint returns a paginated list of all Unit of Measure Status entities.
-     * Results can be sorted and paginated using standard Spring Data parameters.</p>
-     *
-     * @param pageable pagination and sorting parameters
-     * @return ResponseEntity containing a paginated list of UOM Status responses
-     */
     @GetMapping
-    @Operation(
-        summary = "Get all UOM Statuses",
-        description = "Retrieves all Unit of Measure Status entities with pagination and sorting support. " +
-            "Default sorting is by name with 20 items per page.",
-        tags = {"UOM Status Management"}
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "UOM Statuses retrieved successfully",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                examples = @ExampleObject(
-                    name = "Paginated UOM Statuses",
-                    summary = "Example of paginated UOM Status list",
-                    value = """
-                        {
-                            "content": [
-                                {
-                                    "id": 1,
-                                    "name": "Active",
-                                    "description": "Active status",
-                                    "isUsable": true
-                                },
-                                {
-                                    "id": 2,
-                                    "name": "Inactive",
-                                    "description": "Inactive status",
-                                    "isUsable": false
-                                }
-                            ],
-                            "pageable": {
-                                "sort": {
-                                    "sorted": true,
-                                    "unsorted": false
-                                },
-                                "pageNumber": 0,
-                                "pageSize": 20
-                            },
-                            "totalElements": 2,
-                            "totalPages": 1,
-                            "last": true,
-                            "first": true,
-                            "numberOfElements": 2
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
-        )
+    @Operation(summary = "Get all UOM Statuses", 
+        description = """
+                Retrieves all Unit of Measure Status records with pagination support.
+                
+                **Pagination Parameters:**
+                - `page`: Page number (0-indexed, default: 0)
+                - `size`: Page size (default: 20)
+                - `sort`: Sort criteria (e.g., 'name', 'id,desc')""")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Retrieved successfully - Returns paginated list of statuses",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusPageResponse"),
+                examples = @ExampleObject(name = "Success", ref = "#/components/examples/UomStatusPage"))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
     public ResponseEntity<Page<UomStatusResponse>> getAll(
-        @Parameter(
-            description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
-            schema = @Schema(
-                type = "object",
-                description = "Pageable object with page, size, and sort parameters"
-            ),
-            example = "{ \"page\": 0, \"size\": 20, \"sort\": [\"name,asc\"] }"
-        )
-        @PageableDefault(size = 20, sort = "name") Pageable pageable
-    ) {
+            @Parameter(description = "Pagination parameters: page, size, sort")
+            @PageableDefault(size = 20) Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-getAll";
         log.info("[{}] Request to retrieve all {} records.", methodNomenclature, ENTITY_NAME);
         Page<UomStatusResponse> response = service.findAll(pageable);
@@ -410,104 +151,33 @@ public class UomStatusController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Searches for UOM Status entities by name with case-insensitive partial matching.
-     *
-     * <p>This endpoint searches for Unit of Measure Status entities where the name
-     * contains the provided search term (case-insensitive). Results are paginated.</p>
-     *
-     * @param name     the name to search for (partial match supported)
-     * @param pageable pagination and sorting parameters
-     * @return ResponseEntity containing a paginated list of matching UOM Status responses
-     */
     @GetMapping("search")
-    @Operation(
-        summary = "Search UOM Statuses by name",
-        description = "Searches for Unit of Measure Status entities by name with case-insensitive partial matching. " +
-            "Useful for implementing autocomplete or search functionality.",
-        tags = {"UOM Status Management"}
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Search completed successfully (may return empty results)",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                examples = @ExampleObject(
-                    name = "Search Results",
-                    summary = "Example of search results for 'act'",
-                    value = """
-                        {
-                            "content": [
-                                {
-                                    "id": 1,
-                                    "name": "Active",
-                                    "description": "Active status",
-                                    "isUsable": true
-                                },
-                                {
-                                    "id": 3,
-                                    "name": "Inactive",
-                                    "description": "Inactive status",
-                                    "isUsable": false
-                                }
-                            ],
-                            "totalElements": 2,
-                            "totalPages": 1,
-                            "numberOfElements": 2
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid search parameters (name cannot be blank)",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Invalid Search Parameter",
-                    summary = "Example of blank name error",
-                    value = """
-                        {
-                            "code": 1002,
-                            "value": "INVALID_DATA",
-                            "message": "Name parameter cannot be blank",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/search"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
-        )
+    @Operation(summary = "Search UOM Statuses by name", 
+        description = """
+                Searches for Unit of Measure Status records using case-insensitive partial name matching.
+                
+                **Search Features:**
+                - Case-insensitive matching
+                - Partial string matching (e.g., 'act' finds 'Active')
+                - Results support pagination and sorting
+                
+                **Example:** `/states/search?name=act&page=0&size=20`""")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Search completed successfully - Returns matching statuses",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusPageResponse"),
+                examples = @ExampleObject(name = "Success", ref = "#/components/examples/UomStatusPage"))),
+        @ApiResponse(responseCode = "400", description = "Bad Request - Name parameter cannot be blank",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Missing Name", ref = "#/components/examples/ErrorBadRequest"))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
     public ResponseEntity<Page<UomStatusResponse>> getByNameContaining(
-        @Parameter(
-            description = "The name to search for (case-insensitive partial matching)",
-            required = true,
-            example = "active",
-            schema = @Schema(type = "string", minLength = 1)
-        )
-        @RequestParam @NotBlank String name,
-        @Parameter(
-            description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
-            schema = @Schema(
-                type = "object",
-                description = "Pageable object with page, size, and sort parameters"
-            ),
-            example = "{ \"page\": 0, \"size\": 20, \"sort\": [\"name,asc\"] }"
-        )
-        @PageableDefault(size = 20, sort = "name") Pageable pageable
-    ) {
+            @Parameter(description = "Search term (case-insensitive)", example = "active", required = true)
+            @RequestParam @NotBlank String name,
+            @Parameter(description = "Pagination parameters")
+            @PageableDefault(size = 20) Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-getByNameContaining";
         log.info("[{}] Request to retrieve {} records with content in their name.", methodNomenclature, ENTITY_NAME);
         Page<UomStatusResponse> response = service.findAllByName(name, pageable);
@@ -515,103 +185,33 @@ public class UomStatusController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Filters UOM Status entities by their usability status.
-     *
-     * <p>This endpoint retrieves Unit of Measure Status entities filtered by their
-     * usability flag. Useful for getting only active or inactive statuses.</p>
-     *
-     * @param isUsable the usability status to filter by
-     * @param pageable pagination and sorting parameters
-     * @return ResponseEntity containing a paginated list of filtered UOM Status responses
-     */
     @GetMapping("filter")
-    @Operation(
-        summary = "Filter UOM Statuses by usability",
-        description = "Retrieves Unit of Measure Status entities filtered by their usability status. " +
-            "Use true to get only usable statuses, false for unusable ones.",
-        tags = {"UOM Status Management"}
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Filtering completed successfully",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                examples = @ExampleObject(
-                    name = "Filtered Results",
-                    summary = "Example of filtered results for usable=true",
-                    value = """
-                        {
-                            "content": [
-                                {
-                                    "id": 1,
-                                    "name": "Active",
-                                    "description": "Active status",
-                                    "isUsable": true
-                                },
-                                {
-                                    "id": 4,
-                                    "name": "Enabled",
-                                    "description": "Enabled status",
-                                    "isUsable": true
-                                }
-                            ],
-                            "totalElements": 2,
-                            "numberOfElements": 2
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid filter parameters (isUsable cannot be null)",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Invalid Filter Parameter",
-                    summary = "Example of null isUsable error",
-                    value = """
-                        {
-                            "code": 1002,
-                            "value": "INVALID_DATA",
-                            "message": "isUsable parameter is required and cannot be null",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/filter"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
-        )
+    @Operation(summary = "Filter UOM Statuses by usability", 
+        description = """
+                Filters Unit of Measure Status records by their usability status.
+                
+                **Filter Options:**
+                - `isUsable=true`: Returns only usable statuses
+                - `isUsable=false`: Returns only non-usable statuses
+                - Results support pagination and sorting
+                
+                **Example:** `/states/filter?isUsable=true&page=0&size=20`""")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Filtering completed successfully - Returns filtered statuses",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusPageResponse"),
+                examples = @ExampleObject(name = "Success", ref = "#/components/examples/UomStatusPage"))),
+        @ApiResponse(responseCode = "400", description = "Bad Request - isUsable parameter is required",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Missing Parameter", ref = "#/components/examples/ErrorBadRequest"))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
     public ResponseEntity<Page<UomStatusResponse>> filterByIsUsable(
-        @Parameter(
-            description = "The usability status to filter by (true for usable, false for unusable)",
-            required = true,
-            example = "true",
-            schema = @Schema(type = "boolean")
-        )
-        @RequestParam @NotNull Boolean isUsable,
-        @Parameter(
-            description = "Pagination and sorting parameters. Supports 'page', 'size', and 'sort' parameters.",
-            schema = @Schema(
-                type = "object",
-                description = "Pageable object with page, size, and sort parameters"
-            ),
-            example = "{ \"page\": 0, \"size\": 20, \"sort\": [\"name,asc\"] }"
-        )
-        @PageableDefault(size = 20, sort = "name") Pageable pageable
-    ) {
+            @Parameter(description = "Filter by usability status", example = "true", required = true)
+            @RequestParam @NotNull Boolean isUsable,
+            @Parameter(description = "Pagination parameters")
+            @PageableDefault(size = 20) Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-filterByIsUsable";
         log.info("[{}] Request to filter all {} records by usability.", methodNomenclature, ENTITY_NAME);
         Page<UomStatusResponse> response = service.findAllByIsUsable(isUsable, pageable);
@@ -619,82 +219,33 @@ public class UomStatusController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Checks if a UOM Status name is already taken.
-     *
-     * <p>This endpoint validates name availability for UOM Status entities.
-     * Useful for client-side validation and preventing duplicate names.</p>
-     *
-     * @param name the name to check for availability
-     * @return ResponseEntity containing boolean indicating if the name is taken
-     */
     @GetMapping("check-name")
-    @Operation(
-        summary = "Check name availability",
-        description = "Checks if a Unit of Measure Status name is already taken. " +
-            "Returns true if the name exists, false if it's available for use.",
-        tags = {"UOM Status Management"}
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Name availability check completed successfully",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(type = "boolean"),
+    @Operation(summary = "Check name availability", 
+        description = """
+                Validates whether a name is already in use by another status.
+                
+                **Response Values:**
+                - `true`: Name is already taken (not available)
+                - `false`: Name is available and can be used
+                
+                **Example:** `/states/check-name?name=Active`""")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Check completed successfully - Returns boolean (true=taken, false=available)",
+            content = @Content(schema = @Schema(type = "boolean"),
                 examples = {
-                    @ExampleObject(
-                        name = "Name Taken",
-                        summary = "Example when name is already taken",
-                        value = "true"
-                    ),
-                    @ExampleObject(
-                        name = "Name Available",
-                        summary = "Example when name is available",
-                        value = "false"
-                    )
-                }
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid name parameter (cannot be blank)",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Invalid Name Parameter",
-                    summary = "Example of blank name error",
-                    value = """
-                        {
-                            "code": 1002,
-                            "value": "INVALID_DATA",
-                            "message": "Name parameter cannot be blank",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/check-name"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
-        )
+                    @ExampleObject(name = "Name Taken", value = "true"),
+                    @ExampleObject(name = "Name Available", value = "false")
+                })),
+        @ApiResponse(responseCode = "400", description = "Bad Request - Name parameter cannot be blank",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Missing Name", ref = "#/components/examples/ErrorBadRequest"))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
     public ResponseEntity<Boolean> isNameTaken(
-        @Parameter(
-            description = "The name to check for availability (case-sensitive)",
-            required = true,
-            example = "Active",
-            schema = @Schema(type = "string", minLength = 1, maxLength = 50)
-        )
-        @RequestParam @NotBlank() String name
-    ) {
+            @Parameter(description = "Name to check for availability", example = "Active", required = true)
+            @RequestParam @NotBlank String name) {
         final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
         log.info("[{}] Request to check if name is taken.", methodNomenclature);
         Boolean isTaken = service.isNameTaken(name);
@@ -702,139 +253,50 @@ public class UomStatusController {
         return ResponseEntity.ok(isTaken);
     }
 
-    // ========================================
-    // UPDATE OPERATIONS
-    // ========================================
-
-    /**
-     * Updates an existing UOM Status entity (excluding usability status).
-     *
-     * <p>This endpoint updates an existing Unit of Measure Status with the provided
-     * information. The usability status cannot be changed through this endpoint -
-     * use the dedicated status change endpoint for that purpose.</p>
-     *
-     * <p><b>Note:</b> The isUsable field is intentionally excluded from the update DTO
-     * to force the use of the dedicated status change endpoint for better audit trails.</p>
-     *
-     * @param id      the unique identifier of the UOM Status to update
-     * @param request the update request containing the fields to modify
-     * @return ResponseEntity containing the updated UOM Status
-     */
     @PutMapping("{id}")
-    @Operation(
-        summary = "Update UOM Status",
-        description = "Updates an existing Unit of Measure Status entity. Note: usability status " +
-            "cannot be changed through this endpoint - use the status change endpoint instead.",
-        tags = {"UOM Status Management"}
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "UOM Status updated successfully",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = UomStatusResponse.class),
-                examples = @ExampleObject(
-                    name = "Updated UOM Status",
-                    summary = "Example of successfully updated UOM Status",
-                    value = """
-                        {
-                            "id": 1,
-                            "name": "Updated Active",
-                            "description": "Updated description for active status",
-                            "isUsable": true
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid input data, validation errors, or invalid ID",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Validation Error",
-                    summary = "Example of validation error",
-                    value = """
-                        {
-                            "code": 1002,
-                            "value": "INVALID_DATA",
-                            "message": "Name length must be between 1 and 50 characters",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/1"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "UOM Status not found with the specified ID",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Not Found",
-                    summary = "Example of resource not found error",
-                    value = """
-                        {
-                            "code": 1004,
-                            "value": "RESOURCE_NOT_FOUND",
-                            "message": "UomStatus not found with id: 999",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/999"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            description = "Name conflict with existing UOM Status",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Name Conflict",
-                    summary = "Example of name conflict during update",
-                    value = """
-                        {
-                            "code": 1003,
-                            "value": "RESOURCE_CONFLICT",
-                            "message": "UomStatus already exists with name: Active",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/1"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
-        )
+    @Operation(summary = "Update UOM Status", 
+        description = """
+                Updates an existing UOM Status record.
+                
+                **Important:** The `isUsable` field cannot be changed using this endpoint. Use the dedicated `/states/{id}/change-usability` endpoint to modify the usability status.
+                
+                **Updatable Fields:**
+                - `name`: New status name (1-50 chars, optional)
+                - `description`: New description (max 200 chars, optional)
+                
+                **Request Body:** `UomStatusUpdate`""")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Updated successfully - Returns the updated status",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusResponse"),
+                examples = @ExampleObject(name = "Success", ref = "#/components/examples/UomStatusUpdated"))),
+        @ApiResponse(responseCode = "400", description = "Bad Request - Invalid input data or validation errors",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Validation Error", ref = "#/components/examples/ErrorBadRequest"))),
+        @ApiResponse(responseCode = "404", description = "Not Found - Status with given ID does not exist",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Not Found", ref = "#/components/examples/ErrorNotFound"))),
+        @ApiResponse(responseCode = "409", description = "Conflict - New name already exists",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Name Conflict", ref = "#/components/examples/ErrorConflict"))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
     public ResponseEntity<UomStatusResponse> update(
-        @Parameter(
-            description = "The unique identifier of the UOM Status to update",
-            required = true,
-            example = "1",
-            schema = @Schema(type = "integer", format = "int64", minimum = "1")
-        )
-        @PathVariable @NotNull @Positive Long id,
-        @Parameter(
-            description = "Update request containing the fields to modify (excludes isUsable)",
-            required = true,
-            schema = @Schema(implementation = UomStatusUpdate.class)
-        )
-        @Valid @RequestBody UomStatusUpdate request
-    ) {
+            @Parameter(description = "UOM Status ID", example = "1", required = true)
+            @PathVariable @NotNull @Positive Long id,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                required = true,
+                description = "Payload for updating a UOM status (isUsable is not allowed here)",
+                content = @Content(
+                    schema = @Schema(ref = "#/components/schemas/UomStatusUpdate"),
+                    examples = @ExampleObject(
+                        name = "Update Request",
+                        value = "{\"name\":\"Inactive\",\"description\":\"Unit of measure has been marked as inactive and is no longer used in transactions\"}"
+                    )
+                )
+            )
+            @Valid @RequestBody UomStatusUpdate request) {
         final String methodNomenclature = NOMENCLATURE + "-update";
         log.info("[{}] Request to update {} record.", methodNomenclature, ENTITY_NAME);
         UomStatusResponse response = service.update(id, request);
@@ -843,96 +305,35 @@ public class UomStatusController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Changes the usability status of a UOM Status entity.
-     *
-     * <p>This is a dedicated endpoint for status management to maintain data integrity
-     * and provide better audit trails. It allows changing only the usability flag
-     * of an existing UOM Status.</p>
-     *
-     * @param id       the unique identifier of the UOM Status
-     * @param isUsable the new usability status
-     * @return ResponseEntity with no content indicating a successful status change
-     */
     @PatchMapping("{id}/change-usability/")
-    @Operation(
-        summary = "Change UOM Status usability",
-        description = "Changes the usability status of a Unit of Measure Status entity. " +
-            "This dedicated endpoint ensures better data integrity and audit trails for status changes.",
-        tags = {"UOM Status Management"}
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "204",
-            description = "Status changed successfully (no content returned)"
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid parameters (ID must be positive, isUsable cannot be null)",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Invalid Parameters",
-                    summary = "Example of invalid parameter error",
-                    value = """
-                        {
-                            "code": 1002,
-                            "value": "INVALID_DATA",
-                            "message": "isUsable parameter is required and cannot be null",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/1/status"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "UOM Status not found with the specified ID",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Not Found",
-                    summary = "Example of resource not found error",
-                    value = """
-                        {
-                            "code": 1004,
-                            "value": "RESOURCE_NOT_FOUND",
-                            "message": "UomStatus not found with id: 999",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/999/status"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
-        )
+    @Operation(summary = "Change UOM Status usability", 
+        description = """
+                Dedicated endpoint to change only the `isUsable` flag for a status.
+                
+                **Purpose:** This separate endpoint ensures audit integrity by dedicating status changes to their own operation, distinct from regular updates.
+                
+                **Parameters:**
+                - `id`: Status identifier (positive integer)
+                - `isUsable`: New usability status (required boolean)
+                
+                **Example:** `PATCH /states/1/change-usability/?isUsable=false`""")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Status changed successfully - No content returned"),
+        @ApiResponse(responseCode = "400", description = "Bad Request - Invalid ID format or missing isUsable parameter",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Invalid Parameters", ref = "#/components/examples/ErrorBadRequest"))),
+        @ApiResponse(responseCode = "404", description = "Not Found - Status with given ID does not exist",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Not Found", ref = "#/components/examples/ErrorNotFound"))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
     public ResponseEntity<Void> changeUsability(
-        @Parameter(
-            description = "The unique identifier of the UOM Status to update",
-            required = true,
-            example = "1",
-            schema = @Schema(type = "integer", format = "int64", minimum = "1")
-        )
-        @PathVariable @NotNull @Positive Long id,
-        @Parameter(
-            description = "The new usability status (true for usable, false for unusable)",
-            required = true,
-            example = "false",
-            schema = @Schema(type = "boolean")
-        )
-        @RequestParam @NotNull Boolean isUsable
-    ) {
+            @Parameter(description = "UOM Status ID", example = "1", required = true)
+            @PathVariable @NotNull @Positive Long id,
+            @Parameter(description = "New usability status", example = "false", required = true)
+            @RequestParam @NotNull Boolean isUsable) {
         final String methodNomenclature = NOMENCLATURE + "-changeUsability";
         log.info("[{}] Request to change status for {} record.", methodNomenclature, ENTITY_NAME);
         service.changeStatus(id, isUsable);
@@ -940,115 +341,33 @@ public class UomStatusController {
         return ResponseEntity.noContent().build();
     }
 
-    // ========================================
-    // DELETE OPERATIONS
-    // ========================================
-
-    /**
-     * Deletes a UOM Status entity by its ID.
-     *
-     * <p>This is a hard delete operation that permanently removes the UOM Status
-     * from the system. Use with caution as this operation cannot be undone.</p>
-     *
-     * <p><b>Warning:</b> This operation may fail if the UOM Status is referenced
-     * by other entities (foreign key constraint violations).</p>
-     *
-     * @param id the unique identifier of the UOM Status to delete
-     * @return ResponseEntity with no content indicating successful deletion
-     */
     @DeleteMapping("{id}")
-    @Operation(
-        summary = "Delete UOM Status",
-        description = "Permanently deletes a Unit of Measure Status entity. This operation cannot be undone. " +
-            "May fail if the status is referenced by other entities.",
-        tags = {"UOM Status Management"}
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "204",
-            description = "UOM Status deleted successfully (no content returned)"
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid ID format (must be a positive number)",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Invalid ID",
-                    summary = "Example of invalid ID error",
-                    value = """
-                        {
-                            "code": 1002,
-                            "value": "INVALID_DATA",
-                            "message": "ID must be a positive number",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/invalid"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "UOM Status not found with the specified ID",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Not Found",
-                    summary = "Example of resource not found error",
-                    value = """
-                        {
-                            "code": 1004,
-                            "value": "RESOURCE_NOT_FOUND",
-                            "message": "UomStatus not found with id: 999",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/999"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            description = "Cannot delete due to existing dependencies (foreign key constraints)",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(
-                    name = "Constraint Violation",
-                    summary = "Example of foreign key constraint error",
-                    value = """
-                        {
-                            "code": 1006,
-                            "value": "UNEXPECTED_ERROR",
-                            "message": "Cannot delete UomStatus as it is referenced by other entities",
-                            "timestamp": "2025-08-06T10:30:00",
-                            "path": "/api/v1/uom-status/1"
-                        }
-                        """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
-        )
+    @Operation(summary = "Delete UOM Status", 
+        description = """
+                Permanently deletes a UOM Status record.
+                
+                **Warning:** This operation cannot be undone. Deletion may fail if the status is referenced by other entities.
+                
+                **Parameters:**
+                - `id`: Status identifier (positive integer)""")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Deleted successfully - No content returned"),
+        @ApiResponse(responseCode = "400", description = "Bad Request - Invalid ID format",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Invalid ID", ref = "#/components/examples/ErrorBadRequest"))),
+        @ApiResponse(responseCode = "404", description = "Not Found - Status with given ID does not exist",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Not Found", ref = "#/components/examples/ErrorNotFound"))),
+        @ApiResponse(responseCode = "409", description = "Conflict - Cannot delete due to dependencies or foreign key constraints",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Has Dependencies", ref = "#/components/examples/ErrorDeleteConflict"))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+            content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
+                examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
     public ResponseEntity<Void> delete(
-        @Parameter(
-            description = "The unique identifier of the UOM Status to delete",
-            required = true,
-            example = "1",
-            schema = @Schema(type = "integer", format = "int64", minimum = "1")
-        )
-        @PathVariable @NotNull @Positive Long id
-    ) {
+            @Parameter(description = "UOM Status ID", example = "1", required = true)
+            @PathVariable @NotNull @Positive Long id) {
         final String methodNomenclature = NOMENCLATURE + "-delete";
         log.info("[{}] Request to delete a {} record.", methodNomenclature, ENTITY_NAME);
         service.deleteById(id);

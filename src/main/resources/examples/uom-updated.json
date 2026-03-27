@@ -1,0 +1,8 @@
+{
+  "id": 1,
+  "name": "Gram",
+  "description": "Derived mass unit equal to one thousandth of a kilogram",
+  "conversionFactorToBase": 0.001,
+  "uomStatusId": 1
+}
+
