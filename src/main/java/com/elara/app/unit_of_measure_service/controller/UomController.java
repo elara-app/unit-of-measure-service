@@ -50,12 +50,14 @@ public class UomController {
     // ========================================
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Create new UOM", description = "Creates a new Unit of Measure record.\n\n" +
-        "**Validation Rules:**\n" +
-        "- `name`: Required, 1-50 characters, must be unique\n" +
-        "- `description`: Optional, max 200 characters\n" +
-        "- `conversionFactorToBase`: Required, positive number\n" +
-        "- `uomStatusId`: Required, positive ID of an existing UOM status")
+    @Operation(summary = "Create new UOM", description = """
+            Creates a new Unit of Measure record.
+            
+            **Validation Rules:**
+            - `name`: Required, 1-50 characters, must be unique
+            - `description`: Optional, max 200 characters
+            - `conversionFactorToBase`: Required, positive number
+            - `uomStatusId`: Required, positive ID of an existing UOM status""")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Created successfully - Returns the newly created unit",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomResponse"),
@@ -227,8 +229,10 @@ public class UomController {
     // ========================================
 
     @PutMapping("{id}")
-    @Operation(summary = "Update UOM", description = "Updates an existing Unit of Measure.\n\n" +
-        "**Important:** `uomStatusId` is not updatable in this endpoint. Use `PATCH /{id}/change-state` to change status.")
+    @Operation(summary = "Update UOM", description = """
+            Updates an existing Unit of Measure.
+            
+            **Important:** `uomStatusId` is not updatable in this endpoint. Use `PATCH /{id}/change-state` to change status.""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Updated successfully - Returns updated unit",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomResponse"),
