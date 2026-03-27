@@ -1,0 +1,7 @@
+{
+  "code": 1003,
+  "value": "RESOURCE_CONFLICT",
+  "message": "A Unit of Measure Status with name 'Active' already exists",
+  "timestamp": "2025-08-06T10:30:15",
+  "path": "/states"
+}
