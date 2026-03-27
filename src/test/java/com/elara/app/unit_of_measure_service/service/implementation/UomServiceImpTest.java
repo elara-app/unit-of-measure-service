@@ -108,7 +108,7 @@ class UomServiceImpTest {
             
             when(service.isNameTaken("Kilogram")).thenReturn(false);
             when(mapper.toEntity(request)).thenReturn(entity);
-            when(statusService.findByIdService(999L)).thenThrow(new ResourceNotFoundException("UomStatus", "id", "999"));
+            when(statusService.findByIdService(999L)).thenThrow(new ResourceNotFoundException("Uom not found, when: \"id = 999\"."));
 
             // When & Then
             assertThatThrownBy(() -> service.save(request))
@@ -566,7 +566,7 @@ class UomServiceImpTest {
             Uom existing = Uom.builder().id(uomId).name("Kilogram").uomStatus(oldStatus).build();
 
             when(repository.findById(uomId)).thenReturn(Optional.of(existing));
-            when(statusService.findByIdService(statusId)).thenThrow(new ResourceNotFoundException("UomStatus", "id", "999"));
+            when(statusService.findByIdService(statusId)).thenThrow(new ResourceNotFoundException("Uom not found, when: \"id = 999\"."));
 
             // When & Then
             assertThatThrownBy(() -> service.changeStatus(uomId, statusId))
