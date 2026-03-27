@@ -1,0 +1,6 @@
+{
+  "id": 1,
+  "name": "Inactive",
+  "description": "Unit of measure has been marked as inactive and is no longer used in transactions",
+  "isUsable": false
+}
