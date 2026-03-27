@@ -48,12 +48,15 @@ public class UomStatusController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Create new UOM Status", 
-        description = "Creates a new Unit of Measure Status record.\n\n" +
-                      "**Validation Rules:**\n" +
-                      "- `name`: Required, 1-50 characters, must be unique\n" +
-                      "- `description`: Optional, max 200 characters\n" +
-                      "- `isUsable`: Required boolean field\n\n" +
-                      "**Request Body:** `UomStatusRequest`")
+        description = """
+                Creates a new Unit of Measure Status record.
+                
+                **Validation Rules:**
+                - `name`: Required, 1-50 characters, must be unique
+                - `description`: Optional, max 200 characters
+                - `isUsable`: Required boolean field
+                
+                **Request Body:** `UomStatusRequest`""")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Created successfully - Returns the newly created status",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusResponse"),
@@ -91,9 +94,11 @@ public class UomStatusController {
 
     @GetMapping("{id}")
     @Operation(summary = "Get UOM Status by ID", 
-        description = "Retrieves a specific Unit of Measure Status record by its unique identifier.\n\n" +
-                      "**Parameters:**\n" +
-                      "- `id`: Status identifier (positive integer)")
+        description = """
+                Retrieves a specific Unit of Measure Status record by its unique identifier.
+                
+                **Parameters:**
+                - `id`: Status identifier (positive integer)""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Found successfully - Returns the status details",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusResponse"),
@@ -121,11 +126,13 @@ public class UomStatusController {
 
     @GetMapping
     @Operation(summary = "Get all UOM Statuses", 
-        description = "Retrieves all Unit of Measure Status records with pagination support.\n\n" +
-                      "**Pagination Parameters:**\n" +
-                      "- `page`: Page number (0-indexed, default: 0)\n" +
-                      "- `size`: Page size (default: 20)\n" +
-                      "- `sort`: Sort criteria (e.g., 'name', 'id,desc')")
+        description = """
+                Retrieves all Unit of Measure Status records with pagination support.
+                
+                **Pagination Parameters:**
+                - `page`: Page number (0-indexed, default: 0)
+                - `size`: Page size (default: 20)
+                - `sort`: Sort criteria (e.g., 'name', 'id,desc')""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Retrieved successfully - Returns paginated list of statuses",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusPageResponse"),
@@ -146,12 +153,15 @@ public class UomStatusController {
 
     @GetMapping("search")
     @Operation(summary = "Search UOM Statuses by name", 
-        description = "Searches for Unit of Measure Status records using case-insensitive partial name matching.\n\n" +
-                      "**Search Features:**\n" +
-                      "- Case-insensitive matching\n" +
-                      "- Partial string matching (e.g., 'act' finds 'Active')\n" +
-                      "- Results support pagination and sorting\n\n" +
-                      "**Example:** `/states/search?name=act&page=0&size=20`")
+        description = """
+                Searches for Unit of Measure Status records using case-insensitive partial name matching.
+                
+                **Search Features:**
+                - Case-insensitive matching
+                - Partial string matching (e.g., 'act' finds 'Active')
+                - Results support pagination and sorting
+                
+                **Example:** `/states/search?name=act&page=0&size=20`""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Search completed successfully - Returns matching statuses",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusPageResponse"),
@@ -177,12 +187,15 @@ public class UomStatusController {
 
     @GetMapping("filter")
     @Operation(summary = "Filter UOM Statuses by usability", 
-        description = "Filters Unit of Measure Status records by their usability status.\n\n" +
-                      "**Filter Options:**\n" +
-                      "- `isUsable=true`: Returns only usable statuses\n" +
-                      "- `isUsable=false`: Returns only non-usable statuses\n" +
-                      "- Results support pagination and sorting\n\n" +
-                      "**Example:** `/states/filter?isUsable=true&page=0&size=20`")
+        description = """
+                Filters Unit of Measure Status records by their usability status.
+                
+                **Filter Options:**
+                - `isUsable=true`: Returns only usable statuses
+                - `isUsable=false`: Returns only non-usable statuses
+                - Results support pagination and sorting
+                
+                **Example:** `/states/filter?isUsable=true&page=0&size=20`""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Filtering completed successfully - Returns filtered statuses",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusPageResponse"),
@@ -208,11 +221,14 @@ public class UomStatusController {
 
     @GetMapping("check-name")
     @Operation(summary = "Check name availability", 
-        description = "Validates whether a name is already in use by another status.\n\n" +
-                      "**Response Values:**\n" +
-                      "- `true`: Name is already taken (not available)\n" +
-                      "- `false`: Name is available and can be used\n\n" +
-                      "**Example:** `/states/check-name?name=Active`")
+        description = """
+                Validates whether a name is already in use by another status.
+                
+                **Response Values:**
+                - `true`: Name is already taken (not available)
+                - `false`: Name is available and can be used
+                
+                **Example:** `/states/check-name?name=Active`""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Check completed successfully - Returns boolean (true=taken, false=available)",
             content = @Content(schema = @Schema(type = "boolean"),
@@ -239,12 +255,16 @@ public class UomStatusController {
 
     @PutMapping("{id}")
     @Operation(summary = "Update UOM Status", 
-        description = "Updates an existing UOM Status record.\n\n" +
-                      "**Important:** The `isUsable` field cannot be changed using this endpoint. Use the dedicated `/states/{id}/change-usability` endpoint to modify the usability status.\n\n" +
-                      "**Updatable Fields:**\n" +
-                      "- `name`: New status name (1-50 chars, optional)\n" +
-                      "- `description`: New description (max 200 chars, optional)\n\n" +
-                      "**Request Body:** `UomStatusUpdate`")
+        description = """
+                Updates an existing UOM Status record.
+                
+                **Important:** The `isUsable` field cannot be changed using this endpoint. Use the dedicated `/states/{id}/change-usability` endpoint to modify the usability status.
+                
+                **Updatable Fields:**
+                - `name`: New status name (1-50 chars, optional)
+                - `description`: New description (max 200 chars, optional)
+                
+                **Request Body:** `UomStatusUpdate`""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Updated successfully - Returns the updated status",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusResponse"),
@@ -287,12 +307,16 @@ public class UomStatusController {
 
     @PatchMapping("{id}/change-usability/")
     @Operation(summary = "Change UOM Status usability", 
-        description = "Dedicated endpoint to change only the `isUsable` flag for a status.\n\n" +
-                      "**Purpose:** This separate endpoint ensures audit integrity by dedicating status changes to their own operation, distinct from regular updates.\n\n" +
-                      "**Parameters:**\n" +
-                      "- `id`: Status identifier (positive integer)\n" +
-                      "- `isUsable`: New usability status (required boolean)\n\n" +
-                      "**Example:** `PATCH /states/1/change-usability/?isUsable=false`")
+        description = """
+                Dedicated endpoint to change only the `isUsable` flag for a status.
+                
+                **Purpose:** This separate endpoint ensures audit integrity by dedicating status changes to their own operation, distinct from regular updates.
+                
+                **Parameters:**
+                - `id`: Status identifier (positive integer)
+                - `isUsable`: New usability status (required boolean)
+                
+                **Example:** `PATCH /states/1/change-usability/?isUsable=false`""")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Status changed successfully - No content returned"),
         @ApiResponse(responseCode = "400", description = "Bad Request - Invalid ID format or missing isUsable parameter",
@@ -319,10 +343,13 @@ public class UomStatusController {
 
     @DeleteMapping("{id}")
     @Operation(summary = "Delete UOM Status", 
-        description = "Permanently deletes a UOM Status record.\n\n" +
-                      "**Warning:** This operation cannot be undone. Deletion may fail if the status is referenced by other entities.\n\n" +
-                      "**Parameters:**\n" +
-                      "- `id`: Status identifier (positive integer)")
+        description = """
+                Permanently deletes a UOM Status record.
+                
+                **Warning:** This operation cannot be undone. Deletion may fail if the status is referenced by other entities.
+                
+                **Parameters:**
+                - `id`: Status identifier (positive integer)""")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Deleted successfully - No content returned"),
         @ApiResponse(responseCode = "400", description = "Bad Request - Invalid ID format",
