@@ -270,7 +270,7 @@ public class UomController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("{id}/change-state")
+    @PatchMapping("{id}/status/{newUomStatusId}")
     @Operation(summary = "Change UOM status", description = "Changes only the status association (`uomStatusId`) of a UOM record.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Status changed successfully - No content returned"),
@@ -284,17 +284,17 @@ public class UomController {
             content = @Content(schema = @Schema(ref = "#/components/schemas/ErrorResponse"),
                 examples = @ExampleObject(name = "Server Error", ref = "#/components/examples/ErrorServer")))
     })
-    public ResponseEntity<Void> changeStateId(
+    public ResponseEntity<UomResponse> changeStateId(
         @Parameter(description = "UOM ID", example = "1", required = true)
         @PathVariable @NotNull @Positive Long id,
         @Parameter(description = "New target status ID", example = "2", required = true)
-        @RequestParam @NotNull @Positive Long newUomStatusId
+        @PathVariable @NotNull @Positive Long newUomStatusId
     ) {
         final String methodNomenclature = NOMENCLATURE + "-changeStateId";
         log.info("[{}] Request to change status for {} record.", methodNomenclature, ENTITY_NAME);
-        service.changeStatus(id, newUomStatusId);
+        UomResponse response = service.changeStatus(id, newUomStatusId);
         log.info("[{}] Usability changed for {} record.", methodNomenclature, ENTITY_NAME);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(response);
     }
 
     // ========================================

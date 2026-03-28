@@ -164,7 +164,7 @@ public class UomServiceImp implements UomService {
 
     @Override
     @Transactional
-    public void changeStatus(Long id, Long uomStatusId) {
+    public UomResponse changeStatus(Long id, Long uomStatusId) {
         final String methodNomenclature = NOMENCLATURE + "-changeStatus";
         log.info("[{}] Change status id of {} record with id: {} to: {}", methodNomenclature, ENTITY_NAME, id, uomStatusId);
         try {
@@ -177,6 +177,7 @@ public class UomServiceImp implements UomService {
             UomStatus newStatus = statusService.findByIdService(uomStatusId);
             existing.setUomStatus(newStatus);
             log.info("[{}] Changed status id of {} record with id: {} to: {}", methodNomenclature, ENTITY_NAME, id, newStatus.getId());
+            return mapper.toResponse(existing);
         } catch (ResourceNotFoundException e) {
             String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
