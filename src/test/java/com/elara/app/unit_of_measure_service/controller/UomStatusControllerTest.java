@@ -35,6 +35,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @WebMvcTest(controllers = UomStatusController.class)
 @Import({GlobalExceptionHandler.class, UomStatusControllerTest.TestConfig.class})
@@ -351,42 +352,47 @@ class UomStatusControllerTest {
         }
     }
 
-//    @Nested
-//    @DisplayName("PATCH /states/{id}/change-usability - changeUomStatusUsability")
-//    class ChangeStatusTests {
-//        @Test
-//        @DisplayName("should return 204 on success")
-//        void changeStatus_shouldReturn204() throws Exception {
-//            doNothing().when(service).changeStatus(1L, true);
-//
-//            mockMvc.perform(patch(BASE_URL + "/{id}/change-usability", 1)
-//                    .param("isUsable", "true"))
-//                .andExpect(status().isNoContent());
-//        }
-//
-//        @Test
-//        @DisplayName("should return 404 when id not found")
-//        void changeStatus_shouldReturn404() throws Exception {
-//            org.mockito.Mockito.doThrow(new ResourceNotFoundException("not found"))
-//                .when(service).changeStatus(999L, false);
-//
-//            mockMvc.perform(patch(BASE_URL + "/{id}/change-usability", 999)
-//                    .param("isUsable", "false"))
-//                .andExpect(status().isNotFound())
-//                .andExpect(jsonPath("$.code").value(1004));
-//        }
-//
-//        @Test
-//        @DisplayName("should return 400 when missing isUsable param (handled by GlobalExceptionHandler)")
-//        void changeStatus_shouldReturn400_onMissingParam() throws Exception {
-//            given(messageService.getMessage(eq("parameter.missing"), any())).willReturn("Missing param");
-//
-//            mockMvc.perform(patch(BASE_URL + "/{id}/change-usability", 1))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.code").value(1002))
-//                .andExpect(jsonPath("$.value").value("INVALID_DATA"));
-//        }
-//    }
+    @Nested
+    @DisplayName("PATCH /states/{id}/change-usability - changeUomStatusUsability")
+    class ChangeStatusTests {
+        @Test
+        @DisplayName("changeUsability_validRequest_returns204")
+        void changeUsability_validRequest_returns204() throws Exception {
+            doNothing().when(service).changeStatus(1L, true);
+
+            mockMvc.perform(patch(BASE_URL + "/{id}/change-usability", 1)
+                    .param("isUsable", "true"))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+            verify(service).changeStatus(1L, true);
+        }
+
+        @Test
+        @DisplayName("changeUsability_notFound_returns404")
+        void changeUsability_notFound_returns404() throws Exception {
+            doThrow(new ResourceNotFoundException("Status not found"))
+                .when(service).changeStatus(999L, false);
+
+            mockMvc.perform(patch(BASE_URL + "/{id}/change-usability", 999)
+                    .param("isUsable", "false"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(1004));
+
+            verify(service).changeStatus(999L, false);
+        }
+
+        @Test
+        @DisplayName("changeUsability_missingParam_returns400")
+        void changeUsability_missingParam_returns400() throws Exception {
+            given(messageService.getMessage(eq("parameter.missing"), any())).willReturn("Missing param");
+
+            mockMvc.perform(patch(BASE_URL + "/{id}/change-usability", 1))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(1002))
+                .andExpect(jsonPath("$.value").value("INVALID_DATA"));
+        }
+    }
 
     @Nested
     @DisplayName("DELETE /states/{id} - deleteUomStatus")

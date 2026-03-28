@@ -569,56 +569,55 @@ class UomControllerTest {
     @DisplayName("PATCH /{id}/status/{statusId} - Change Status")
     class ChangeStatusTests {
 
-//        @Test
-//        @DisplayName("should return 200 when status changed successfully")
-//        void changeStatus_shouldReturn200WhenBothExist() throws Exception {
-//            // Given
-//            Long uomId = 1L;
-//            Long statusId = 2L;
-//
-//            when(service.changeStatus(uomId, statusId)).thenReturn(null);
-//
-//            // When & Then
-//            mockMvc.perform(patch(BASE_URL + "{id}/status/{statusId}", uomId, statusId))
-//                .andExpect(status().isOk());
-//
-//            verify(service).changeStatus(uomId, statusId);
-//        }
+        @Test
+        @DisplayName("changeStatus_validRequest_returns200")
+        void changeStatus_validRequest_returns200() throws Exception {
+            Long uomId = 1L;
+            Long statusId = 2L;
+            UomResponse mockResponse = new UomResponse(uomId, "kg", "kilogram", new BigDecimal("1.0"), statusId);
+
+            when(service.changeStatus(uomId, statusId)).thenReturn(mockResponse);
+
+            mockMvc.perform(patch(BASE_URL + "{id}/status/{statusId}", uomId, statusId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(uomId));
+
+            verify(service).changeStatus(uomId, statusId);
+        }
 
         @Test
-        @DisplayName("should return 404 when UOM not exists")
-        void changeStatus_shouldReturn404WhenUomNotExists() throws Exception {
-            // Given
+        @DisplayName("changeStatus_uomNotFound_returns404")
+        void changeStatus_uomNotFound_returns404() throws Exception {
             Long uomId = 999L;
             Long statusId = 1L;
             doThrow(new ResourceNotFoundException("Uom not found, when: \"id = 999\"."))
                 .when(service).changeStatus(uomId, statusId);
 
-            // When & Then
             mockMvc.perform(patch(BASE_URL + "{id}/status/{statusId}", uomId, statusId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(1004));
+
+            verify(service).changeStatus(uomId, statusId);
         }
 
         @Test
-        @DisplayName("should return 404 when Status not exists")
-        void changeStatus_shouldReturn404WhenStatusNotExists() throws Exception {
-            // Given
+        @DisplayName("changeStatus_statusNotFound_returns404")
+        void changeStatus_statusNotFound_returns404() throws Exception {
             Long uomId = 1L;
             Long statusId = 999L;
-            doThrow(new ResourceNotFoundException("Uom not found, when: \"id = 999\"."))
+            doThrow(new ResourceNotFoundException("Status not found, when: \"id = 999\"."))
                 .when(service).changeStatus(uomId, statusId);
 
-            // When & Then
             mockMvc.perform(patch(BASE_URL + "{id}/status/{statusId}", uomId, statusId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(1004));
+
+            verify(service).changeStatus(uomId, statusId);
         }
 
         @Test
-        @DisplayName("should return 400 when IDs are invalid")
-        void changeStatus_shouldReturn400WhenIdsInvalid() throws Exception {
-            // When & Then
+        @DisplayName("changeStatus_invalidIds_returns400")
+        void changeStatus_invalidIds_returns400() throws Exception {
             mockMvc.perform(patch(BASE_URL + "{id}/status/{statusId}", -1, 0))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(1002));
