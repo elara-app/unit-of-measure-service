@@ -66,9 +66,9 @@ public class UomServiceImp implements UomService {
         try {
             Uom existing = repository.findById(id)
                 .orElseThrow(() -> {
-                    String notFoundMsg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-                    log.warn("[{}] {}", methodNomenclature, notFoundMsg);
-                    return new ResourceNotFoundException(ENTITY_NAME, "id", id);
+                    String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                    log.warn("[{}] {}", methodNomenclature, msg);
+                    return new ResourceNotFoundException(msg);
                 });
             if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
                 String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
@@ -95,7 +95,7 @@ public class UomServiceImp implements UomService {
             if (!repository.existsById(id)) {
                 String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
                 log.warn("[{}] {}", methodNomenclature, msg);
-                throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
+                throw new ResourceNotFoundException(msg);
             }
             repository.deleteById(id);
             log.info("[{}] {} record with id: {}, deleted.", methodNomenclature, ENTITY_NAME, id);
@@ -115,7 +115,7 @@ public class UomServiceImp implements UomService {
             if (entity.isEmpty()) {
                 String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
                 log.warn("[{}] {}", methodNomenclature, msg);
-                throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
+                throw new ResourceNotFoundException(msg);
             }
             log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity.get());
             return mapper.toResponse(entity.get());
@@ -164,7 +164,7 @@ public class UomServiceImp implements UomService {
 
     @Override
     @Transactional
-    public void changeStatus(Long id, Long uomStatusId) {
+    public UomResponse changeStatus(Long id, Long uomStatusId) {
         final String methodNomenclature = NOMENCLATURE + "-changeStatus";
         log.info("[{}] Change status id of {} record with id: {} to: {}", methodNomenclature, ENTITY_NAME, id, uomStatusId);
         try {
@@ -172,11 +172,12 @@ public class UomServiceImp implements UomService {
                 .orElseThrow(() -> {
                     String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
                     log.warn("[{}] {}", methodNomenclature, msg);
-                    return new ResourceNotFoundException(ENTITY_NAME, "id", id);
+                    return new ResourceNotFoundException(msg);
                 });
             UomStatus newStatus = statusService.findByIdService(uomStatusId);
             existing.setUomStatus(newStatus);
             log.info("[{}] Changed status id of {} record with id: {} to: {}", methodNomenclature, ENTITY_NAME, id, newStatus.getId());
+            return mapper.toResponse(existing);
         } catch (ResourceNotFoundException e) {
             String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
