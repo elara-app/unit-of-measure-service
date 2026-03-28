@@ -4,6 +4,7 @@ import com.elara.app.unit_of_measure_service.exceptions.BaseException;
 import com.elara.app.unit_of_measure_service.utils.ErrorCode;
 import com.elara.app.unit_of_measure_service.utils.MessageService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,17 @@ public class GlobalExceptionHandler {
             ErrorCode.INVALID_DATA.getValue(),
             Arrays.stream(exception.getDetailMessageArguments()).toList().get(1).toString(),
             request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ErrorCode.INVALID_DATA.getCode(),
+                ErrorCode.INVALID_DATA.getValue(),
+                exception.getMessage(),
+                request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
