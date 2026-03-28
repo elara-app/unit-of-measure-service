@@ -305,7 +305,7 @@ public class UomStatusController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("{id}/change-usability/")
+    @PatchMapping("{id}/change-usability")
     @Operation(summary = "Change UOM Status usability", 
         description = """
                 Dedicated endpoint to change only the `isUsable` flag for a status.
