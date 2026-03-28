@@ -20,6 +20,7 @@ public record UomRequest(
     @Positive
     BigDecimal conversionFactorToBase,
 
+    @NotNull
     @Positive
     Long uomStatusId
 
