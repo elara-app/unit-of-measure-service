@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,7 +32,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,6 +49,7 @@ class UomServiceImpTest {
     @Mock
     private UomStatusService statusService;
 
+    @Spy
     @InjectMocks
     private UomServiceImp service;
 
@@ -66,7 +67,7 @@ class UomServiceImpTest {
             Uom saved = Uom.builder().id(1L).name("Kilogram").description("Base unit of mass").conversionFactorToBase(new BigDecimal("1.000")).uomStatus(status).build();
             UomResponse response = new UomResponse(1L, "Kilogram", "Base unit of mass", new BigDecimal("1.000"), null);
 
-            when(service.isNameTaken("Kilogram")).thenReturn(false);
+            doReturn(false).when(service).isNameTaken("Kilogram");
             when(mapper.toEntity(request)).thenReturn(entity);
             when(statusService.findByIdService(1L)).thenReturn(status);
             when(repository.save(entity)).thenReturn(saved);
@@ -87,7 +88,7 @@ class UomServiceImpTest {
         void save_shouldThrowResourceConflictWhenNameTaken() {
             // Given
             UomRequest request = new UomRequest("Kilogram", "desc", new BigDecimal("1.000"), 1L);
-            when(service.isNameTaken("Kilogram")).thenReturn(true);
+            doReturn(true).when(service).isNameTaken("Kilogram");
             when(messageService.getMessage("crud.already.exists", "Uom", "name", "Kilogram"))
                     .thenReturn("Uom with name 'Kilogram' already exists");
 
@@ -106,7 +107,7 @@ class UomServiceImpTest {
             UomRequest request = new UomRequest("Kilogram", "desc", new BigDecimal("1.000"), 999L);
             Uom entity = Uom.builder().name("Kilogram").build();
             
-            when(service.isNameTaken("Kilogram")).thenReturn(false);
+            doReturn(false).when(service).isNameTaken("Kilogram");
             when(mapper.toEntity(request)).thenReturn(entity);
             when(statusService.findByIdService(999L)).thenThrow(new ResourceNotFoundException("Uom not found, when: \"id = 999\"."));
 
@@ -127,7 +128,7 @@ class UomServiceImpTest {
             Uom saved = Uom.builder().id(1L).name("Gram").uomStatus(status).build();
             UomResponse response = new UomResponse(1L, "Gram", "desc", new BigDecimal("0.001"), null);
 
-            when(service.isNameTaken("Gram")).thenReturn(false);
+            doReturn(false).when(service).isNameTaken("Gram");
             when(mapper.toEntity(request)).thenReturn(entity);
             when(statusService.findByIdService(1L)).thenReturn(status);
             when(repository.save(entity)).thenReturn(saved);
@@ -165,7 +166,7 @@ class UomServiceImpTest {
             UomResponse response = new UomResponse(1L, "Kilogram Updated", "New description", new BigDecimal("1.500"), null);
 
             when(repository.findById(id)).thenReturn(Optional.of(existing));
-            when(service.isNameTaken("Kilogram Updated")).thenReturn(false);
+            doReturn(false).when(service).isNameTaken("Kilogram Updated");
             doNothing().when(mapper).updateEntityFromDto(existing, updateRequest);
             when(mapper.toResponse(existing)).thenReturn(response);
 
@@ -207,7 +208,7 @@ class UomServiceImpTest {
             Uom existing = Uom.builder().id(1L).name("Kilogram").uomStatus(status).build();
 
             when(repository.findById(id)).thenReturn(Optional.of(existing));
-            when(service.isNameTaken("Gram")).thenReturn(true);
+            doReturn(true).when(service).isNameTaken("Gram");
             when(messageService.getMessage("crud.already.exists", "Uom", "name", "Gram"))
                     .thenReturn("Name already exists");
 
@@ -252,7 +253,7 @@ class UomServiceImpTest {
             UomResponse response = new UomResponse(1L, "Updated", "desc", new BigDecimal("1.0"), null);
 
             when(repository.findById(id)).thenReturn(Optional.of(existing));
-            when(service.isNameTaken("Updated")).thenReturn(false);
+            doReturn(false).when(service).isNameTaken("Updated");
             doNothing().when(mapper).updateEntityFromDto(existing, updateRequest);
             when(mapper.toResponse(existing)).thenReturn(response);
 
