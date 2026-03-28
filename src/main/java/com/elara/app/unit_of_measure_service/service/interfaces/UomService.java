@@ -24,6 +24,6 @@ public interface UomService {
 
     Boolean isNameTaken(String name);
 
-    void changeStatus(Long id, Long uomStatusId);
+    UomResponse changeStatus(Long id, Long uomStatusId);
 
 }
