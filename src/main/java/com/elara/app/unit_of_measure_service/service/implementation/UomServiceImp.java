@@ -12,12 +12,12 @@ import com.elara.app.unit_of_measure_service.repository.UomRepository;
 import com.elara.app.unit_of_measure_service.service.interfaces.UomService;
 import com.elara.app.unit_of_measure_service.service.interfaces.UomStatusService;
 import com.elara.app.unit_of_measure_service.utils.MessageService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -107,6 +107,7 @@ public class UomServiceImp implements UomService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UomResponse findById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-findById";
         log.info("[{}] Fetch {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
@@ -127,6 +128,7 @@ public class UomServiceImp implements UomService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<UomResponse> findAll(Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAll";
         log.info("[{}] Fetch all {} records.", methodNomenclature, ENTITY_NAME);
@@ -136,6 +138,7 @@ public class UomServiceImp implements UomService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<UomResponse> findAllByName(String name, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByName";
         log.info("[{}] Fetch all {} records that contain in their name: '{}'", methodNomenclature, ENTITY_NAME, name);
@@ -145,6 +148,7 @@ public class UomServiceImp implements UomService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<UomResponse> findAllByUomStatusId(Long uomStatusId, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByUomStatusId";
         log.info("[{}] Fetch all {} records with status id: '{}'", methodNomenclature, ENTITY_NAME, uomStatusId);
