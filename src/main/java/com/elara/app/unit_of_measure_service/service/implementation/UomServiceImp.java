@@ -40,13 +40,13 @@ public class UomServiceImp implements UomService {
         final String methodNomenclature = NOMENCLATURE + "-save";
         log.info("[{}] {} record to save: {}", methodNomenclature, ENTITY_NAME, request);
         try {
-            if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
+            if (isNameTaken(Objects.requireNonNull(request).name())) {
                 String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
                 log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
                 throw new ResourceConflictException(alreadyExistsMsg);
             }
             Uom entity = mapper.toEntity(request);
-            UomStatus status = statusService.findByIdService(request.uomStatusId());
+            UomStatus status = statusService.findEntityById(request.uomStatusId());
             entity.setUomStatus(status); // This can be avoided using @Context in the mapper and receive the request and UomStatus as parameters
             Uom saved = repository.save(entity);
             log.info("[{}] {} record created with id: {}.", methodNomenclature, ENTITY_NAME, saved.getId());
@@ -70,7 +70,7 @@ public class UomServiceImp implements UomService {
                     log.warn("[{}] {}", methodNomenclature, msg);
                     return new ResourceNotFoundException(msg);
                 });
-            if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
+            if (!existing.getName().equals(request.name()) && isNameTaken(request.name())) {
                 String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
                 log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
                 throw new ResourceConflictException(alreadyExistsMsg);
@@ -154,10 +154,10 @@ public class UomServiceImp implements UomService {
     }
 
     @Override
-    public Boolean isNameTaken(String name) {
+    public boolean isNameTaken(String name) {
         final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
         log.info("[{}] Check if name '{}' is taken.", methodNomenclature, name);
-        Boolean exists = repository.existsByNameIgnoreCase(name);
+        boolean exists = repository.existsByNameIgnoreCase(name);
         log.info("[{}] Name '{}' {} taken.", methodNomenclature, name, exists ? "is" : "is not");
         return exists;
     }
@@ -174,7 +174,7 @@ public class UomServiceImp implements UomService {
                     log.warn("[{}] {}", methodNomenclature, msg);
                     return new ResourceNotFoundException(msg);
                 });
-            UomStatus newStatus = statusService.findByIdService(uomStatusId);
+            UomStatus newStatus = statusService.findEntityById(uomStatusId);
             existing.setUomStatus(newStatus);
             log.info("[{}] Changed status id of {} record with id: {} to: {}", methodNomenclature, ENTITY_NAME, id, newStatus.getId());
             return mapper.toResponse(existing);

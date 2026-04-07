@@ -15,6 +15,6 @@ public interface UomRepository extends JpaRepository<Uom, Long> {
 
     Page<Uom> findAllByUomStatusId(Long uomStatusId, Pageable pageable);
 
-    Boolean existsByNameIgnoreCase(String name);
+    boolean existsByNameIgnoreCase(String name);
 
 }
