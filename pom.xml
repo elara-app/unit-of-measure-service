@@ -247,12 +247,14 @@
                                         </limit>
                                     </limits>
                                     <excludes>
-                                        <exclude>com.elara.app.UnitOfMeasureServiceApplication.configuration.*</exclude>
+                                        <exclude>com.elara.app.UnitOfMeasureServiceApplication.config.*</exclude>
+                                        <exclude>com.elara.app.unit_of_measure_service.UnitOfMeasureServiceApplication</exclude>
                                     </excludes>
                                 </rule>
                             </rules>
                             <excludes>
                                 <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
+                                <exclude>**/config/**</exclude>
                                 <exclude>**/dto/**</exclude>
                             </excludes>
                         </configuration>
@@ -263,6 +265,7 @@
                     <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
                     <excludes>
                         <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
+                        <exclude>**/config/**</exclude>
                         <exclude>**/dto/**</exclude>
                     </excludes>
                 </configuration>
