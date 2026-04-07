@@ -53,7 +53,6 @@
         <maven.compiler.version>3.14.0</maven.compiler.version>
         <maven.surefire.version>3.5.3</maven.surefire.version>
         <lombok.version>1.18.38</lombok.version>
-        <postgresql.version>42.7.7</postgresql.version>
         <jacoco.version>0.8.12</jacoco.version>
         <sonar.scanner.version>5.1.0.4751</sonar.scanner.version>
         <mapstruct.version>1.6.3</mapstruct.version>
@@ -130,7 +129,6 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
 
