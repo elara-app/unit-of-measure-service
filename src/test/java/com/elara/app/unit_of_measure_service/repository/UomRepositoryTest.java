@@ -231,7 +231,7 @@ class UomRepositoryTest {
             createAndPersistUom("Kilogram", "Base unit", new BigDecimal("1.000"), activeStatus);
 
             // When
-            Boolean exists = repository.existsByNameIgnoreCase("Kilogram");
+            boolean exists = repository.existsByNameIgnoreCase("Kilogram");
 
             // Then
             assertThat(exists).isTrue();
@@ -244,7 +244,7 @@ class UomRepositoryTest {
             createAndPersistUom("Kilogram", "Base unit", new BigDecimal("1.000"), activeStatus);
 
             // When
-            Boolean exists = repository.existsByNameIgnoreCase("Liter");
+            boolean exists = repository.existsByNameIgnoreCase("Liter");
 
             // Then
             assertThat(exists).isFalse();
@@ -257,9 +257,9 @@ class UomRepositoryTest {
             createAndPersistUom("Kilogram", "Base unit", new BigDecimal("1.000"), activeStatus);
 
             // When
-            Boolean existsLower = repository.existsByNameIgnoreCase("kilogram");
-            Boolean existsUpper = repository.existsByNameIgnoreCase("KILOGRAM");
-            Boolean existsMixed = repository.existsByNameIgnoreCase("KiLoGrAm");
+            boolean existsLower = repository.existsByNameIgnoreCase("kilogram");
+            boolean existsUpper = repository.existsByNameIgnoreCase("KILOGRAM");
+            boolean existsMixed = repository.existsByNameIgnoreCase("KiLoGrAm");
 
             // Then
             assertThat(existsLower).isTrue();
