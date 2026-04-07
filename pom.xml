@@ -64,6 +64,12 @@
             **/UnitOfMeasureServiceApplication.java
         </sonar.exclusions>
     </properties>
+
+    <!--
+        dependencyManagement section is used to centralize and manage versions of dependencies.
+        The spring-cloud-dependencies BOM (Bill of Materials) ensures consistent versions for all Spring Cloud components.
+        By importing this BOM, you avoid version conflicts and simplify dependency upgrades.
+    -->
     <dependencyManagement>
         <dependencies>
             <dependency>
