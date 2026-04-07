@@ -50,7 +50,7 @@ public class UomStatusServiceImp implements UomStatusService {
     public UomStatusResponse save(UomStatusRequest request) {
         final String methodNomenclature = NOMENCLATURE + "-save";
         log.info("[{}] {} record to save: {}", methodNomenclature, ENTITY_NAME, request);
-        if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
+        if (isNameTaken(Objects.requireNonNull(request).name())) {
             String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
             String saveErrorMsg = messageService.getMessage("crud.save.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
@@ -89,7 +89,7 @@ public class UomStatusServiceImp implements UomStatusService {
                     log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
                     return new ResourceNotFoundException(notFoundMsg);
                 });
-            if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
+            if (!existing.getName().equals(request.name()) && isNameTaken(request.name())) {
                 String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
                 log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
                 throw new ResourceConflictException(alreadyExistsMsg);
@@ -150,8 +150,8 @@ public class UomStatusServiceImp implements UomStatusService {
     }
 
     @Transactional
-    public UomStatus findByIdService(Long id) {
-        final String methodNomenclature = NOMENCLATURE + "-findByIdService";
+    public UomStatus findEntityById(Long id) {
+        final String methodNomenclature = NOMENCLATURE + "-findEntityById";
         log.info("[{}] Fetch {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
         UomStatus entity = repository.findById(id)
             .orElseThrow(() -> {
@@ -216,10 +216,10 @@ public class UomStatusServiceImp implements UomStatusService {
      * @param name the name of the UomStatus to check
      * @return true if exists, false otherwise
      */
-    public Boolean isNameTaken(String name) {
+    public boolean isNameTaken(String name) {
         final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
         log.info("[{}] Check if name '{}' is taken.", methodNomenclature, name);
-        Boolean exists = repository.existsByName(name);
+        boolean exists = repository.existsByName(name);
         log.info("[{}] Name '{}' {} taken.", methodNomenclature, name, exists ? "is" : "is not");
         return exists;
     }
