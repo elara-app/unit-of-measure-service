@@ -120,6 +120,11 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bus-amqp</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.openapi.version}</version>
+        </dependency>
 
         <!-- Runtime dependencies -->
         <dependency>
@@ -145,12 +150,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- OpenAPI/Swagger dependencies -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.openapi.version}</version>
-        </dependency>
     </dependencies>
 
     <!-- - - - - - - - - - - - - -->
