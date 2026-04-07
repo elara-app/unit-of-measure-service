@@ -10,12 +10,12 @@ import com.elara.app.unit_of_measure_service.model.UomStatus;
 import com.elara.app.unit_of_measure_service.repository.UomStatusRepository;
 import com.elara.app.unit_of_measure_service.service.interfaces.UomStatusService;
 import com.elara.app.unit_of_measure_service.utils.MessageService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -135,7 +135,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @return an Optional containing the found UomStatusResponse, or empty if not found
      * @throws ResourceNotFoundException if no UomStatus found with the given id
      */
-    @Override
+    @Override @Transactional(readOnly = true)
     public UomStatusResponse findById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-findById";
         log.info("[{}] Fetch {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
@@ -170,6 +170,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @return a page of UomStatusResponse
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<UomStatusResponse> findAll(Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAll";
         log.info("[{}] Fetch all {} records.", methodNomenclature, ENTITY_NAME);
@@ -186,6 +187,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @return a page of UomStatusResponse
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByName";
         log.info("[{}] Fetch all {} records that contain in their name: '{}'", methodNomenclature, ENTITY_NAME, name);
@@ -202,6 +204,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @return a page of UomStatusResponse
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByIsUsable";
         log.info("[{}] Fetch all {} records with isUsable: {}.", methodNomenclature, ENTITY_NAME, isUsable);
