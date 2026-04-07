@@ -69,7 +69,7 @@ class UomServiceImpTest {
 
             doReturn(false).when(service).isNameTaken("Kilogram");
             when(mapper.toEntity(request)).thenReturn(entity);
-            when(statusService.findByIdService(1L)).thenReturn(status);
+            when(statusService.findEntityById(1L)).thenReturn(status);
             when(repository.save(entity)).thenReturn(saved);
             when(mapper.toResponse(saved)).thenReturn(response);
 
@@ -79,7 +79,7 @@ class UomServiceImpTest {
             // Then
             assertThat(result).isEqualTo(response);
             verify(repository).save(entity);
-            verify(statusService).findByIdService(1L);
+            verify(statusService).findEntityById(1L);
             verify(mapper).toResponse(saved);
         }
 
@@ -109,7 +109,7 @@ class UomServiceImpTest {
             
             doReturn(false).when(service).isNameTaken("Kilogram");
             when(mapper.toEntity(request)).thenReturn(entity);
-            when(statusService.findByIdService(999L)).thenThrow(new ResourceNotFoundException("Uom not found, when: \"id = 999\"."));
+            when(statusService.findEntityById(999L)).thenThrow(new ResourceNotFoundException("Uom not found, when: \"id = 999\"."));
 
             // When & Then
             assertThatThrownBy(() -> service.save(request))
@@ -130,7 +130,7 @@ class UomServiceImpTest {
 
             doReturn(false).when(service).isNameTaken("Gram");
             when(mapper.toEntity(request)).thenReturn(entity);
-            when(statusService.findByIdService(1L)).thenReturn(status);
+            when(statusService.findEntityById(1L)).thenReturn(status);
             when(repository.save(entity)).thenReturn(saved);
             when(mapper.toResponse(saved)).thenReturn(response);
 
@@ -138,7 +138,7 @@ class UomServiceImpTest {
             service.save(request);
 
             // Then
-            verify(statusService).findByIdService(1L);
+            verify(statusService).findEntityById(1L);
             verify(repository).save(argThat(uom -> uom.getUomStatus() != null && uom.getUomStatus().getId().equals(1L)));
         }
 
@@ -481,7 +481,7 @@ class UomServiceImpTest {
             when(repository.existsByNameIgnoreCase(name)).thenReturn(true);
 
             // When
-            Boolean result = service.isNameTaken(name);
+            boolean result = service.isNameTaken(name);
 
             // Then
             assertThat(result).isTrue();
@@ -496,7 +496,7 @@ class UomServiceImpTest {
             when(repository.existsByNameIgnoreCase(name)).thenReturn(false);
 
             // When
-            Boolean result = service.isNameTaken(name);
+            boolean result = service.isNameTaken(name);
 
             // Then
             assertThat(result).isFalse();
@@ -528,7 +528,7 @@ class UomServiceImpTest {
             Uom existing = Uom.builder().id(uomId).name("Kilogram").uomStatus(oldStatus).build();
 
             when(repository.findById(uomId)).thenReturn(Optional.of(existing));
-            when(statusService.findByIdService(statusId)).thenReturn(newStatus);
+            when(statusService.findEntityById(statusId)).thenReturn(newStatus);
 
             // When
             service.changeStatus(uomId, statusId);
@@ -536,7 +536,7 @@ class UomServiceImpTest {
             // Then
             assertThat(existing.getUomStatus()).isEqualTo(newStatus);
             verify(repository).findById(uomId);
-            verify(statusService).findByIdService(statusId);
+            verify(statusService).findEntityById(statusId);
         }
 
         @Test
@@ -554,7 +554,7 @@ class UomServiceImpTest {
             assertThatThrownBy(() -> service.changeStatus(uomId, statusId))
                     .isInstanceOf(ResourceNotFoundException.class);
             
-            verify(statusService, never()).findByIdService(any());
+            verify(statusService, never()).findEntityById(any());
         }
 
         @Test
@@ -567,7 +567,7 @@ class UomServiceImpTest {
             Uom existing = Uom.builder().id(uomId).name("Kilogram").uomStatus(oldStatus).build();
 
             when(repository.findById(uomId)).thenReturn(Optional.of(existing));
-            when(statusService.findByIdService(statusId)).thenThrow(new ResourceNotFoundException("Uom not found, when: \"id = 999\"."));
+            when(statusService.findEntityById(statusId)).thenThrow(new ResourceNotFoundException("Uom not found, when: \"id = 999\"."));
 
             // When & Then
             assertThatThrownBy(() -> service.changeStatus(uomId, statusId))
