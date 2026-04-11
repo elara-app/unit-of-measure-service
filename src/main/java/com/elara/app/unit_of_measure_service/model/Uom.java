@@ -37,6 +37,7 @@ public class Uom {
     @Column(name = "conversion_factor_to_base", nullable = false, precision = 10, scale = 3)
     private BigDecimal conversionFactorToBase;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uom_status_id")
     private UomStatus uomStatus;
