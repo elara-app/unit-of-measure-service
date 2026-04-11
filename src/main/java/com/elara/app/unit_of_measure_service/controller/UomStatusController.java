@@ -29,7 +29,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "states/", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "status/", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.*;
 )
 public class UomStatusController {
 
-    private static final String ENTITY_NAME = "State";
+    private static final String ENTITY_NAME = "UomStatus";
     private static final String NOMENCLATURE = ENTITY_NAME + "-controller";
     private final UomStatusService service;
     private final MessageService messageService;
@@ -161,7 +161,7 @@ public class UomStatusController {
                 - Partial string matching (e.g., 'act' finds 'Active')
                 - Results support pagination and sorting
                 
-                **Example:** `/states/search?name=act&page=0&size=20`""")
+                **Example:** `/status/search?name=act&page=0&size=20`""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Search completed successfully - Returns matching statuses",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusPageResponse"),
@@ -195,7 +195,7 @@ public class UomStatusController {
                 - `isUsable=false`: Returns only non-usable statuses
                 - Results support pagination and sorting
                 
-                **Example:** `/states/filter?isUsable=true&page=0&size=20`""")
+                **Example:** `/status/filter?isUsable=true&page=0&size=20`""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Filtering completed successfully - Returns filtered statuses",
             content = @Content(schema = @Schema(ref = "#/components/schemas/UomStatusPageResponse"),
@@ -228,7 +228,7 @@ public class UomStatusController {
                 - `true`: Name is already taken (not available)
                 - `false`: Name is available and can be used
                 
-                **Example:** `/states/check-name?name=Active`""")
+                **Example:** `/status/check-name?name=Active`""")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Check completed successfully - Returns boolean (true=taken, false=available)",
             content = @Content(schema = @Schema(type = "boolean"),
@@ -258,7 +258,7 @@ public class UomStatusController {
         description = """
                 Updates an existing UOM Status record.
                 
-                **Important:** The `isUsable` field cannot be changed using this endpoint. Use the dedicated `/states/{id}/change-usability` endpoint to modify the usability status.
+                **Important:** The `isUsable` field cannot be changed using this endpoint. Use the dedicated `/status/{id}/change-usability` endpoint to modify the usability status.
                 
                 **Updatable Fields:**
                 - `name`: New status name (1-50 chars, optional)
@@ -316,7 +316,7 @@ public class UomStatusController {
                 - `id`: Status identifier (positive integer)
                 - `isUsable`: New usability status (required boolean)
                 
-                **Example:** `PATCH /states/1/change-usability/?isUsable=false`""")
+                **Example:** `PATCH /status/1/change-usability/?isUsable=false`""")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Status changed successfully - No content returned"),
         @ApiResponse(responseCode = "400", description = "Bad Request - Invalid ID format or missing isUsable parameter",
