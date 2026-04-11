@@ -33,10 +33,9 @@
     <!-- - - - - - - - - - - - - -->
     <developers>
         <developer>
-            <id>julianbetov</id>
-            <name>Julian Bermudez</name>
-            <email>julianbetov@gmail.com</email>
-            <url>https://github.com/julianbetov</url>
+            <id>andresbetov</id>
+            <name>Andres Bermudez</name>
+            <url>https://github.com/andresbetov</url>
         </developer>
     </developers>
 
@@ -51,25 +50,26 @@
     <!-- - - - - - - - - - - - - -->
     <properties>
         <java.version>21</java.version>
-        <maven.compiler.version>3.14.0</maven.compiler.version>
-        <maven.surefire.version>3.5.3</maven.surefire.version>
+        <maven.compiler.release>21</maven.compiler.release>
         <lombok.version>1.18.38</lombok.version>
-        <h2.version>2.3.232</h2.version>
-        <postgresql.version>42.7.7</postgresql.version>
-        <jacoco.version>0.8.12</jacoco.version>
-        <sonar.scanner.version>5.1.0.4751</sonar.scanner.version>
+        <jacoco.version>0.8.14</jacoco.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <springdoc.openapi.version>2.8.0</springdoc.openapi.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
         <!-- + + + + -->
-        <sonar.language>java</sonar.language>
+        <sonar.scanner.version>5.1.0.4751</sonar.scanner.version>
         <sonar.projectKey>com.elara.app:unit-of-measure-service</sonar.projectKey>
-        <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.exclusions>
             **/UnitOfMeasureServiceApplication.java
         </sonar.exclusions>
-        <springdoc.openapi.version>2.8.0</springdoc.openapi.version>
-        <spring-cloud.version>2025.0.0</spring-cloud.version>
     </properties>
+
+    <!--
+        dependencyManagement section is used to centralize and manage versions of dependencies.
+        The spring-cloud-dependencies BOM (Bill of Materials) ensures consistent versions for all Spring Cloud components.
+        By importing this BOM, you avoid version conflicts and simplify dependency upgrades.
+    -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -124,37 +124,35 @@
             <artifactId>spring-cloud-starter-bus-amqp</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.openapi.version}</version>
         </dependency>
 
         <!-- Runtime dependencies -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
             <scope>runtime</scope>
         </dependency>
 
         <!-- Test dependencies -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- OpenAPI/Swagger dependencies -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.openapi.version}</version>
-        </dependency>
     </dependencies>
 
     <!-- - - - - - - - - - - - - -->
@@ -164,8 +162,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.version}</version>
                 <configuration>
+                    <release>${maven.compiler.release}</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -249,12 +247,14 @@
                                         </limit>
                                     </limits>
                                     <excludes>
-                                        <exclude>com.elara.app.UnitOfMeasureServiceApplication.configuration.*</exclude>
+                                        <exclude>com.elara.app.UnitOfMeasureServiceApplication.config.*</exclude>
+                                        <exclude>com.elara.app.unit_of_measure_service.UnitOfMeasureServiceApplication</exclude>
                                     </excludes>
                                 </rule>
                             </rules>
                             <excludes>
                                 <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
+                                <exclude>**/config/**</exclude>
                                 <exclude>**/dto/**</exclude>
                             </excludes>
                         </configuration>
@@ -265,6 +265,7 @@
                     <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
                     <excludes>
                         <exclude>**/UnitOfMeasureServiceApplication.class</exclude>
+                        <exclude>**/config/**</exclude>
                         <exclude>**/dto/**</exclude>
                     </excludes>
                 </configuration>

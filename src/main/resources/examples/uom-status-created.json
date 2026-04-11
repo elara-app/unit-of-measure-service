@@ -1,0 +1,6 @@
+{
+  "id": 1,
+  "name": "Active",
+  "description": "Unit of measure is currently active and can be used in transactions",
+  "isUsable": true
+}

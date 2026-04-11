@@ -10,12 +10,12 @@ import com.elara.app.unit_of_measure_service.model.UomStatus;
 import com.elara.app.unit_of_measure_service.repository.UomStatusRepository;
 import com.elara.app.unit_of_measure_service.service.interfaces.UomStatusService;
 import com.elara.app.unit_of_measure_service.utils.MessageService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class UomStatusServiceImp implements UomStatusService {
     public UomStatusResponse save(UomStatusRequest request) {
         final String methodNomenclature = NOMENCLATURE + "-save";
         log.info("[{}] {} record to save: {}", methodNomenclature, ENTITY_NAME, request);
-        if (Boolean.TRUE.equals(isNameTaken(Objects.requireNonNull(request).name()))) {
+        if (isNameTaken(Objects.requireNonNull(request).name())) {
             String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
             String saveErrorMsg = messageService.getMessage("crud.save.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
@@ -87,9 +87,9 @@ public class UomStatusServiceImp implements UomStatusService {
                     String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME);
                     log.warn("[{}] {}", methodNomenclature, notFoundMsg);
                     log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
-                    return new ResourceNotFoundException(ENTITY_NAME, "id", id);
+                    return new ResourceNotFoundException(notFoundMsg);
                 });
-            if (!existing.getName().equals(request.name()) && Boolean.TRUE.equals(isNameTaken(request.name()))) {
+            if (!existing.getName().equals(request.name()) && isNameTaken(request.name())) {
                 String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
                 log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
                 throw new ResourceConflictException(alreadyExistsMsg);
@@ -121,7 +121,7 @@ public class UomStatusServiceImp implements UomStatusService {
             String deleteErrorMsg = messageService.getMessage("crud.delete.error", ENTITY_NAME);
             log.warn("[{}] {}", methodNomenclature, notFoundMsg);
             log.warn("[{}] {}", methodNomenclature, deleteErrorMsg);
-            throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
+            throw new ResourceNotFoundException(notFoundMsg);
         }
         repository.deleteById(id);
         log.info("[{}] {} record with id: {}, deleted.", methodNomenclature, ENTITY_NAME, id);
@@ -135,7 +135,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @return an Optional containing the found UomStatusResponse, or empty if not found
      * @throws ResourceNotFoundException if no UomStatus found with the given id
      */
-    @Override
+    @Override @Transactional(readOnly = true)
     public UomStatusResponse findById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-findById";
         log.info("[{}] Fetch {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
@@ -143,21 +143,22 @@ public class UomStatusServiceImp implements UomStatusService {
         if (entity.isEmpty()) {
             String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id.toString());
             log.warn("[{}] {}", methodNomenclature, msg);
-            throw new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
+            throw new ResourceNotFoundException(msg);
         }
         log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity.get());
         return mapper.toResponse(entity.get());
     }
 
+    @Override
     @Transactional
-    public UomStatus findByIdService(Long id) {
-        final String methodNomenclature = NOMENCLATURE + "-findByIdService";
+    public UomStatus findEntityById(Long id) {
+        final String methodNomenclature = NOMENCLATURE + "-findEntityById";
         log.info("[{}] Fetch {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
         UomStatus entity = repository.findById(id)
             .orElseThrow(() -> {
                 String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
                 log.warn("[{}] {}", methodNomenclature, msg);
-                return new ResourceNotFoundException(ENTITY_NAME, "id", id.toString());
+                return new ResourceNotFoundException(msg);
             });
         log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity);
         return entity;
@@ -170,6 +171,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @return a page of UomStatusResponse
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<UomStatusResponse> findAll(Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAll";
         log.info("[{}] Fetch all {} records.", methodNomenclature, ENTITY_NAME);
@@ -186,6 +188,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @return a page of UomStatusResponse
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<UomStatusResponse> findAllByName(String name, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByName";
         log.info("[{}] Fetch all {} records that contain in their name: '{}'", methodNomenclature, ENTITY_NAME, name);
@@ -202,6 +205,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @return a page of UomStatusResponse
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable) {
         final String methodNomenclature = NOMENCLATURE + "-findAllByIsUsable";
         log.info("[{}] Fetch all {} records with isUsable: {}.", methodNomenclature, ENTITY_NAME, isUsable);
@@ -216,10 +220,11 @@ public class UomStatusServiceImp implements UomStatusService {
      * @param name the name of the UomStatus to check
      * @return true if exists, false otherwise
      */
-    public Boolean isNameTaken(String name) {
+    @Override
+    public boolean isNameTaken(String name) {
         final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
         log.info("[{}] Check if name '{}' is taken.", methodNomenclature, name);
-        Boolean exists = repository.existsByName(name);
+        boolean exists = repository.existsByName(name);
         log.info("[{}] Name '{}' {} taken.", methodNomenclature, name, exists ? "is" : "is not");
         return exists;
     }
@@ -241,7 +246,7 @@ public class UomStatusServiceImp implements UomStatusService {
             .orElseThrow(() -> {
                 String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
                 log.warn("[{}] {}", methodNomenclature, msg);
-                return new ResourceNotFoundException(ENTITY_NAME, "id", id);
+                return new ResourceNotFoundException(msg);
             });
         existing.setIsUsable(isUsable);
         log.info("[{}] Changed status of {} record with id: {} to: {}", methodNomenclature, ENTITY_NAME, id, isUsable);

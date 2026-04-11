@@ -17,6 +17,6 @@ public interface UomStatusRepository extends JpaRepository<UomStatus, Long> {
 
     Page<UomStatus> findAllByIsUsable(Boolean isUsable, Pageable pageable);
 
-    Boolean existsByName(String name);
+    boolean existsByName(String name);
 
 }
