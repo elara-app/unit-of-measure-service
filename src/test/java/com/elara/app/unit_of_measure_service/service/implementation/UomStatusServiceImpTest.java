@@ -394,8 +394,8 @@ class UomStatusServiceImpTest {
         }
 
         @Test
-        @DisplayName("FindByIdService with existing id, returns UomStatus entity")
-        void findByIdService_withExistingId_returnsEntity() {
+        @DisplayName("FindEntityById with existing id, returns UomStatus entity")
+        void findEntityById_withExistingId_returnsEntity() {
             Long id = 1L;
             UomStatus entity = UomStatus.builder()
                 .id(id)
@@ -406,7 +406,7 @@ class UomStatusServiceImpTest {
 
             when(repository.findById(id)).thenReturn(Optional.of(entity));
 
-            UomStatus result = service.findByIdService(id);
+            UomStatus result = service.findEntityById(id);
 
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(id);
@@ -420,8 +420,8 @@ class UomStatusServiceImpTest {
         }
 
         @Test
-        @DisplayName("FindByIdService with non-existent id, throws ResourceNotFoundException")
-        void findByIdService_withNonExistentId_throwsResourceNotFoundException() {
+        @DisplayName("FindEntityById with non-existent id, throws ResourceNotFoundException")
+        void findEntityById_withNonExistentId_throwsResourceNotFoundException() {
             Long id = 999L;
             String errorMessage = "UomStatus with id '999' not found";
 
@@ -429,7 +429,7 @@ class UomStatusServiceImpTest {
             when(messageService.getMessage(eq("crud.not.found"), eq("UomStatus"), eq("id"), eq(id)))
                 .thenReturn(errorMessage);
 
-            assertThatThrownBy(() -> service.findByIdService(id))
+            assertThatThrownBy(() -> service.findEntityById(id))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining(errorMessage);
 
@@ -593,7 +593,7 @@ class UomStatusServiceImpTest {
 
             when(repository.existsByName(name)).thenReturn(true);
 
-            Boolean result = service.isNameTaken(name);
+            boolean result = service.isNameTaken(name);
 
             assertThat(result).isTrue();
             verify(repository).existsByName(name);
@@ -607,7 +607,7 @@ class UomStatusServiceImpTest {
 
             when(repository.existsByName(name)).thenReturn(false);
 
-            Boolean result = service.isNameTaken(name);
+            boolean result = service.isNameTaken(name);
 
             assertThat(result).isFalse();
             verify(repository).existsByName(name);
