@@ -149,6 +149,7 @@ public class UomStatusServiceImp implements UomStatusService {
         return mapper.toResponse(entity.get());
     }
 
+    @Override
     @Transactional
     public UomStatus findEntityById(Long id) {
         final String methodNomenclature = NOMENCLATURE + "-findEntityById";
@@ -219,6 +220,7 @@ public class UomStatusServiceImp implements UomStatusService {
      * @param name the name of the UomStatus to check
      * @return true if exists, false otherwise
      */
+    @Override
     public boolean isNameTaken(String name) {
         final String methodNomenclature = NOMENCLATURE + "-isNameTaken";
         log.info("[{}] Check if name '{}' is taken.", methodNomenclature, name);
