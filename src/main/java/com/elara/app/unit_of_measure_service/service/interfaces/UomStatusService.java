@@ -17,7 +17,7 @@ public interface UomStatusService {
 
     UomStatusResponse findById(Long id);
 
-    UomStatus findByIdService(Long id);
+    UomStatus findEntityById(Long id);
 
     Page<UomStatusResponse> findAll(Pageable pageable);
 
@@ -25,7 +25,7 @@ public interface UomStatusService {
 
     Page<UomStatusResponse> findAllByIsUsable(Boolean isUsable, Pageable pageable);
 
-    Boolean isNameTaken(String name);
+    boolean isNameTaken(String name);
 
     void changeStatus(Long id, Boolean isUsable);
 
