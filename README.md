@@ -21,7 +21,7 @@ The repository contains a complete `unit-of-measure-service` implementation wher
 ## What This Service Delivers
 
 - Full lifecycle management for units of measure (`create`, `update`, `delete`, `findById`, paginated `findAll`, paginated name search, status change).
-- - Full lifecycle management for UOM statuses (k/read/update/delete, usability changes, and status search/filter operations).
+- Full lifecycle management for UOM statuses (k/read/update/delete, usability changes, and status search/filter operations).
 - Strict request validation for IDs, text fields, and numeric values.
 - Business safeguards such as case-insensitive name uniqueness, status association rules, and status usability control.
 - Stable error contract through centralized exception handling and structured error responses.
