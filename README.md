@@ -1,8 +1,8 @@
 # Unit of Measure Service
 
-Spring Boot microservice for unit of measure management within a distributed platform.
+Spring Boot microservice for unit of measure catalog and status governance within a distributed platform.
 
-The repository contains a complete `unit-of-measure-service` implementation where delivery quality is visible in the product itself: clear architecture boundaries, strict validation, consistent error contracts, documented APIs, and build-enforced testing standards.
+The repository contains a complete `unit-of-measure-service` implementation where delivery quality is visible in the product itself: clear architecture boundaries, strict validation, consistent error contracts, documented APIs, and build-enforced testing standards for a reference-data service consumed by other domains.
 
 ## Project Snapshot
 
@@ -21,22 +21,26 @@ The repository contains a complete `unit-of-measure-service` implementation wher
 ## What This Service Delivers
 
 - Full lifecycle management for units of measure (`create`, `update`, `delete`, `findById`, paginated `findAll`, paginated name search, status change).
+- - Full lifecycle management for UOM statuses (k/read/update/delete, usability changes, and status search/filter operations).
 - Strict request validation for IDs, text fields, and numeric values.
-- Business safeguards such as case-insensitive name uniqueness and status management.
+- Business safeguards such as case-insensitive name uniqueness, status association rules, and status usability control.
 - Stable error contract through centralized exception handling and structured error responses.
 - OpenAPI documentation with reusable schemas and example payloads.
 
 Implementation references:
 - `src/main/java/com/elara/app/unit_of_measure_service/controller/UomController.java`
-- `src/main/java/com/elara/app/unit_of_measure_service/service/imp/UomImp.java`
+- `src/main/java/com/elara/app/unit_of_measure_service/controller/UomStatusController.java`
+- `src/main/java/com/elara/app/unit_of_measure_service/service/implementation/UomServiceImp.java`
+- `src/main/java/com/elara/app/unit_of_measure_service/service/implementation/UomStatusServiceImp.java`
 - `src/main/java/com/elara/app/unit_of_measure_service/config/GlobalExceptionHandler.java`
 - `src/main/java/com/elara/app/unit_of_measure_service/config/OpenApiConfig.java`
 
 ## Microservice Ecosystem Context
 
-Unit of Measure Service operates as one service in a broader microservices architecture. Peer services keep their own repositories and documentation, while this repository captures the interactions as a dependency for Inventory Service:
+Unit of Measure Service operates as one service in a broader microservices' architecture. Peer services keep their own repositories and documentation, while this repository captures interactions where UOM data is the reusable platform reference:
 
-- **Service discovery and client-side load balancing** for inter-service communication.
+- **Inbound request routing through API Gateway**, with service resolution through Eureka.
+- **Service discovery and client-side load balancing** for service registration and lookup.
 - **Centralized configuration** through Config Server.
 - **Secrets management** through Vault in the `dev` profile.
 - **Distributed config refresh** through Spring Cloud Bus (AMQP).
@@ -45,19 +49,47 @@ Unit of Measure Service operates as one service in a broader microservices archi
 Key references:
 - `src/main/resources/application.yml`
 - `src/main/resources/application-dev.yml`
-- `src/main/java/com/elara/app/unit_of_measure_service/config/AppConfig.java`
+- `src/main/java/com/elara/app/unit_of_measure_service/controller/UomController.java`
+- `src/main/java/com/elara/app/unit_of_measure_service/controller/UomStatusController.java`
+
+## Service Interaction in the Microservices Architecture
+
+Unit of Measure Service participates as a core reference-data and state-governance service in the platform interaction model:
+
+1. Client-facing traffic is typically received through [api-gateway](https://github.com/elara-app/api-gateway.git), which routes requests using registry data from [discovery-service](https://github.com/elara-app/discovery-service.git).
+2. On startup and refresh, Unit of Measure Service loads profile-specific configuration from [config-service](https://github.com/elara-app/config-service.git), sourced from [centralized-configuration](https://github.com/elara-app/centralized-configuration.git).
+3. [inventory-service](https://github.com/elara-app/inventory-service.git) consumes Unit of Measure endpoints to validate UOM dependencies in inventory workflows.
+4. Secrets for supported profiles are resolved via Vault integration, and distributed configuration updates are propagated through Spring Cloud Bus.
+
+This service remains the system-of-record for UOM catalog definitions and UOM status rules, while gateway, discovery, config, and secret-management concerns stay delegated to platform infrastructure services.
 
 ## API Surface
 
-Base path: `/`
+Base paths: `/` (UOM) and `/status/` (UOM status catalog)
+
+UOM endpoints:
 
 - `POST /` - create unit of measure
 - `GET /{id}` - retrieve by id
 - `GET /` - paginated listing
 - `GET /search?name=...` - paginated name search
+- `GET /filter/status/{uomStatusId}` - filter UOMs by status
+- `GET /check-name?name=...` - check UOM name availability
 - `PUT /{id}` - update by id
+- `PATCH /{id}/status/{newUomStatusId}` - change status association
 - `DELETE /{id}` - delete by id
-- `PATCH /{id}/status` - change status
+
+UOM status endpoints:
+
+- `POST /status/` - create status
+- `GET /status/{id}` - retrieve status by id
+- `GET /status/` - paginated status listing
+- `GET /status/search?name=...` - paginated status name search
+- `GET /status/filter?isUsable=true|false` - filter statuses by usability
+- `GET /status/check-name?name=...` - check status name availability
+- `PUT /status/{id}` - update status
+- `PATCH /status/{id}/change-usability` - change usability flag
+- `DELETE /status/{id}` - delete status
 
 Detailed request/response schemas and examples are configured in:
 - `src/main/java/com/elara/app/unit_of_measure_service/config/OpenApiConfig.java`
@@ -90,7 +122,7 @@ Targeted test examples:
 
 ```bash
 ./mvnw test -Dtest=UomControllerTest
-./mvnw test -Dtest=UomImpTest#save_withValidRequest_createsAndReturnsResponse
+./mvnw test -Dtest=UomServiceImpTest#save_shouldCreateAndReturnResponse
 ```
 
 
@@ -98,4 +130,3 @@ Targeted test examples:
 
 - `AGENTS.md` - coding conventions, architecture patterns, and operational rules
 - `TESTING_GUIDE.md` - detailed testing practices and examples
-
