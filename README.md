@@ -1,3 +1,5 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/elara-app/unit-of-measure-service)
+
 # Unit of Measure Service
 
 Spring Boot microservice for unit of measure catalog and status governance within a distributed platform.
