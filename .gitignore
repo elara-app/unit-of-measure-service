@@ -24,3 +24,6 @@ target/
 
 ### Custom ###
 .env
+.env.*
+!.env.example
+*.log
