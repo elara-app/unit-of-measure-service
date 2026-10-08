@@ -11,7 +11,7 @@ The repository contains a complete `unit-of-measure-service` implementation wher
 | Area | Details |
 |------|---------|
 | Language & Runtime | Java 21 |
-| Framework | Spring Boot 3.5.3 |
+| Framework | Spring Boot 3.5.6 |
 | Build Tool | Maven (`./mvnw`) |
 | Data Layer | Spring Data JPA + PostgreSQL (runtime) + H2 (tests) |
 | API | REST + OpenAPI (springdoc) |
