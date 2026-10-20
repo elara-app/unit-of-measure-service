@@ -1,10 +1,10 @@
 # Agent Guidelines - Unit of Measure Service
 
-This document provides essential information for AI coding agents working on this Spring Boot 3.5.3 microservice.
+This document provides essential information for AI coding agents working on this Spring Boot 3.5.6 microservice.
 
 ## Project Overview
 
-- **Project**: Elara Unit of Measure Service (Spring Boot 3.5.3, Java 21)
+- **Project**: Elara Unit of Measure Service (Spring Boot 3.5.6, Java 21)
 - **Build Tool**: Maven 3.x
 - **Package**: `com.elara.app.unit_of_measure_service`
 - **Architecture**: Spring Cloud microservice with Eureka, Config Server, Vault, and RabbitMQ-based Spring Cloud Bus for distributed config refresh

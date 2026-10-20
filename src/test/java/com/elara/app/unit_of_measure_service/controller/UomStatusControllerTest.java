@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @WebMvcTest(controllers = UomStatusController.class)
+@ActiveProfiles("test")
 @Import({GlobalExceptionHandler.class, UomStatusControllerTest.TestConfig.class})
 class UomStatusControllerTest {
 
@@ -60,7 +62,7 @@ class UomStatusControllerTest {
     @Autowired
     private MessageService messageService;
 
-    private static final String BASE_URL = "/states/";
+    private static final String BASE_URL = "/status/";
 
     @TestConfiguration
     static class TestConfig {
@@ -75,7 +77,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("POST states/ - createUomStatus")
+    @DisplayName("POST status/ - createUomStatus")
     class CreateUomStatusTests {
         @Test
         @DisplayName("should return 201 with created resource")
@@ -149,7 +151,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /states/{id} - getUomStatusById")
+    @DisplayName("GET /status/{id} - getUomStatusById")
     class GetByIdTests {
         @Test
         @DisplayName("should return 200 with resource")
@@ -177,7 +179,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /states - getAllUomStatuses")
+    @DisplayName("GET /status - getAllUomStatuses")
     class GetAllTests {
         @Test
         @DisplayName("should return 200 with paged content")
@@ -208,7 +210,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /states/search - searchUomStatusesByName")
+    @DisplayName("GET /status/search - searchUomStatusesByName")
     class SearchByNameTests {
         @Test
         @DisplayName("should return 200 with results")
@@ -237,7 +239,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /states/filter - filterUomStatusesByUsability")
+    @DisplayName("GET /status/filter - filterUomStatusesByUsability")
     class FilterByUsabilityTests {
         @Test
         @DisplayName("should return 200 with filtered results")
@@ -265,7 +267,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /states/check-name - isNameTaken")
+    @DisplayName("GET /status/check-name - isNameTaken")
     class CheckNameTests {
         @Test
         @DisplayName("should return 200 with true/false")
@@ -290,7 +292,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("PUT /states/{id} - updateUomStatus")
+    @DisplayName("PUT /status/{id} - updateUomStatus")
     class UpdateTests {
         @Test
         @DisplayName("should return 200 with updated resource")
@@ -353,7 +355,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("PATCH /states/{id}/change-usability - changeUomStatusUsability")
+    @DisplayName("PATCH /status/{id}/change-usability - changeUomStatusUsability")
     class ChangeStatusTests {
         @Test
         @DisplayName("changeUsability_validRequest_returns204")
@@ -395,7 +397,7 @@ class UomStatusControllerTest {
     }
 
     @Nested
-    @DisplayName("DELETE /states/{id} - deleteUomStatus")
+    @DisplayName("DELETE /status/{id} - deleteUomStatus")
     class DeleteTests {
         @Test
         @DisplayName("should return 204 on success")
