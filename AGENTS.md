@@ -334,6 +334,10 @@ log.error("[{}] Unexpected error: {}", methodNomenclature, e.getMessage(), e);
 final String methodNomenclature = NOMENCLATURE + "-methodName";
 ```
 
+The global exception handler owns exception logging: log the operation here and
+let the handler report the exceptions you propagate. Logging a `WARN` in a
+`catch` that rethrows produces two `WARN` lines for the same failure.
+
 ## Testing Standards
 
 Reference the comprehensive [TESTING_GUIDE.md](TESTING_GUIDE.md) for detailed testing patterns.
