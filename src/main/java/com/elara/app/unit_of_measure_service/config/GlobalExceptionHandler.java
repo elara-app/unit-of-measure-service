@@ -33,25 +33,30 @@ public class GlobalExceptionHandler {
         String path = request.getRequestURI();
         int code = exception.getCode();
         String message = exception.getMessage();
-        log.warn("[GlobalExceptionHandler-BaseException] Code: {} | Message: {} | Path: {}", code, message, path);
+        HttpStatus status = determineHttpStatus(code);
+        if (status.is5xxServerError()) {
+            log.error("[GlobalExceptionHandler-BaseException] Code: {} | Message: {} | Path: {}", code, message, path, exception);
+        } else {
+            log.warn("[GlobalExceptionHandler-BaseException] Code: {} | Message: {} | Path: {}", code, message, path);
+        }
         ErrorResponse errorResponse = createErrorResponse(
             code,
             exception.getValue(),
             message,
             path
         );
-        return new ResponseEntity<>(errorResponse, determineHttpStatus(code));
+        return new ResponseEntity<>(errorResponse, status);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException exception, HttpServletRequest request) {
         String path = request.getRequestURI();
-        log.warn("[GlobalExceptionHandler-ValidationError] Message: {} | Path: {}",
-            exception.getMessage(), path);
+        String message = Arrays.stream(exception.getDetailMessageArguments()).toList().get(1).toString();
+        log.warn("[GlobalExceptionHandler-ValidationError] Message: {} | Path: {}", message, path);
         ErrorResponse errorResponse = createErrorResponse(
             ErrorCode.INVALID_DATA.getCode(),
             ErrorCode.INVALID_DATA.getValue(),
-            Arrays.stream(exception.getDetailMessageArguments()).toList().get(1).toString(),
+            message,
             path
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
