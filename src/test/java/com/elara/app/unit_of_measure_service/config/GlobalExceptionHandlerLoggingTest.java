@@ -16,7 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
@@ -61,6 +64,7 @@ class GlobalExceptionHandlerLoggingTest {
         ILoggingEvent event = appender.list.getFirst();
         assertThat(event.getLevel()).isEqualTo(Level.WARN);
         assertThat(event.getThrowableProxy()).isNull();
+        assertThat(event.getFormattedMessage()).contains("Code: 1004", PATH);
     }
 
     @Test
@@ -71,6 +75,24 @@ class GlobalExceptionHandlerLoggingTest {
         ILoggingEvent event = appender.list.getFirst();
         assertThat(event.getLevel()).isEqualTo(Level.ERROR);
         assertThat(event.getThrowableProxy()).isNotNull();
+        assertThat(event.getFormattedMessage()).contains("Code: 1001", PATH);
+    }
+
+    @Test
+    void dataIntegrityViolationLogsWarnWithoutRowValues() {
+        SQLException cause = new SQLException("duplicate", "23505");
+        DataIntegrityViolationException exception =
+            new DataIntegrityViolationException("Key (name)=(SECRET-VALUE) already exists", cause);
+
+        handler.handleDataIntegrityViolationException(exception, request);
+
+        assertThat(appender.list).hasSize(1);
+        ILoggingEvent event = appender.list.getFirst();
+        assertThat(event.getLevel()).isEqualTo(Level.WARN);
+        assertThat(event.getThrowableProxy()).isNull();
+        assertThat(event.getFormattedMessage())
+            .contains("23505", PATH)
+            .doesNotContain("SECRET-VALUE");
     }
 
     @Test
@@ -81,6 +103,7 @@ class GlobalExceptionHandlerLoggingTest {
         ILoggingEvent event = appender.list.getFirst();
         assertThat(event.getLevel()).isEqualTo(Level.ERROR);
         assertThat(event.getThrowableProxy()).isNotNull();
+        assertThat(event.getFormattedMessage()).contains(PATH);
     }
 
     @Test
@@ -96,8 +119,9 @@ class GlobalExceptionHandlerLoggingTest {
         assertThat(appender.list).hasSize(1);
         ILoggingEvent event = appender.list.getFirst();
         assertThat(event.getLevel()).isEqualTo(Level.WARN);
+        assertThat(event.getThrowableProxy()).isNull();
         assertThat(event.getFormattedMessage())
-            .contains("name: size must be between 1 and 50")
+            .contains("name: size must be between 1 and 50", PATH)
             .doesNotContain("SUPER-SECRET");
     }
 }
