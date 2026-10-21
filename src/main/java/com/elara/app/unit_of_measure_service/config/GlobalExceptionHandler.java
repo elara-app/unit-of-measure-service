@@ -9,12 +9,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -89,6 +92,37 @@ public class GlobalExceptionHandler {
             path
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatchException(MethodArgumentTypeMismatchException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String requiredType = exception.getRequiredType() != null
+            ? exception.getRequiredType().getSimpleName()
+            : "Unknown";
+        String message = messageService.getMessage("type.mismatch", exception.getName(), requiredType, exception.getValue());
+        log.warn("[GlobalExceptionHandler-TypeMismatch] Parameter: {} | Message: {} | Path: {}", exception.getName(), message, path);
+        ErrorResponse errorResponse = createErrorResponse(
+            ErrorCode.INVALID_DATA.getCode(),
+            ErrorCode.INVALID_DATA.getValue(),
+            message,
+            path
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String message = messageService.getMessage("media.type.not.supported", exception.getContentType(), MediaType.APPLICATION_JSON_VALUE);
+        log.warn("[GlobalExceptionHandler-UnsupportedMediaType] ContentType: {} | Message: {} | Path: {}", exception.getContentType(), message, path);
+        ErrorResponse errorResponse = createErrorResponse(
+            ErrorCode.INVALID_DATA.getCode(),
+            ErrorCode.INVALID_DATA.getValue(),
+            message,
+            path
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
