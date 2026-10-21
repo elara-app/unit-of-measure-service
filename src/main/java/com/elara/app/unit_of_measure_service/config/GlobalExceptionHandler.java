@@ -16,6 +16,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -108,8 +109,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException exception, HttpServletRequest request) {
         String path = request.getRequestURI();
         String detail = getDataFromDataIntegrityExceptionMessage(exception.getMessage());
-        log.error("[GlobalExceptionHandler-DataIntegrityViolation] Detail: {} | Path: {}",
-            detail, path, exception);
+        String sqlState = exception.getMostSpecificCause() instanceof SQLException sqlException
+            ? sqlException.getSQLState()
+            : "n/a";
+        log.warn("[GlobalExceptionHandler-DataIntegrityViolation] SQLState: {} | Path: {}", sqlState, path);
         ErrorResponse errorResponse = createErrorResponse(
             ErrorCode.DATABASE_ERROR.getCode(),
             ErrorCode.DATABASE_ERROR.getValue(),
