@@ -15,7 +15,7 @@
     <!-- - - - - - - - - - - - - -->
     <groupId>com.elara.app</groupId>
     <artifactId>unit-of-measure-service</artifactId>
-    <version>1.1</version>
+    <version>1.3.0</version>
     <name>unit-of-measure-service</name>
     <description>Manage the unit of measure for the inventory and product services</description>
     <url/>
