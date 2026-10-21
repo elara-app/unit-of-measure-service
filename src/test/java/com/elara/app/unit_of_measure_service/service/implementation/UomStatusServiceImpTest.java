@@ -103,8 +103,6 @@ class UomStatusServiceImpTest {
             when(repository.existsByName("Active")).thenReturn(true);
             when(messageService.getMessage(eq("crud.already.exists"), eq("UomStatus"), eq("name"), eq("Active")))
                 .thenReturn(errorMessage);
-            when(messageService.getMessage(eq("crud.save.error"), eq("UomStatus")))
-                .thenReturn("Error saving UomStatus");
 
             assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(ResourceConflictException.class)
@@ -114,7 +112,7 @@ class UomStatusServiceImpTest {
             verify(repository, never()).save(any());
             verify(mapper, never()).toEntity(any());
             verify(messageService).getMessage(eq("crud.already.exists"), eq("UomStatus"), eq("name"), eq("Active"));
-            verify(messageService).getMessage(eq("crud.save.error"), eq("UomStatus"));
+            verify(messageService, never()).getMessage(eq("crud.save.error"), eq("UomStatus"));
         }
 
         @Test
@@ -311,8 +309,6 @@ class UomStatusServiceImpTest {
             when(repository.existsById(id)).thenReturn(false);
             when(messageService.getMessage(eq("crud.not.found"), eq("UomStatus"), eq("id"), eq(id)))
                 .thenReturn(errorMessage);
-            when(messageService.getMessage(eq("crud.delete.error"), eq("UomStatus")))
-                .thenReturn("Error deleting UomStatus");
 
             assertThatThrownBy(() -> service.deleteById(id))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -321,7 +317,7 @@ class UomStatusServiceImpTest {
             verify(repository).existsById(id);
             verify(repository, never()).deleteById(any());
             verify(messageService).getMessage(eq("crud.not.found"), eq("UomStatus"), eq("id"), eq(id));
-            verify(messageService).getMessage(eq("crud.delete.error"), eq("UomStatus"));
+            verify(messageService, never()).getMessage(eq("crud.delete.error"), eq("UomStatus"));
         }
 
         @Test
@@ -746,14 +742,12 @@ class UomStatusServiceImpTest {
             when(repository.existsByName("Duplicate")).thenReturn(true);
             when(messageService.getMessage(eq("crud.already.exists"), eq("UomStatus"), eq("name"), eq("Duplicate")))
                 .thenReturn("Already exists");
-            when(messageService.getMessage(eq("crud.save.error"), eq("UomStatus")))
-                .thenReturn("Save error");
 
             assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(ResourceConflictException.class);
 
             verify(messageService).getMessage(eq("crud.already.exists"), eq("UomStatus"), eq("name"), eq("Duplicate"));
-            verify(messageService).getMessage(eq("crud.save.error"), eq("UomStatus"));
+            verify(messageService, never()).getMessage(eq("crud.save.error"), eq("UomStatus"));
         }
 
         @Test
@@ -777,21 +771,20 @@ class UomStatusServiceImpTest {
         }
 
         @Test
-        @DisplayName("Update operation logs error messages when catching exceptions")
-        void update_logsErrorMessageWhenCatchingExceptions() {
+        @DisplayName("Update propagates the not-found error without a generic error message")
+        void update_propagatesNotFoundWithoutGenericErrorMessage() {
             Long id = 1L;
             UomStatusUpdate updateRequest = new UomStatusUpdate("Name", "Desc");
-            
+
             when(repository.findById(id)).thenReturn(Optional.empty());
             when(messageService.getMessage(eq("crud.not.found"), eq("UomStatus"), eq("id"), eq(id)))
                 .thenReturn("Not found");
-            when(messageService.getMessage(eq("crud.update.error"), eq("UomStatus")))
-                .thenReturn("Update error");
 
             assertThatThrownBy(() -> service.update(id, updateRequest))
-                .isInstanceOf(ResourceNotFoundException.class);
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Not found");
 
-            verify(messageService, times(2)).getMessage(eq("crud.update.error"), eq("UomStatus"));
+            verify(messageService, never()).getMessage(eq("crud.update.error"), eq("UomStatus"));
         }
     }
 
