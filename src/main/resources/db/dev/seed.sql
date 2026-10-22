@@ -15,6 +15,12 @@ INSERT INTO public.uom (id, name, description, conversion_factor_to_base, uom_st
 VALUES (1, 'Kilogram', 'Base unit of mass in SI', 1.000,
         (SELECT id FROM public.uom_status WHERE name = 'Active')),
        (2, 'Gram', 'Derived mass unit equal to one thousandth of a kilogram', 0.001,
+        (SELECT id FROM public.uom_status WHERE name = 'Active')),
+       (3, 'Pound', 'Imperial unit of mass', 0.454,
+        (SELECT id FROM public.uom_status WHERE name = 'Active')),
+       (4, 'Ounce', 'Imperial unit of mass equal to one sixteenth of a pound', 0.028,
+        (SELECT id FROM public.uom_status WHERE name = 'Active')),
+       (5, 'Tonne', 'Metric unit of mass equal to 1000 kilograms', 1000.000,
         (SELECT id FROM public.uom_status WHERE name = 'Active'))
 ON CONFLICT DO NOTHING;
 
