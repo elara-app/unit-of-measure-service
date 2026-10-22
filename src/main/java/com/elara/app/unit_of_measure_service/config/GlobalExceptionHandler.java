@@ -6,15 +6,20 @@ import com.elara.app.unit_of_measure_service.utils.MessageService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -22,84 +27,145 @@ import java.util.regex.Pattern;
 
 @ControllerAdvice
 @RequiredArgsConstructor
+@Slf4j
 public class GlobalExceptionHandler {
 
     private final MessageService messageService;
 
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ErrorResponse> handleBaseException(BaseException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        int code = exception.getCode();
+        String message = exception.getMessage();
+        HttpStatus status = determineHttpStatus(code);
+        if (status.is5xxServerError()) {
+            log.error("[GlobalExceptionHandler-BaseException] Code: {} | Message: {} | Path: {}", code, message, path, exception);
+        } else {
+            log.warn("[GlobalExceptionHandler-BaseException] Code: {} | Message: {} | Path: {}", code, message, path);
+        }
         ErrorResponse errorResponse = createErrorResponse(
-            exception.getCode(),
+            code,
             exception.getValue(),
-            exception.getMessage(),
-            request.getRequestURI()
+            message,
+            path
         );
-        return new ResponseEntity<>(errorResponse, determineHttpStatus(exception.getCode()));
+        return new ResponseEntity<>(errorResponse, status);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String message = Arrays.stream(exception.getDetailMessageArguments()).toList().get(1).toString();
+        log.warn("[GlobalExceptionHandler-ValidationError] Message: {} | Path: {}", message, path);
         ErrorResponse errorResponse = createErrorResponse(
             ErrorCode.INVALID_DATA.getCode(),
             ErrorCode.INVALID_DATA.getValue(),
-            Arrays.stream(exception.getDetailMessageArguments()).toList().get(1).toString(),
-            request.getRequestURI()
+            message,
+            path
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String message = exception.getMessage();
+        log.warn("[GlobalExceptionHandler-ConstraintViolation] Message: {} | Path: {}", message, path);
         ErrorResponse errorResponse = createErrorResponse(
                 ErrorCode.INVALID_DATA.getCode(),
                 ErrorCode.INVALID_DATA.getValue(),
-                exception.getMessage(),
-                request.getRequestURI()
+                message,
+                path
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingParameter(MissingServletRequestParameterException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String parameter = exception.getParameterName();
+        log.warn("[GlobalExceptionHandler-MissingParameter] Parameter: {} | Path: {}", parameter, path);
         ErrorResponse errorResponse = createErrorResponse(
             ErrorCode.INVALID_DATA.getCode(),
             ErrorCode.INVALID_DATA.getValue(),
-            messageService.getMessage("parameter.missing", exception.getParameterName()),
-            request.getRequestURI()
+            messageService.getMessage("parameter.missing", parameter),
+            path
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpServletRequest request) {
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatchException(MethodArgumentTypeMismatchException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String requiredType = exception.getRequiredType() != null
+            ? exception.getRequiredType().getSimpleName()
+            : "Unknown";
+        String message = messageService.getMessage("type.mismatch", exception.getName(), requiredType, exception.getValue());
+        log.warn("[GlobalExceptionHandler-TypeMismatch] Parameter: {} | Message: {} | Path: {}", exception.getName(), message, path);
         ErrorResponse errorResponse = createErrorResponse(
             ErrorCode.INVALID_DATA.getCode(),
             ErrorCode.INVALID_DATA.getValue(),
-            messageService.getMessage("method.not.supported", request.getMethod()),
-            request.getRequestURI()
+            message,
+            path
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String message = messageService.getMessage("media.type.not.supported", exception.getContentType(), MediaType.APPLICATION_JSON_VALUE);
+        log.warn("[GlobalExceptionHandler-UnsupportedMediaType] ContentType: {} | Message: {} | Path: {}", exception.getContentType(), message, path);
+        ErrorResponse errorResponse = createErrorResponse(
+            ErrorCode.INVALID_DATA.getCode(),
+            ErrorCode.INVALID_DATA.getValue(),
+            message,
+            path
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+        log.warn("[GlobalExceptionHandler-MethodNotAllowed] Method: {} | Path: {}", method, path);
+        ErrorResponse errorResponse = createErrorResponse(
+            ErrorCode.INVALID_DATA.getCode(),
+            ErrorCode.INVALID_DATA.getValue(),
+            messageService.getMessage("method.not.supported", method),
+            path
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
         String detail = getDataFromDataIntegrityExceptionMessage(exception.getMessage());
+        String sqlState = exception.getMostSpecificCause() instanceof SQLException sqlException
+            ? sqlException.getSQLState()
+            : "n/a";
+        log.warn("[GlobalExceptionHandler-DataIntegrityViolation] SQLState: {} | Path: {}", sqlState, path);
         ErrorResponse errorResponse = createErrorResponse(
             ErrorCode.DATABASE_ERROR.getCode(),
             ErrorCode.DATABASE_ERROR.getValue(),
             "Integrity violation: " + messageService.getMessage("global.error.database", detail),
-            request.getRequestURI()
+            path
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String message = exception.getMessage();
+        log.error("[GlobalExceptionHandler-UnexpectedException] Message: {} | Path: {}", message, path, exception);
         ErrorResponse errorResponse = createErrorResponse(
             ErrorCode.UNEXPECTED_ERROR.getCode(),
             ErrorCode.UNEXPECTED_ERROR.getValue(),
-            messageService.getMessage("global.error.unexpected", exception.getMessage()),
-            request.getRequestURI()
+            messageService.getMessage("global.error.unexpected", message),
+            path
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }

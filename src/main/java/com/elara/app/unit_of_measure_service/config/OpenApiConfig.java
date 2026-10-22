@@ -34,7 +34,7 @@ public class OpenApiConfig {
         return new OpenAPI()
             .info(new Info()
                 .title("Unit of Measure Service API")
-                .version("1.1.0")
+                .version("1.3.0")
                 .description("""
                         RESTful API for managing Unit of Measure and Unit of Measure Status entities in the Elara platform.
                         

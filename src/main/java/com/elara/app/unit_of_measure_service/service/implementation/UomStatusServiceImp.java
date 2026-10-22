@@ -39,7 +39,7 @@ public class UomStatusServiceImp implements UomStatusService {
 
     /**
      * Saves a new UomStatus entity.
-     * Logs the attempt, warns if a conflict exists, and logs success or error.
+     * Logs the attempt and the success; the exception handler reports a conflict.
      *
      * @param request the UomStatusRequest DTO
      * @return the saved UomStatusResponse
@@ -52,9 +52,6 @@ public class UomStatusServiceImp implements UomStatusService {
         log.info("[{}] {} record to save: {}", methodNomenclature, ENTITY_NAME, request);
         if (isNameTaken(Objects.requireNonNull(request).name())) {
             String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
-            String saveErrorMsg = messageService.getMessage("crud.save.error", ENTITY_NAME);
-            log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
-            log.warn("[{}] {}", methodNomenclature, saveErrorMsg);
             throw new ResourceConflictException(alreadyExistsMsg);
         }
         UomStatus entity = mapper.toEntity(request);
@@ -80,28 +77,18 @@ public class UomStatusServiceImp implements UomStatusService {
     public UomStatusResponse update(Long id, UomStatusUpdate request) {
         final String methodNomenclature = NOMENCLATURE + "-update";
         log.info("[{}] Update {} record with id: {} and request: {}", methodNomenclature, ENTITY_NAME, id, request);
-        try {
-            UomStatus existing = repository.findById(id)
-                .orElseThrow(() -> {
-                    String notFoundMsg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-                    String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME);
-                    log.warn("[{}] {}", methodNomenclature, notFoundMsg);
-                    log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
-                    return new ResourceNotFoundException(notFoundMsg);
-                });
-            if (!existing.getName().equals(request.name()) && isNameTaken(request.name())) {
-                String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
-                log.warn("[{}] {}", methodNomenclature, alreadyExistsMsg);
-                throw new ResourceConflictException(alreadyExistsMsg);
-            }
-            mapper.updateEntityFromDto(existing, request);
-            log.info("[{}] {} record updated with data: {}", methodNomenclature, ENTITY_NAME, existing);
-            return mapper.toResponse(existing);
-        } catch (ResourceNotFoundException | ResourceConflictException e) {
-            String updateErrorMsg = messageService.getMessage("crud.update.error", ENTITY_NAME);
-            log.warn("[{}] {}", methodNomenclature, updateErrorMsg);
-            throw e;
+        UomStatus existing = repository.findById(id)
+            .orElseThrow(() -> {
+                String notFoundMsg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
+                return new ResourceNotFoundException(notFoundMsg);
+            });
+        if (!existing.getName().equals(request.name()) && isNameTaken(request.name())) {
+            String alreadyExistsMsg = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
+            throw new ResourceConflictException(alreadyExistsMsg);
         }
+        mapper.updateEntityFromDto(existing, request);
+        log.info("[{}] {} record updated with data: {}", methodNomenclature, ENTITY_NAME, existing);
+        return mapper.toResponse(existing);
     }
 
     /**
@@ -118,9 +105,6 @@ public class UomStatusServiceImp implements UomStatusService {
         log.info("[{}] Delete {} record with id: {}", methodNomenclature, ENTITY_NAME, id);
         if (!repository.existsById(id)) {
             String notFoundMsg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-            String deleteErrorMsg = messageService.getMessage("crud.delete.error", ENTITY_NAME);
-            log.warn("[{}] {}", methodNomenclature, notFoundMsg);
-            log.warn("[{}] {}", methodNomenclature, deleteErrorMsg);
             throw new ResourceNotFoundException(notFoundMsg);
         }
         repository.deleteById(id);
@@ -142,7 +126,6 @@ public class UomStatusServiceImp implements UomStatusService {
         Optional<UomStatus> entity = repository.findById(id);
         if (entity.isEmpty()) {
             String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id.toString());
-            log.warn("[{}] {}", methodNomenclature, msg);
             throw new ResourceNotFoundException(msg);
         }
         log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity.get());
@@ -157,7 +140,6 @@ public class UomStatusServiceImp implements UomStatusService {
         UomStatus entity = repository.findById(id)
             .orElseThrow(() -> {
                 String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-                log.warn("[{}] {}", methodNomenclature, msg);
                 return new ResourceNotFoundException(msg);
             });
         log.info("[{}] Fetched {} record with id: {}: {}", methodNomenclature, ENTITY_NAME, id, entity);
@@ -245,7 +227,6 @@ public class UomStatusServiceImp implements UomStatusService {
         UomStatus existing = repository.findById(id)
             .orElseThrow(() -> {
                 String msg = messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id);
-                log.warn("[{}] {}", methodNomenclature, msg);
                 return new ResourceNotFoundException(msg);
             });
         existing.setIsUsable(isUsable);

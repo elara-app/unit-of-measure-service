@@ -17,12 +17,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -302,6 +306,56 @@ class GlobalExceptionHandlerTest {
             
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
             assertThat(response.getBody().getMessage()).isEqualTo(translatedMessage);
+        }
+    }
+
+    @Nested
+    @DisplayName("Media Type and Type Mismatch Handling")
+    class MediaTypeAndTypeMismatchTests {
+
+        @Test
+        @DisplayName("Handle HttpMediaTypeNotSupportedException, returns UNSUPPORTED_MEDIA_TYPE")
+        void handleMediaTypeNotSupported_returnsUnsupportedMediaType() {
+            HttpMediaTypeNotSupportedException exception = new HttpMediaTypeNotSupportedException(
+                MediaType.TEXT_PLAIN, List.of(MediaType.APPLICATION_JSON));
+            String translatedMessage = "Media type text/plain is not supported";
+            when(messageService.getMessage(eq("media.type.not.supported"),
+                eq(MediaType.TEXT_PLAIN), eq(MediaType.APPLICATION_JSON_VALUE)))
+                .thenReturn(translatedMessage);
+
+            ResponseEntity<ErrorResponse> response =
+                exceptionHandler.handleMediaTypeNotSupportedException(exception, request);
+
+            assertNotNull(response);
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+            ErrorResponse body = response.getBody();
+            assertNotNull(body);
+            assertThat(body.getCode()).isEqualTo(ErrorCode.INVALID_DATA.getCode());
+            assertThat(body.getValue()).isEqualTo(ErrorCode.INVALID_DATA.getValue());
+            assertThat(body.getMessage()).isEqualTo(translatedMessage);
+            assertThat(body.getPath()).isEqualTo(TEST_PATH);
+        }
+
+        @Test
+        @DisplayName("Handle MethodArgumentTypeMismatchException, returns BAD_REQUEST")
+        void handleTypeMismatch_returnsBadRequest() {
+            MethodArgumentTypeMismatchException exception = new MethodArgumentTypeMismatchException(
+                "abc", Long.class, "id", null, null);
+            String translatedMessage = "Type mismatch for parameter id";
+            when(messageService.getMessage(eq("type.mismatch"), eq("id"), eq("Long"), eq("abc")))
+                .thenReturn(translatedMessage);
+
+            ResponseEntity<ErrorResponse> response =
+                exceptionHandler.handleTypeMismatchException(exception, request);
+
+            assertNotNull(response);
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            ErrorResponse body = response.getBody();
+            assertNotNull(body);
+            assertThat(body.getCode()).isEqualTo(ErrorCode.INVALID_DATA.getCode());
+            assertThat(body.getValue()).isEqualTo(ErrorCode.INVALID_DATA.getValue());
+            assertThat(body.getMessage()).isEqualTo(translatedMessage);
+            assertThat(body.getPath()).isEqualTo(TEST_PATH);
         }
     }
 
