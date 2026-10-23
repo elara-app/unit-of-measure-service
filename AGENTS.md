@@ -1,434 +1,124 @@
-# Agent Guidelines - Unit of Measure Service
+# AGENTS — unit-of-measure-service
 
-This document provides essential information for AI coding agents working on this Spring Boot 3.5.6 microservice.
+Operating guide for agents changing this repository. It records commands, contracts, traps and stop conditions. The API contract itself lives in [`README.md`](README.md); do not duplicate endpoint tables here.
 
-## Project Overview
+## Read first
 
-- **Project**: Elara Unit of Measure Service (Spring Boot 3.5.6, Java 21)
-- **Build Tool**: Maven 3.x
-- **Package**: `com.elara.app.unit_of_measure_service`
-- **Architecture**: Spring Cloud microservice with Eureka, Config Server, Vault, and RabbitMQ-based Spring Cloud Bus for distributed config refresh
+- [`README.md`](README.md) — purpose, API tables, error contract, run/verify, limitations.
+- [`TESTING_GUIDE.md`](TESTING_GUIDE.md) — real test classes, isolation rules, H2 notes and coverage details.
+- [infrastructure/README.md](https://github.com/elara-app/infrastructure#readme) — canonical full-stack Compose block; link to it, never duplicate it.
+- [`centralized-configuration`](https://github.com/elara-app/centralized-configuration) — profile matrix, shared properties and Vault paths.
 
-## Build, Test & Run Commands
+## Scope and boundaries
 
-### Build & Package
+- This repo owns the UOM catalog (`/`) and the UOM status catalog (`/status/`). Nothing else.
+- Do not add inventory stock logic, authentication/authorization, audit tables, domain events or outbound service calls.
+- The only cross-service contract is with `inventory-service`: seeded UOM ids 1 (Kilogram) and 2 (Gram) must keep existing for inventory writes.
+- Known code-level quirks are documented as traps below. Changing them is a deliberate decision, not a drive-by fix; see Stop and ask.
+
+## Quick facts
+
+| Item | Value |
+|---|---|
+| Maven coordinates | `com.elara.app:unit-of-measure-service:1.3.1` |
+| Main class / package | `UnitOfMeasureServiceApplication`, `com.elara.app.unit_of_measure_service` |
+| Service ID / port | `unit-of-measure-service` / `8082` (port comes from Config Server; the Dockerfile exposes 8082) |
+| Java / Boot / Cloud | Java 21, Spring Boot 3.5.6, Spring Cloud 2025.0.0 |
+| Persistence | PostgreSQL (`precision = 10, scale = 3` for the conversion factor); H2 only for Maven tests |
+| Runtime dependencies | Eureka client, Config Server client, optional Vault, RabbitMQ + Spring Cloud Bus |
+| Controllers | `UomController` at `/`, `UomStatusController` at `/status/` |
+| Service implementations | `service/implementation/UomServiceImp`, `service/implementation/UomStatusServiceImp` |
+
+## Commands
+
+The wrapper is mode 644. Always use `sh ./mvnw`; never `./mvnw`, and do not instruct `chmod +x`.
+
 ```bash
-# Clean and build
-./mvnw clean install
-
-# Build without tests
-./mvnw clean install -DskipTests
-
-# Create executable JAR
-./mvnw clean package
+sh ./mvnw -B clean verify -Dspring.profiles.active=test   # full gate (CI equivalent)
+sh ./mvnw test                                            # tests only
+sh ./mvnw test -Dtest=UomControllerTest                   # focused class
+sh ./mvnw test -Dtest=UomServiceImpTest#save_shouldCreateAndReturnResponse
+sh ./mvnw spring-boot:run                                 # needs Config Server + PostgreSQL
 ```
 
-### Testing
-```bash
-# Run all tests
-./mvnw test
-
-# Run tests with coverage report
-./mvnw clean verify
-
-# Run specific test class
-./mvnw test -Dtest=UomControllerTest
-
-# Run specific test method
-./mvnw test -Dtest=UomImpTest#save_withValidRequest_createsAndReturnsResponse
-
-# Run tests with verbose output
-./mvnw test -Dsurefire.useFile=false
-```
-
-### Running the Application
-```bash
-# Run with default profile
-./mvnw spring-boot:run
-
-# Run with specific profile
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-### Code Quality
-```bash
-# Generate JaCoCo coverage report (target/site/jacoco/index.html)
-./mvnw verify
-
-# Coverage requirements:
-# - Line coverage: 80% minimum
-# - Branch coverage: 70% minimum
-# - No uncovered classes (excludes DTOs, config classes, and main application class)
-```
-
-## Code Style Guidelines
-
-### Package Structure
-```
-com.elara.app.unit_of_measure_service/
-├── config/                 # Configuration classes (AppConfig, OpenApiConfig, GlobalExceptionHandler)
-├── controller/             # REST controllers (@RestController)
-├── dto/                    # Data Transfer Objects
-│   ├── request/           # Request DTOs (records)
-│   ├── response/          # Response DTOs (records)
-│   └── update/            # Update DTOs (records)
-├── exceptions/            # Custom exception classes
-├── mapper/                # MapStruct mappers
-├── model/                 # JPA entities
-├── repository/            # Spring Data JPA repositories
-├── service/
-│   ├── imp/              # Service implementations
-│   └── interfaces/       # Service interfaces
-└── utils/                # Utilities (MessageService, ErrorCode, ApplicationContextHolder)
-```
-
-### Imports Organization
-```java
-// 1. Java standard library
-import java.math.BigDecimal;
-import java.util.Objects;
-
-// 2. Jakarta EE
-import jakarta.persistence.*;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-
-// 3. Spring Framework
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
-
-// 4. Third-party libraries (Lombok, MapStruct, etc.)
-import lombok.*;
-import lombok.extern.slf4j.Slf4j;
-
-// 5. Internal packages (com.elara.app.*)
-import com.elara.app.unit_of_measure_service.dto.*;
-import com.elara.app.unit_of_measure_service.service.interfaces.*;
-```
-
-### Naming Conventions
-
-**Classes:**
-- Controllers: `{Entity}Controller` (e.g., `UomController`)
-- Services: `{Entity}Service` interface, `{Entity}Imp` implementation
-- Repositories: `{Entity}Repository`
-- DTOs: `{Entity}Request`, `{Entity}Response`, `{Entity}Update`
-- Entities: `{Entity}` (e.g., `Uom`)
-- Exceptions: `{Type}Exception` (e.g., `ResourceNotFoundException`)
-
-**Variables & Constants:**
-```java
-// Constants: UPPER_SNAKE_CASE
-private static final String ENTITY_NAME = "Uom";
-private static final String NOMENCLATURE = ENTITY_NAME + "-service";
-
-// Variables: camelCase
-private final UomService service;
-
-// Method variables: camelCase with descriptive names
-final String methodNomenclature = NOMENCLATURE + "-save";
-```
-
-**Methods:**
-- CRUD: `save()`, `update()`, `deleteById()`, `findById()`, `findAll()`
-- Queries: `findAllByName()`, `existsByNameIgnoreCase()`
-- Checks: `isNameTaken()`, `changeStatus()`
-
-### DTOs - Use Records
-```java
-public record UomRequest(
-    @NotBlank @Size(max = 50) String name,
-    @Size(max = 200) String description,
-    @Size(max = 10) String abbreviation,
-    @NotNull @Positive BigDecimal conversionFactor
-) {}
-```
-
-### Entities - JPA with Lombok
-```java
-@Entity(name = "uom")
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Uom {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter(AccessLevel.NONE)
-    private Long id;
-    
-    @NotBlank @Size(max = 50)
-    @Column(name = "name", unique = true, nullable = false, length = 50)
-    private String name;
-    
-    // Always use snake_case for column names
-}
-```
-
-### Controllers - REST API Pattern
-```java
-@RestController
-@RequestMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-@RequiredArgsConstructor
-@Validated
-@Slf4j
-@Tag(name = "Unit of Measure Management", description = "...")
-public class UomController {
-    private final UomService service;
-    private static final String ENTITY_NAME = "Uom";
-    private static final String NOMENCLATURE = ENTITY_NAME + "-controller";
-    
-    // Section comments for clarity
-    // ========================================
-    // CREATE OPERATIONS
-    // ========================================
-    
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "...", description = "...")
-    public ResponseEntity<UomResponse> create(@Valid @RequestBody UomRequest request) {
-        final String methodNomenclature = NOMENCLATURE + "-create";
-        log.info("[{}] Request to create {}: {}", methodNomenclature, ENTITY_NAME, request);
-        UomResponse response = service.save(request);
-        log.info("[{}] {} created with id: {}", methodNomenclature, ENTITY_NAME, response.id());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-}
-```
-
-### Services - Business Logic
-```java
-@Slf4j
-@Service
-@RequiredArgsConstructor
-public class UomImp implements UomService {
-    private static final String ENTITY_NAME = "Uom";
-    private static final String NOMENCLATURE = ENTITY_NAME + "-service";
-    
-    private final UomMapper mapper;
-    private final UomRepository repository;
-    private final MessageService messageService;
-    
-    @Override
-    @Transactional
-    public UomResponse save(UomRequest request) {
-        final String methodNomenclature = NOMENCLATURE + "-save";
-        log.info("[{}] Attempting to create {} with name: {}", methodNomenclature, ENTITY_NAME, request.name());
-        
-        // Validation
-        if (repository.existsByNameIgnoreCase(request.name())) {
-            String message = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name());
-            throw new ResourceConflictException(message);
-        }
-        
-        // Save and return
-        Uom entity = mapper.toEntity(request);
-        Uom saved = repository.save(entity);
-        return mapper.toResponse(saved);
-    }
-}
-```
-
-### Validation Annotations
-Use Jakarta validation on DTOs and entities:
-- `@NotNull` - Field cannot be null
-- `@NotBlank` - String cannot be null, empty, or whitespace
-- `@Size(max = 50)` - String/collection size constraints
-- `@Positive` - Number must be > 0
-- `@DecimalMin(value = "0.0", inclusive = false)` - Decimal validation
-- `@Digits(integer = 10, fraction = 4)` - Decimal precision
-
-### Error Handling
-
-**Standard Error Codes:**
-
-| Code | Value | HTTP Status | Usage |
-|------|-------|-------------|-------|
-| 1001 | DATABASE_ERROR | 500 | Database operation failed |
-| 1002 | INVALID_DATA | 400 | Validation errors |
-| 1003 | RESOURCE_CONFLICT | 409 | Duplicate/conflict |
-| 1004 | RESOURCE_NOT_FOUND | 404 | Resource doesn't exist |
-| 1005 | SERVICE_UNAVAILABLE | 503 | External service down |
-| 1006 | UNEXPECTED_ERROR | 500 | Unhandled exceptions |
-
-**Exception Hierarchy:**
-
-The project uses a `BaseException` hierarchy that automatically maps to error codes and HTTP status:
-
-```java
-// Base exception with error code mapping
-public abstract class BaseException extends RuntimeException {
-    private final int code;
-    private final String value;
-    
-    public BaseException(ErrorCode errorCode, String message) {
-        super(message);
-        this.code = errorCode.getCode();
-        this.value = errorCode.getValue();
-    }
-}
-
-// Specific exception types
-public class ResourceNotFoundException extends BaseException {
-    public ResourceNotFoundException(String message) {
-        super(ErrorCode.RESOURCE_NOT_FOUND, message);
-    }
-}
-
-public class ResourceConflictException extends BaseException {
-    public ResourceConflictException(String message) {
-        super(ErrorCode.RESOURCE_CONFLICT, message);
-    }
-}
-
-public class InvalidDataException extends BaseException {
-    public InvalidDataException(String message) {
-        super(ErrorCode.INVALID_DATA, message);
-    }
-}
-
-public class DatabaseException extends BaseException {
-    public DatabaseException(String message) {
-        super(ErrorCode.DATABASE_ERROR, message);
-    }
-}
-
-public class ServiceUnavailableException extends BaseException {
-    public ServiceUnavailableException(String message) {
-        super(ErrorCode.SERVICE_UNAVAILABLE, message);
-    }
-}
-```
-
-**GlobalExceptionHandler** automatically handles all `BaseException` subclasses and returns properly formatted error responses with correct HTTP status codes.
-
-**Throwing Exceptions:**
-```java
-// Not found (404)
-throw new ResourceNotFoundException(messageService.getMessage("crud.not.found", ENTITY_NAME, "id", id.toString()));
-
-// Conflict/duplicate (409)
-throw new ResourceConflictException(messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", request.name()));
-
-// Invalid data (400)
-throw new InvalidDataException(messageService.getMessage("uom.invalid.data", request));
-
-// Database error (500)
-throw new DatabaseException(messageService.getMessage("global.error.database", e.getMessage()));
-
-// Service unavailable (503)
-throw new ServiceUnavailableException(messageService.getMessage("global.error.service.unavailable"));
-```
-
-
-### Logging Standards
-```java
-// Use SLF4J with nomenclature pattern
-log.info("[{}] Attempting to create {} with name: {}", methodNomenclature, ENTITY_NAME, name);
-log.warn("[{}] {}", methodNomenclature, errorMessage);
-log.error("[{}] Unexpected error: {}", methodNomenclature, e.getMessage(), e);
-
-// Include method nomenclature in all logs
-final String methodNomenclature = NOMENCLATURE + "-methodName";
-```
-
-The global exception handler owns exception logging: log the operation here and
-let the handler report the exceptions you propagate. Logging a `WARN` in a
-`catch` that rethrows produces two `WARN` lines for the same failure.
-
-## Testing Standards
-
-Reference the comprehensive [TESTING_GUIDE.md](TESTING_GUIDE.md) for detailed testing patterns.
-
-**Quick Reference:**
-- Controller tests: `@WebMvcTest` + `MockMvc`
-- In `@WebMvcTest`, use `@MockitoBean` for mocked Spring-managed collaborators
-- Service tests: `@ExtendWith(MockitoExtension.class)` + `@Mock`/`@InjectMocks`
-- Repository tests: `@DataJpaTest` + `TestEntityManager`
-- Mapper tests: `@SpringBootTest` + `@Autowired`
-- Repository and integration tests commonly use `@ActiveProfiles("test")`
-- Use Given-When-Then structure
-- Test naming: `method_condition_expectedResult`
-- Always use `@AfterEach` to reset mocks
-
-## Documentation
-
-**Swagger/OpenAPI:**
-- All endpoints must have `@Operation` with summary and description
-- Include `@ApiResponses` for all response codes (200/201, 400, 404, 409, 500)
-- Use `@Parameter` for path/query parameters
-- Reference schema examples: `@Schema(ref = "#/components/schemas/...")`
-- `OpenApiConfig` loads example payloads from `src/main/resources/examples/*.json`; keep those files aligned with response schemas and controller examples
-- The `info.version` literal in `OpenApiConfig` must equal the project version in `pom.xml`; update both when the version changes
-
-## Common Patterns
-
-### Application Bootstrap & External Configuration
-
-- `src/main/resources/application.yml` imports `configserver:http://localhost:8888` and starts with the `dev` profile by default.
-- `src/main/resources/application-dev.yml` imports Vault secrets from `vault://secret/unit-of-measure-service/dev`.
-- Keep `spring-cloud-starter-bus-amqp` when config refresh propagation across services is required; it is part of the distributed config workflow, not a local message queue feature.
-
-### Pagination
-```java
-// Controller
-public ResponseEntity<Page<UomResponse>> getAll(
-    @PageableDefault(size = 20, sort = "name") Pageable pageable) {
-    return ResponseEntity.ok(service.findAll(pageable));
-}
-
-// Service
-public Page<UomResponse> findAll(Pageable pageable) {
-    return repository.findAll(pageable).map(mapper::toResponse);
-}
-```
-
-### Name Uniqueness Check
-```java
-// Avoid duplicate on create
-if (repository.existsByNameIgnoreCase(name)) {
-    String message = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", name);
-    throw new ResourceConflictException(message);
-}
-
-// Allow same name on update (skip check if name unchanged)
-if (!existing.getName().equals(update.name()) && 
-    repository.existsByNameIgnoreCase(update.name())) {
-    String message = messageService.getMessage("crud.already.exists", ENTITY_NAME, "name", update.name());
-    throw new ResourceConflictException(message);
-}
-```
-
-### MapStruct Configuration
-Use `componentModel = "spring"` for dependency injection:
-```java
-@Mapper(componentModel = "spring")
-public interface UomMapper {
-    Uom toEntity(UomRequest request);
-    UomResponse toResponse(Uom entity);
-    void updateUomFromDto(@MappingTarget Uom entity, UomUpdate update);
-}
-```
-
-## Critical Rules
-
-1. **Always use `@Transactional`** on service methods that modify data
-2. **Never expose entities directly** - always use DTOs
-3. **Log at entry and exit** of service methods with nomenclature
-4. **Use `Objects.requireNonNull()`** when null checks are critical
-5. **Column names must be snake_case**, Java fields are camelCase
-6. **IDs use `@Positive` validation**, never accept 0 or negative
-7. **String fields need `@Size` limits** matching database constraints
-8. **BigDecimal for quantities/factors**, never use `float` or `double`
-9. **Test isolation is mandatory** - use `reset()` in `@AfterEach`
-10. **Throw proper exceptions with BaseException hierarchy** - use `MessageService` for message generation
-11. **Never construct raw error messages** - always use `messageService.getMessage()` for localization
-
----
-
-**Last Updated:** April 10, 2026  
-**Version:** 1.0  
-**Related:** See [TESTING_GUIDE.md](TESTING_GUIDE.md) for comprehensive testing patterns
-
+Full-stack verification: [infrastructure/README.md](https://github.com/elara-app/infrastructure#readme).
+
+## Repository map
+
+| Package | Contents |
+|---|---|
+| `controller/` | `UomController`, `UomStatusController`; validation, logging, delegation |
+| `service/interfaces/` | `UomService`, `UomStatusService` |
+| `service/implementation/` | `UomServiceImp`, `UomStatusServiceImp`; business invariants and transactions |
+| `repository/` | `UomRepository`, `UomStatusRepository` (Spring Data JPA) |
+| `model/` | `Uom`, `UomStatus` entities |
+| `dto/request`, `dto/update`, `dto/response` | request, update and response records |
+| `mapper/` | `UomMapper`, `UomStatusMapper` (MapStruct, `componentModel = "spring"`) |
+| `config/` | `GlobalExceptionHandler`, `ErrorResponse`, `OpenApiConfig` (there is no `AppConfig`) |
+| `exceptions/` | `BaseException` and its subclasses |
+| `utils/` | `ErrorCode`, `MessageService`, `ApplicationContextHolder` |
+
+## Contracts and invariants
+
+- UOM name uniqueness is case-insensitive (`existsByNameIgnoreCase`); status name uniqueness is case-sensitive (`existsByName`).
+- Both update guards compare with `equals`, which is case-sensitive: a case-only UOM rename re-enters the case-insensitive check and returns 409, while a case-only status rename is allowed.
+- `PATCH /{id}/status/{newUomStatusId}` returns 200 with a `UomResponse`. The OpenAPI annotation says 204 — ignore it.
+- `PATCH /status/{id}/change-usability?isUsable=` returns 204 and requires the query parameter; `PUT /status/{id}` cannot change `isUsable`.
+- `PUT /{id}` preserves the existing `uomStatus` even though `UomUpdate` omits it.
+- No usability veto: create and change-status accept any existing status, usable or not, and making a status unusable later does not cascade.
+- List endpoints use `@PageableDefault(size = 20)` with no default sort; page JSON is nested (`content` + `page`) via `VIA_DTO`.
+- Status delete relies on the FK: `DataIntegrityViolationException` becomes 409 code 1001. UOM delete has no reverse dependency and no reachable 409.
+- Error mapping: validation/missing parameter/type mismatch → 400 code 1002; service 404 → 1004; service 409 → 1003; data integrity → 409 code 1001; codes 1001/1005/1006 → 500; other exceptions → 500 code 1006. `BaseException` is a concrete class.
+- `conversionFactorToBase` is a `BigDecimal` greater than zero with column scale 3. There is no `abbreviation` field and no `@Digits` on UOM DTOs.
+
+## Configuration and runtime
+
+- `application.yml` sets active profile `dev` and imports `optional:configserver:${CONFIG_URI:http://localhost:8888}` with `fail-fast:false` and retry.
+- `application-dev.yml` imports `optional:vault://secret/unit-of-measure-service/dev`, uses `ddl-auto: update` and runs the idempotent `db/dev/seed.sql` (3 statuses, 5 UOMs).
+- `application-test.yml` disables Config Server, Vault, Bus and discovery and uses H2 with `create-drop`. H2 is test-scope, so the packaged jar cannot run `test`.
+- Port, datasource, RabbitMQ, Eureka and actuator exposure for dev come from Config Server; Vault supplies credentials only.
+- Config refresh uses RabbitMQ/Spring Cloud Bus, not a domain event bus. `refresh` and `busrefresh` are exposed in dev.
+
+## Testing and quality gates
+
+- 13 test classes, 229 tests: `UomControllerTest` (38), `UomStatusControllerTest` (22), `UomServiceImpTest` (26), `UomStatusServiceImpTest` (33), `UomRepositoryTest` (18), `UomStatusRepositoryTest` (8), `UomMapperTest` (19), `UomStatusMapperTest` (5), `GlobalExceptionHandlerTest` (34), `GlobalExceptionHandlerLoggingTest` (5), `CustomExceptionsTest` (15), `ApplicationContextHolderTest` (2), `MessageServiceTest` (4).
+- There is no `UnitOfMeasureServiceApplicationTests`; context loading is covered indirectly by the mapper tests and `ApplicationContextHolderTest`, which use `@SpringBootTest`.
+- Controller tests use `@WebMvcTest` with `@TestConfiguration` beans returning `mock(...)`, not `@MockitoBean`.
+- `UomServiceImpTest` uses `@Spy @InjectMocks` and has no `@AfterEach`/`reset()`; do not copy it as the standard isolation pattern. `UomStatusServiceImpTest` and both controller tests do reset mocks.
+- JaCoCo in `verify`: bundle line 80%, branch 70%, missed classes 0; package line 70%. Exclusions are `**/UnitOfMeasureServiceApplication.class`, `**/config/**` and `**/dto/**`.
+- CI: pull requests to `develop`/`main` run the reusable org test workflow; pushes to `main` publish the image. No Checkstyle, SpotBugs or Enforcer gate.
+
+## Definition of done
+
+- `sh ./mvnw -B clean verify -Dspring.profiles.active=test` exits 0.
+- New or changed behavior has tests and introduces no uncovered class (the gate enforces this).
+- Status codes, nested page shape and error codes still match [`README.md`](README.md); update its tables when behavior changes intentionally.
+- OpenAPI annotations and `src/main/resources/examples/*.json` stay aligned with live responses; fix stale `/states`, `change-state`, flat page and PATCH 204 wording when touching them.
+- `OpenApiConfig` `info.version` matches the `pom.xml` version.
+
+## Stop and ask
+
+- Changing the UOM id contract used by inventory (ids 1/2) or the seed data shape.
+- Making `UomServiceImp.deleteById` transactional or changing delete semantics.
+- Changing the MapStruct null-overwrite behavior for `UomStatusUpdate`/`UomUpdate`, or adding `isUsable` to `PUT`.
+- Adding path validation to `PUT /{id}` or changing either case-sensitivity rule.
+- Adding security, audit fields, migrations, domain events or new external calls.
+- Changing gateway routes, profiles or property ownership in another repository.
+
+## Known traps
+
+- Status names are case-sensitive; UOM names are case-insensitive.
+- No `abbreviation` field; no `@Digits`; the conversion factor column scale is 3.
+- `BaseException` is concrete, not abstract.
+- Error 1005 maps to HTTP 500 here, not 503, and is not used by normal flows.
+- `UomStatusUpdate.name` is optional, but omission nulls the stored name through the generated mapper.
+- `PUT /{id}` has no path-id validation; invalid ids reach the service and normally return 404.
+- `UomServiceImp.deleteById` is not transactional; a race can produce a generic 500.
+- OpenAPI still says `/states`/`change-state`, shows flat pages and documents the status PATCH as 204.
+- `./mvnw` fails on the host because the wrapper is mode 644; only the Docker build runs `chmod +x`.
+
+## Documentation maintenance
+
+- README owns the API contract; AGENTS stays free of duplicated endpoint tables.
+- Update `OpenApiConfig` and `examples/*.json` together with controller changes; flag stale wording instead of copying it.
+- Keep cross-repo facts (ports, routes, Vault path, seed counts) pointing at `infrastructure` and `centralized-configuration` instead of restating them.
