@@ -36,7 +36,7 @@ Request flow: controller → service interface → `UomServiceImp` / `UomStatusS
 - The `uom` table has a required lazy `@ManyToOne` to `uom_status`; deleting a referenced status is blocked by the foreign key, while UOM rows are not referenced by any local table.
 - RabbitMQ carries Spring Cloud Bus refresh events only; there is no domain event producer or consumer.
 
-Platform concerns stay outside this repo. Gateway routing, service discovery, stack layout and ports live in [infra/README.md](../infra/README.md); profile values and Vault paths live in [`centralized-configuration`](https://github.com/elara-app/centralized-configuration).
+Platform concerns stay outside this repo. Gateway routing, service discovery, stack layout and ports live in [infrastructure/README.md](https://github.com/elara-app/infrastructure#readme); profile values and Vault paths live in [`centralized-configuration`](https://github.com/elara-app/centralized-configuration).
 
 ## API
 
@@ -107,7 +107,7 @@ sh ./mvnw test -Dtest=UomServiceImpTest#save_shouldCreateAndReturnResponse
 
 `sh ./mvnw spring-boot:run` is not a standalone quickstart: the default `dev` profile expects Config Server (default `http://localhost:8888`) and PostgreSQL on `localhost:5432/unit_of_measure_db`. Without Config Server the service has no configured port or datasource from this repo.
 
-For the full stack, follow [infra/README.md#verify-the-stack](../infra/README.md#verify-the-stack). After the stack is up, verify through the gateway:
+For the full stack, follow [infrastructure/README.md](https://github.com/elara-app/infrastructure#readme). After the stack is up, verify through the gateway:
 
 ```bash
 curl -s http://127.0.0.1:8080/api/v1/uom/ | jq '.page.totalElements'         # 5
@@ -166,6 +166,6 @@ CI runs the reusable org test workflow on pull requests to `develop` and `main`;
 
 - [`AGENTS.md`](AGENTS.md) — agent commands, invariants, traps and stop conditions.
 - [`TESTING_GUIDE.md`](TESTING_GUIDE.md) — test classes, isolation rules, mocking and coverage.
-- [`infra/README.md`](../infra/README.md) — stack layout, ports and the canonical Compose workflow.
+- [infrastructure/README.md](https://github.com/elara-app/infrastructure#readme) — stack layout, ports and the canonical Compose workflow.
 - [`centralized-configuration`](https://github.com/elara-app/centralized-configuration) — profile matrix, shared config and Vault paths.
 - [`OpenAPI at /swagger-ui.html`](http://localhost:8082/swagger-ui.html) — interactive docs for a running instance.
