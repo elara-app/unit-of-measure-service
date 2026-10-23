@@ -6,7 +6,7 @@ Operating guide for agents changing this repository. It records commands, contra
 
 - [`README.md`](README.md) — purpose, API tables, error contract, run/verify, limitations.
 - [`TESTING_GUIDE.md`](TESTING_GUIDE.md) — real test classes, isolation rules, H2 notes and coverage details.
-- [`infra/README.md#verify-the-stack`](../infra/README.md#verify-the-stack) — canonical full-stack Compose block; link to it, never duplicate it.
+- [infrastructure/README.md](https://github.com/elara-app/infrastructure#readme) — canonical full-stack Compose block; link to it, never duplicate it.
 - [`centralized-configuration`](https://github.com/elara-app/centralized-configuration) — profile matrix, shared properties and Vault paths.
 
 ## Scope and boundaries
@@ -41,7 +41,7 @@ sh ./mvnw test -Dtest=UomServiceImpTest#save_shouldCreateAndReturnResponse
 sh ./mvnw spring-boot:run                                 # needs Config Server + PostgreSQL
 ```
 
-Full-stack verification: [infra/README.md#verify-the-stack](../infra/README.md#verify-the-stack).
+Full-stack verification: [infrastructure/README.md](https://github.com/elara-app/infrastructure#readme).
 
 ## Repository map
 
@@ -121,4 +121,4 @@ Full-stack verification: [infra/README.md#verify-the-stack](../infra/README.md#v
 
 - README owns the API contract; AGENTS stays free of duplicated endpoint tables.
 - Update `OpenApiConfig` and `examples/*.json` together with controller changes; flag stale wording instead of copying it.
-- Keep cross-repo facts (ports, routes, Vault path, seed counts) pointing at `infra` and `centralized-configuration` instead of restating them.
+- Keep cross-repo facts (ports, routes, Vault path, seed counts) pointing at `infrastructure` and `centralized-configuration` instead of restating them.
